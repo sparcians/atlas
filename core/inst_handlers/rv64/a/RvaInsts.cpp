@@ -1,4 +1,5 @@
 #include "core/inst_handlers/rv64/a/RvaInsts.hpp"
+#include "core/inst_handlers/rv64/a/inst_helpers.hpp"
 #include "include/ActionTags.hpp"
 #include "core/ActionGroup.hpp"
 
@@ -166,467 +167,239 @@ namespace atlas
                                   nullptr, "sc_w", ActionTags::EXECUTE_TAG));
     }
 
-    ActionGroup* RvaInsts::amoadd_w_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoadd_w_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // WRITE_RD(sext32(MMU.amo<uint32_t>(RS1, [&](uint32_t lhs) { return lhs + RS2; })));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amomaxu_w_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amomaxu_w_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // WRITE_RD(sext32(MMU.amo<uint32_t>(RS1, [&](uint32_t lhs) { return std::max(lhs,
-        // uint32_t(RS2)); })));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
     ActionGroup* RvaInsts::amoadd_d_64_compute_address_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        return nullptr;
+        return compute_address_handler<RV64>(state);
     }
 
     ActionGroup* RvaInsts::amoadd_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // require_rv64;
-        // WRITE_RD(MMU.amo<uint64_t>(RS1, [&](uint64_t lhs) { return lhs + RS2; }));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
+        return amo_handler<RV64, D, std::plus>(state);
     }
 
-    ActionGroup* RvaInsts::amominu_d_64_compute_address_handler(atlas::AtlasState* state)
+    ActionGroup* RvaInsts::amoadd_w_64_compute_address_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        return nullptr;
+        return compute_address_handler<RV64>(state);
     }
 
-    ActionGroup* RvaInsts::amominu_d_64_handler(atlas::AtlasState* state)
+    ActionGroup* RvaInsts::amoadd_w_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // require_rv64;
-        // WRITE_RD(MMU.amo<uint64_t>(RS1, [&](uint64_t lhs) { return std::min(lhs, RS2); }));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amominu_w_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amominu_w_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // WRITE_RD(sext32(MMU.amo<uint32_t>(RS1, [&](uint32_t lhs) { return std::min(lhs,
-        // uint32_t(RS2)); })));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoor_d_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoor_d_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // require_rv64;
-        // WRITE_RD(MMU.amo<uint64_t>(RS1, [&](uint64_t lhs) { return lhs | RS2; }));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoxor_d_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoxor_d_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // require_rv64;
-        // WRITE_RD(MMU.amo<uint64_t>(RS1, [&](uint64_t lhs) { return lhs ^ RS2; }));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoswap_w_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoswap_w_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // WRITE_RD(sext32(MMU.amo<uint32_t>(RS1, [&](uint32_t UNUSED lhs) { return RS2; })));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::lr_d_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::lr_d_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // require_rv64;
-        // WRITE_RD(MMU.load_reserved<int64_t>(RS1));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoor_w_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoor_w_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // WRITE_RD(sext32(MMU.amo<uint32_t>(RS1, [&](uint32_t lhs) { return lhs | RS2; })));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amomaxu_d_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amomaxu_d_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // require_rv64;
-        // WRITE_RD(MMU.amo<uint64_t>(RS1, [&](uint64_t lhs) { return std::max(lhs, RS2); }));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoswap_d_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoswap_d_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // require_rv64;
-        // WRITE_RD(MMU.amo<uint64_t>(RS1, [&](uint64_t UNUSED lhs) { return RS2; }));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amomax_w_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amomax_w_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // WRITE_RD(sext32(MMU.amo<uint32_t>(RS1, [&](int32_t lhs) { return std::max(lhs,
-        // int32_t(RS2)); })));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amomin_d_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amomin_d_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // require_rv64;
-        // WRITE_RD(MMU.amo<uint64_t>(RS1, [&](int64_t lhs) { return std::min(lhs, int64_t(RS2));
-        // }));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoxor_w_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amoxor_w_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // WRITE_RD(sext32(MMU.amo<uint32_t>(RS1, [&](uint32_t lhs) { return lhs ^ RS2; })));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::sc_w_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::sc_w_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-
-        // bool have_reservation = MMU.store_conditional<uint32_t>(RS1, RS2);
-
-        // WRITE_RD(!have_reservation);
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
+        return amo_handler<RV64, W, std::plus>(state);
     }
 
     ActionGroup* RvaInsts::amoand_d_64_compute_address_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        return nullptr;
+        return compute_address_handler<RV64>(state);
     }
 
     ActionGroup* RvaInsts::amoand_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // require_rv64;
-        // WRITE_RD(MMU.amo<uint64_t>(RS1, [&](uint64_t lhs) { return lhs & RS2; }));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amomin_w_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvaInsts::amomin_w_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // WRITE_RD(sext32(MMU.amo<uint32_t>(RS1, [&](int32_t lhs) { return std::min(lhs,
-        // int32_t(RS2)); })));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
+        return amo_handler<RV64, D, std::bit_and>(state);
     }
 
     ActionGroup* RvaInsts::amoand_w_64_compute_address_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        return nullptr;
+        return compute_address_handler<RV64>(state);
     }
 
     ActionGroup* RvaInsts::amoand_w_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // WRITE_RD(sext32(MMU.amo<uint32_t>(RS1, [&](uint32_t lhs) { return lhs & RS2; })));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
+        return amo_handler<RV64, W, std::bit_and>(state);
     }
 
     ActionGroup* RvaInsts::amomax_d_64_compute_address_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        return nullptr;
+        return compute_address_handler<RV64>(state);
     }
 
     ActionGroup* RvaInsts::amomax_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
+        return amo_handler<RV64, D, MaxFunctor, false>(state);
+    }
 
-        // require_extension('A');
-        // require_rv64;
-        // WRITE_RD(MMU.amo<uint64_t>(RS1, [&](int64_t lhs) { return std::max(lhs, int64_t(RS2));
-        // }));
+    ActionGroup* RvaInsts::amomax_w_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
 
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+    ActionGroup* RvaInsts::amomax_w_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, W, MaxFunctor, false>(state);
+    }
+
+    ActionGroup* RvaInsts::amomaxu_d_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amomaxu_d_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, D, MaxFunctor>(state);
+    }
+
+    ActionGroup* RvaInsts::amomaxu_w_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amomaxu_w_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, W, MaxFunctor>(state);
+    }
+
+    ActionGroup* RvaInsts::amomin_d_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amomin_d_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, D, MinFunctor, false>(state);
+    }
+
+    ActionGroup* RvaInsts::amomin_w_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amomin_w_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, W, MinFunctor, false>(state);
+    }
+
+    ActionGroup* RvaInsts::amominu_d_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amominu_d_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, D, MinFunctor>(state);
+    }
+
+    ActionGroup* RvaInsts::amominu_w_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amominu_w_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, W, MinFunctor>(state);
+    }
+
+    ActionGroup* RvaInsts::amoor_d_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amoor_d_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, D, std::bit_or>(state);
+    }
+
+    ActionGroup* RvaInsts::amoor_w_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amoor_w_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, W, std::bit_or>(state);
+    }
+
+    ActionGroup* RvaInsts::amoswap_d_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amoswap_d_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, D, SwapFunctor>(state);
+    }
+
+    ActionGroup* RvaInsts::amoswap_w_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amoswap_w_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, W, SwapFunctor>(state);
+    }
+
+    ActionGroup* RvaInsts::amoxor_d_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amoxor_d_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, D, std::bit_xor>(state);
+    }
+
+    ActionGroup* RvaInsts::amoxor_w_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::amoxor_w_64_handler(atlas::AtlasState* state)
+    {
+        return amo_handler<RV64, W, std::bit_xor>(state);
+    }
+
+    ActionGroup* RvaInsts::lr_d_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::lr_d_64_handler(atlas::AtlasState* state)
+    {
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t paddr = state->getTranslationState()->getTranslationResult().getPaddr();
+        const uint64_t rd_val = state->readMemory<uint64_t>(paddr);
+        inst->getRd()->write(rd_val);
         return nullptr;
     }
 
     ActionGroup* RvaInsts::lr_w_64_compute_address_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        return nullptr;
+        return compute_address_handler<RV64>(state);
     }
 
     ActionGroup* RvaInsts::lr_w_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // WRITE_RD(MMU.load_reserved<int32_t>(RS1));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t paddr = state->getTranslationState()->getTranslationResult().getPaddr();
+        const uint64_t rd_val = signExtend<uint32_t, uint64_t>(state->readMemory<uint32_t>(paddr));
+        inst->getRd()->write(rd_val);
         return nullptr;
     }
 
     ActionGroup* RvaInsts::sc_d_64_compute_address_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        return nullptr;
+        return compute_address_handler<RV64>(state);
     }
 
     ActionGroup* RvaInsts::sc_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('A');
-        // require_rv64;
-
-        // bool have_reservation = MMU.store_conditional<uint64_t>(RS1, RS2);
-
-        // WRITE_RD(!have_reservation);
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs2_val = inst->getRs2()->read();
+        const uint64_t paddr = state->getTranslationState()->getTranslationResult().getPaddr();
+        state->writeMemory<uint64_t>(paddr, rs2_val);
         return nullptr;
     }
 
+    ActionGroup* RvaInsts::sc_w_64_compute_address_handler(atlas::AtlasState* state)
+    {
+        return compute_address_handler<RV64>(state);
+    }
+
+    ActionGroup* RvaInsts::sc_w_64_handler(atlas::AtlasState* state)
+    {
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs2_val = inst->getRs2()->read();
+        const uint64_t paddr = state->getTranslationState()->getTranslationResult().getPaddr();
+        state->writeMemory<uint32_t>(paddr, rs2_val);
+        return nullptr;
+    }
 } // namespace atlas
