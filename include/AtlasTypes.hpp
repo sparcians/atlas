@@ -20,6 +20,8 @@
 #define PT_ENTRIES_SV32 1024 // Sv32 has 1,024 entries in a page table
 #define PT_ENTRIES_SV39 512  // Sv39 has 512 entries in a page table
 
+#define PTE_SIZE 4
+
 namespace atlas
 {
     using Addr = uint64_t;

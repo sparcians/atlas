@@ -32,6 +32,7 @@ namespace atlas
         ILOG("Translating 0x" << std::hex << request.virtual_addr);
 
         // Translation currently not supported, assume VA = PA
+        // TODO: PageTableWalker.pageTableWalk(request.virtual_addr, state);
         translation_state->setTranslationResult(request.virtual_addr, request.size);
 
         // Keep going
