@@ -14,6 +14,7 @@ namespace atlas
       public:
         using base_type = RvzifenceiInsts;
 
+        template <typename XLEN>
         static void getInstHandlers(std::map<std::string, Action> & inst_handlers);
 
       private:

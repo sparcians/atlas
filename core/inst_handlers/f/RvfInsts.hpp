@@ -14,7 +14,9 @@ namespace atlas
       public:
         using base_type = RvfInsts;
 
+        template <typename XLEN>
         static void getInstComputeAddressHandlers(std::map<std::string, Action> & inst_handlers);
+        template <typename XLEN>
         static void getInstHandlers(std::map<std::string, Action> & inst_handlers);
 
       private:

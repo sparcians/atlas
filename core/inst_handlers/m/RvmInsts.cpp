@@ -1,4 +1,4 @@
-#include "core/inst_handlers/rv64/m/RvmInsts.hpp"
+#include "core/inst_handlers/m/RvmInsts.hpp"
 #include "core/inst_handlers/inst_helpers.hpp"
 #include "include/ActionTags.hpp"
 #include "core/ActionGroup.hpp"
@@ -7,48 +7,60 @@
 
 namespace atlas
 {
+    template <typename XLEN>
     void RvmInsts::getInstHandlers(std::map<std::string, Action> & inst_handlers)
     {
-        inst_handlers.emplace("div",
-                              atlas::Action::createAction<&RvmInsts::div_64_handler, RvmInsts>(
-                                  nullptr, "div", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("divu",
-                              atlas::Action::createAction<&RvmInsts::divu_64_handler, RvmInsts>(
-                                  nullptr, "divu", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("divuw",
-                              atlas::Action::createAction<&RvmInsts::divuw_64_handler, RvmInsts>(
-                                  nullptr, "divuw", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("divw",
-                              atlas::Action::createAction<&RvmInsts::divw_64_handler, RvmInsts>(
-                                  nullptr, "divw", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("mul",
-                              atlas::Action::createAction<&RvmInsts::mul_64_handler, RvmInsts>(
-                                  nullptr, "mul", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("mulh",
-                              atlas::Action::createAction<&RvmInsts::mulh_64_handler, RvmInsts>(
-                                  nullptr, "mulh", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("mulhsu",
-                              atlas::Action::createAction<&RvmInsts::mulhsu_64_handler, RvmInsts>(
-                                  nullptr, "mulhsu", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("mulhu",
-                              atlas::Action::createAction<&RvmInsts::mulhu_64_handler, RvmInsts>(
-                                  nullptr, "mulhu", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("mulw",
-                              atlas::Action::createAction<&RvmInsts::mulw_64_handler, RvmInsts>(
-                                  nullptr, "mulw", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("rem",
-                              atlas::Action::createAction<&RvmInsts::rem_64_handler, RvmInsts>(
-                                  nullptr, "rem", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("remu",
-                              atlas::Action::createAction<&RvmInsts::remu_64_handler, RvmInsts>(
-                                  nullptr, "remu", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("remuw",
-                              atlas::Action::createAction<&RvmInsts::remuw_64_handler, RvmInsts>(
-                                  nullptr, "remuw", ActionTags::EXECUTE_TAG));
-        inst_handlers.emplace("remw",
-                              atlas::Action::createAction<&RvmInsts::remw_64_handler, RvmInsts>(
-                                  nullptr, "remw", ActionTags::EXECUTE_TAG));
+        static_assert(std::is_same_v<XLEN, RV64> || std::is_same<XLEN, RV32>::value);
+        if constexpr (std::is_same_v<XLEN, RV64>)
+        {
+            inst_handlers.emplace("div",
+                                  atlas::Action::createAction<&RvmInsts::div_64_handler, RvmInsts>(
+                                      nullptr, "div", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace("divu",
+                                  atlas::Action::createAction<&RvmInsts::divu_64_handler, RvmInsts>(
+                                      nullptr, "divu", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace(
+                "divuw", atlas::Action::createAction<&RvmInsts::divuw_64_handler, RvmInsts>(
+                             nullptr, "divuw", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace("divw",
+                                  atlas::Action::createAction<&RvmInsts::divw_64_handler, RvmInsts>(
+                                      nullptr, "divw", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace("mul",
+                                  atlas::Action::createAction<&RvmInsts::mul_64_handler, RvmInsts>(
+                                      nullptr, "mul", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace("mulh",
+                                  atlas::Action::createAction<&RvmInsts::mulh_64_handler, RvmInsts>(
+                                      nullptr, "mulh", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace(
+                "mulhsu", atlas::Action::createAction<&RvmInsts::mulhsu_64_handler, RvmInsts>(
+                              nullptr, "mulhsu", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace(
+                "mulhu", atlas::Action::createAction<&RvmInsts::mulhu_64_handler, RvmInsts>(
+                             nullptr, "mulhu", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace("mulw",
+                                  atlas::Action::createAction<&RvmInsts::mulw_64_handler, RvmInsts>(
+                                      nullptr, "mulw", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace("rem",
+                                  atlas::Action::createAction<&RvmInsts::rem_64_handler, RvmInsts>(
+                                      nullptr, "rem", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace("remu",
+                                  atlas::Action::createAction<&RvmInsts::remu_64_handler, RvmInsts>(
+                                      nullptr, "remu", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace(
+                "remuw", atlas::Action::createAction<&RvmInsts::remuw_64_handler, RvmInsts>(
+                             nullptr, "remuw", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace("remw",
+                                  atlas::Action::createAction<&RvmInsts::remw_64_handler, RvmInsts>(
+                                      nullptr, "remw", ActionTags::EXECUTE_TAG));
+        }
+        else if constexpr (std::is_same_v<XLEN, RV32>)
+        {
+            sparta_assert(false, "RV32 is not supported yet!");
+        }
     }
+
+    template void RvmInsts::getInstHandlers<RV32>(std::map<std::string, Action> &);
+    template void RvmInsts::getInstHandlers<RV64>(std::map<std::string, Action> &);
 
     ActionGroup* RvmInsts::div_64_handler(atlas::AtlasState* state)
     {
