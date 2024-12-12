@@ -44,7 +44,12 @@ namespace atlas{
     // }
 
     template <MMUMode Mode> bool PageTable<Mode>::isValidIndex(uint32_t idx){
-        return ((idx > baseAddressOfpageTable) && (idx <= (max_entries + baseAddressOfpageTable)));
+        uint32_t pte_size;
+        if(Mode == MMUMode::SV32)
+            pte_size = sizeof(RV32);
+        else if (Mode == MMUMode::SV39)
+            pte_size = sizeof(RV64);
+        return ((idx >= baseAddressOfpageTable) && (idx < ((max_entries * pte_size) + baseAddressOfpageTable)));
     }
 
 
