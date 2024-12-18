@@ -2,7 +2,8 @@
 
 #include "sparta/app/CommandLineSimulator.hpp"
 
-const char USAGE[] = "TODO"
+const char USAGE[] = "Usage:\n"
+                     "./atlas [-i inst limit] <workload>"
                      "\n";
 
 int main(int argc, char** argv)
@@ -49,28 +50,29 @@ int main(int argc, char** argv)
             return err_code; // Any errors already printed to cerr
         }
 
-        if (workload.empty())
-        {
-            std::cerr << "ERROR: Missing a workload to run. Provide an ELF or JSON to run"
-                      << std::endl;
-            std::cerr << USAGE;
-            return -1;
-        }
-
         // Create the simulator
         sparta::Scheduler scheduler;
         atlas::AtlasSim sim(&scheduler, workload, ilimit);
 
         cls.populateSimulation(&sim);
 
-        cls.runSimulator(&sim);
+        if (workload.empty() == false)
+        {
+            cls.runSimulator(&sim);
 
-        cls.postProcess(&sim);
+	    cls.postProcess(&sim);
 
-        // Get workload exit code
-        const atlas::AtlasState::SimState* sim_state = sim.getAtlasState()->getSimState();
-        exit_code = sim_state->workload_exit_code;
-        std::cout << "Workload exit code: " << std::dec << exit_code << std::endl;
+	    // Get workload exit code
+            const atlas::AtlasState::SimState* sim_state = sim.getAtlasState()->getSimState();
+            exit_code = sim_state->workload_exit_code;
+            std::cout << "Workload exit code: " << std::dec << exit_code << std::endl;
+        }
+	else
+        {
+	    std::cout << "ERROR: Missing a workload to run. Provide an ELF or JSON to run" << std::endl;
+            std::cout << USAGE;
+	    return 0;
+	}
     }
     catch (...)
     {
