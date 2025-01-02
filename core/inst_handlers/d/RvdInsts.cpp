@@ -1,6 +1,11 @@
 #include "core/inst_handlers/d/RvdInsts.hpp"
+#include "core/inst_handlers/f/inst_helpers.hpp"
 #include "include/ActionTags.hpp"
 #include "core/ActionGroup.hpp"
+extern "C"
+{
+#include "source/include/softfloat.h"
+}
 
 namespace atlas
 {
@@ -15,17 +20,9 @@ namespace atlas
                 atlas::Action::createAction<&RvdInsts::fld_64_compute_address_handler, RvdInsts>(
                     nullptr, "fld", ActionTags::COMPUTE_ADDR_TAG));
             inst_handlers.emplace(
-                "flw",
-                atlas::Action::createAction<&RvdInsts::flw_64_compute_address_handler, RvdInsts>(
-                    nullptr, "flw", ActionTags::COMPUTE_ADDR_TAG));
-            inst_handlers.emplace(
                 "fsd",
                 atlas::Action::createAction<&RvdInsts::fsd_64_compute_address_handler, RvdInsts>(
                     nullptr, "fsd", ActionTags::COMPUTE_ADDR_TAG));
-            inst_handlers.emplace(
-                "fsw",
-                atlas::Action::createAction<&RvdInsts::fsw_64_compute_address_handler, RvdInsts>(
-                    nullptr, "fsw", ActionTags::COMPUTE_ADDR_TAG));
         }
         else if constexpr (std::is_same_v<XLEN, RV32>)
         {
@@ -91,9 +88,6 @@ namespace atlas
             inst_handlers.emplace(
                 "flt.d", atlas::Action::createAction<&RvdInsts::flt_d_64_handler, RvdInsts>(
                              nullptr, "flt_d", ActionTags::EXECUTE_TAG));
-            inst_handlers.emplace("flw",
-                                  atlas::Action::createAction<&RvdInsts::flw_64_handler, RvdInsts>(
-                                      nullptr, "flw", ActionTags::EXECUTE_TAG));
             inst_handlers.emplace(
                 "fmadd.d", atlas::Action::createAction<&RvdInsts::fmadd_d_64_handler, RvdInsts>(
                                nullptr, "fmadd_d", ActionTags::EXECUTE_TAG));
@@ -113,14 +107,8 @@ namespace atlas
                 "fmv.d.x", atlas::Action::createAction<&RvdInsts::fmv_d_x_64_handler, RvdInsts>(
                                nullptr, "fmv_d_x", ActionTags::EXECUTE_TAG));
             inst_handlers.emplace(
-                "fmv.w.x", atlas::Action::createAction<&RvdInsts::fmv_w_x_64_handler, RvdInsts>(
-                               nullptr, "fmv_w_x", ActionTags::EXECUTE_TAG));
-            inst_handlers.emplace(
                 "fmv.x.d", atlas::Action::createAction<&RvdInsts::fmv_x_d_64_handler, RvdInsts>(
                                nullptr, "fmv_x_d", ActionTags::EXECUTE_TAG));
-            inst_handlers.emplace(
-                "fmv.x.w", atlas::Action::createAction<&RvdInsts::fmv_x_w_64_handler, RvdInsts>(
-                               nullptr, "fmv_x_w", ActionTags::EXECUTE_TAG));
             inst_handlers.emplace(
                 "fnmadd.d", atlas::Action::createAction<&RvdInsts::fnmadd_d_64_handler, RvdInsts>(
                                 nullptr, "fnmadd_d", ActionTags::EXECUTE_TAG));
@@ -145,9 +133,6 @@ namespace atlas
             inst_handlers.emplace(
                 "fsub.d", atlas::Action::createAction<&RvdInsts::fsub_d_64_handler, RvdInsts>(
                               nullptr, "fsub_d", ActionTags::EXECUTE_TAG));
-            inst_handlers.emplace("fsw",
-                                  atlas::Action::createAction<&RvdInsts::fsw_64_handler, RvdInsts>(
-                                      nullptr, "fsw", ActionTags::EXECUTE_TAG));
         }
         else if constexpr (std::is_same_v<XLEN, RV32>)
         {
@@ -162,381 +147,174 @@ namespace atlas
 
     ActionGroup* RvdInsts::fcvt_d_w_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(i32_to_f64((int32_t)RS1));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint32_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(i32_to_f64(rs1_val).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fsub_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(f64_sub(FRS1_D, FRS2_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        softfloat_roundingMode = getRM(inst);
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_sub(float64_t{rs1_val}, float64_t{rs2_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fmv_x_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('D');
-        // require_rv64;
-        // require_fp;
-        // WRITE_RD(FRS1.v[0]);
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(rs1_val);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fcvt_wu_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_RD(sext32(f64_to_ui32(FRS1_D, RM, true)));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_to_ui32(float64_t{rs1_val}, getRM(inst), true));
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fnmsub_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(f64_mulAdd(f64(FRS1_D.v ^ F64_SIGN), FRS2_D, FRS3_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        softfloat_roundingMode = getRM(inst);
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        const uint64_t rs3_val = inst->getRs3()->dmiRead<uint64_t>();
+        const uint64_t product = f64_mul(float64_t{rs1_val}, float64_t{rs2_val}).v;
+        inst->getRd()->write(f64_add(float64_t{product ^ 1UL << 63}, float64_t{rs3_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fle_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // WRITE_RD(f64_le(FRS1_D, FRS2_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_le(float64_t{rs1_val}, float64_t{rs2_val}));
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fmul_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(f64_mul(FRS1_D, FRS2_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        softfloat_roundingMode = getRM(inst);
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_mul(float64_t{rs1_val}, float64_t{rs2_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fsqrt_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(f64_sqrt(FRS1_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        softfloat_roundingMode = getRM(inst);
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_sqrt(float64_t{rs1_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fmadd_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(f64_mulAdd(FRS1_D, FRS2_D, FRS3_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        softfloat_roundingMode = getRM(inst);
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        const uint64_t rs3_val = inst->getRs3()->dmiRead<uint64_t>();
+        inst->getRd()->write(
+            f64_add(f64_mul(float64_t{rs1_val}, float64_t{rs2_val}), float64_t{rs3_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fnmadd_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(f64_mulAdd(f64(FRS1_D.v ^ F64_SIGN), FRS2_D, f64(FRS3_D.v ^ F64_SIGN)));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvdInsts::fmv_w_x_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('F');
-        // require_fp;
-        // WRITE_FRD(f32(RS1));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        softfloat_roundingMode = getRM(inst);
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        const uint64_t rs3_val = inst->getRs3()->dmiRead<uint64_t>();
+        const uint64_t product = f64_mul(float64_t{rs1_val}, float64_t{rs2_val}).v;
+        inst->getRd()->write(f64_sub(float64_t{product ^ 1UL << 63}, float64_t{rs3_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fmin_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // bool less = f64_lt_quiet(FRS1_D, FRS2_D) ||
-        //                         (f64_eq(FRS1_D, FRS2_D) && (FRS1_D.v & F64_SIGN));
-        // if (isNaNF64UI(FRS1_D.v) && isNaNF64UI(FRS2_D.v))
-        //     WRITE_FRD_D(f64(defaultNaNF64UI));
-        // else
-        //     WRITE_FRD_D((less || isNaNF64UI(FRS2_D.v) ? FRS1_D : FRS2_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_le_quiet(float64_t{rs1_val}, float64_t{rs2_val}) ? rs1_val
+                                                                                  : rs2_val);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fdiv_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(f64_div(FRS1_D, FRS2_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        softfloat_roundingMode = getRM(inst);
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_div(float64_t{rs1_val}, float64_t{rs2_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fld_64_compute_address_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        return nullptr;
+        return compute_address_handler<RV64>(state);
     }
 
     ActionGroup* RvdInsts::fld_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('D');
-        // require_fp;
-        // WRITE_FRD(f64(MMU.load<uint64_t>(RS1 + insn.i_imm())));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvdInsts::fsw_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvdInsts::fsw_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('F');
-        // require_fp;
-        // MMU.store<uint32_t>(RS1 + insn.s_imm(), FRS2.v[0]);
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvdInsts::fmv_x_w_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('F');
-        // require_fp;
-        // WRITE_RD(sext32(FRS1.v[0]));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
+        return float_ls_handler<RV64, D>(state, true);
     }
 
     ActionGroup* RvdInsts::fsgnjx_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // WRITE_FRD_D(fsgnj64(freg(FRS1_D), freg(FRS2_D), false, true));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
-    }
-
-    ActionGroup* RvdInsts::flw_64_compute_address_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        return nullptr;
-    }
-
-    ActionGroup* RvdInsts::flw_64_handler(atlas::AtlasState* state)
-    {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('F');
-        // require_fp;
-        // WRITE_FRD(f32(MMU.load<uint32_t>(RS1 + insn.i_imm())));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        const uint64_t sign_mask = 1UL << 63;
+        inst->getRd()->write((rs1_val & ~sign_mask) | ((rs1_val ^ rs2_val) & sign_mask));
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fmv_d_x_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('D');
-        // require_rv64;
-        // require_fp;
-        // WRITE_FRD(f64(RS1));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(rs1_val);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fcvt_w_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_RD(sext32(f64_to_i32(FRS1_D, RM, true)));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(
+            signExtend<int32_t, int64_t>(f64_to_i32(float64_t{rs1_val}, getRM(inst), true)));
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fcvt_lu_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_rv64;
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_RD(f64_to_ui64(FRS1_D, RM, true));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_to_ui64(float64_t{rs1_val}, getRM(inst), true));
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fsgnjn_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // WRITE_FRD_D(fsgnj64(freg(FRS1_D), freg(FRS2_D), true, false));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        const uint64_t sign_mask = 1UL << 63;
+        inst->getRd()->write((rs1_val & ~sign_mask) | ((rs2_val & sign_mask) ^ sign_mask));
         return nullptr;
     }
 
@@ -557,229 +335,119 @@ namespace atlas
 
     ActionGroup* RvdInsts::fadd_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(f64_add(FRS1_D, FRS2_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        softfloat_roundingMode = getRM(inst);
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_add(float64_t{rs1_val}, float64_t{rs2_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fmsub_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(f64_mulAdd(FRS1_D, FRS2_D, f64(FRS3_D.v ^ F64_SIGN)));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        softfloat_roundingMode = getRM(inst);
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        const uint64_t rs3_val = inst->getRs3()->dmiRead<uint64_t>();
+        inst->getRd()->write(
+            f64_sub(f64_mul(float64_t{rs1_val}, float64_t{rs2_val}), float64_t{rs3_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fcvt_d_s_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(f32_to_f64(FRS1_F));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint32_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(f32_to_f64(float32_t{rs1_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fsd_64_compute_address_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        return nullptr;
+        return compute_address_handler<RV64>(state);
     }
 
     ActionGroup* RvdInsts::fsd_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_extension('D');
-        // require_fp;
-        // MMU.store<uint64_t>(RS1 + insn.s_imm(), FRS2.v[0]);
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
-        return nullptr;
+        return float_ls_handler<RV64, D>(state, false);
     }
 
     ActionGroup* RvdInsts::fmax_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // bool greater = f64_lt_quiet(FRS2_D, FRS1_D) ||
-        //                             (f64_eq(FRS2_D, FRS1_D) && (FRS2_D.v & F64_SIGN));
-        // if (isNaNF64UI(FRS1_D.v) && isNaNF64UI(FRS2_D.v))
-        //     WRITE_FRD_D(f64(defaultNaNF64UI));
-        // else
-        //     WRITE_FRD_D((greater || isNaNF64UI(FRS2_D.v) ? FRS1_D : FRS2_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_le_quiet(float64_t{rs1_val}, float64_t{rs2_val}) ? rs2_val
+                                                                                  : rs1_val);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fcvt_s_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_F(f64_to_f32(FRS1_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_to_f32(float64_t{rs1_val}).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fcvt_d_lu_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_rv64;
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(ui64_to_f64(RS1));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(ui64_to_f64(rs1_val).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::feq_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // WRITE_RD(f64_eq(FRS1_D, FRS2_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_eq(float64_t{rs1_val}, float64_t{rs2_val}));
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fsgnj_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // WRITE_FRD_D(fsgnj64(freg(FRS1_D), freg(FRS2_D), false, false));
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        const uint64_t sign_mask = 1UL << 63;
+        inst->getRd()->write((rs1_val & ~sign_mask) | ((rs1_val ^ rs2_val) & sign_mask));
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fcvt_d_l_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_rv64;
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(i64_to_f64(RS1));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(i64_to_f64(rs1_val).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fcvt_d_wu_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_FRD_D(ui32_to_f64((uint32_t)RS1));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint32_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(ui32_to_f64(rs1_val).v);
         return nullptr;
     }
 
     ActionGroup* RvdInsts::flt_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_fp;
-        // WRITE_RD(f64_lt(FRS1_D, FRS2_D));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_lt(float64_t{rs1_val}, float64_t{rs2_val}));
         return nullptr;
     }
 
     ActionGroup* RvdInsts::fcvt_l_d_64_handler(atlas::AtlasState* state)
     {
-        (void)state;
-        ///////////////////////////////////////////////////////////////////////
-        // START OF SPIKE CODE
-
-        // require_either_extension('D', EXT_ZDINX);
-        // require_rv64;
-        // require_fp;
-        // softfloat_roundingMode = RM;
-        // WRITE_RD(f64_to_i64(FRS1_D, RM, true));
-        // set_fp_exceptions;
-
-        // END OF SPIKE CODE
-        ///////////////////////////////////////////////////////////////////////
+        const AtlasInstPtr & inst = state->getCurrentInst();
+        const uint64_t rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        inst->getRd()->write(f64_to_i64(float64_t{rs1_val}, getRM(inst), true));
         return nullptr;
     }
 
