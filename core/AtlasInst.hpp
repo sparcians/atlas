@@ -54,6 +54,11 @@ namespace atlas
 
         uint32_t getOpcodeSize() const { return opcode_size_; }
 
+        uint64_t getRM() const
+        {
+            return opcode_info_->getSpecialField(mavis::OpcodeInfo::SpecialField::RM);
+        }
+
         sparta::Register* getRs1()
         {
             sparta_assert(rs1_, "Operand RS1 is a nullptr! " << *this);
@@ -66,6 +71,12 @@ namespace atlas
             return rs2_;
         }
 
+        sparta::Register* getRs3()
+        {
+            sparta_assert(rs3_, "Operand RS3 is a nullptr! " << *this);
+            return rs3_;
+        }
+
         sparta::Register* getRd()
         {
             sparta_assert(rd_, "Operand RD is a nullptr! " << *this);
@@ -75,6 +86,8 @@ namespace atlas
         bool hasRs1() const { return rs1_ != nullptr; }
 
         bool hasRs2() const { return rs2_ != nullptr; }
+
+        bool hasRs3() const { return rs3_ != nullptr; }
 
         bool hasRd() const { return rd_ != nullptr; }
 
@@ -98,6 +111,7 @@ namespace atlas
         // Registers
         sparta::Register* rs1_;
         sparta::Register* rs2_;
+        sparta::Register* rs3_;
         sparta::Register* rd_;
 
         ActionGroup inst_action_group_;

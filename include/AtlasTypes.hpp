@@ -33,6 +33,9 @@ namespace atlas
     using RV32 = uint32_t;
     using RV64 = uint64_t;
 
+    using SP = uint32_t; // Single Precision
+    using DP = uint64_t; // Double Precision
+
     enum class InstType
     {
         SCALAR,         //! Scalar (integer)
