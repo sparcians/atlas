@@ -17,193 +17,226 @@ namespace atlas
         if constexpr (std::is_same_v<XLEN, RV64>)
         {
             inst_handlers.emplace(
-                "csrrc", atlas::Action::createAction<&RvzicsrInsts::csrrc_64_handler, RvzicsrInsts>(
-                             nullptr, "csrrc", ActionTags::EXECUTE_TAG));
+                "csrrc",
+                atlas::Action::createAction<&RvzicsrInsts::csrrc_handler<RV64>, RvzicsrInsts>(
+                    nullptr, "csrrc", ActionTags::EXECUTE_TAG));
             inst_handlers.emplace(
                 "csrrci",
-                atlas::Action::createAction<&RvzicsrInsts::csrrci_64_handler, RvzicsrInsts>(
+                atlas::Action::createAction<&RvzicsrInsts::csrrci_handler<RV64>, RvzicsrInsts>(
                     nullptr, "csrrci", ActionTags::EXECUTE_TAG));
             inst_handlers.emplace(
-                "csrrs", atlas::Action::createAction<&RvzicsrInsts::csrrs_64_handler, RvzicsrInsts>(
-                             nullptr, "csrrs", ActionTags::EXECUTE_TAG));
+                "csrrs",
+                atlas::Action::createAction<&RvzicsrInsts::csrrs_handler<RV64>, RvzicsrInsts>(
+                    nullptr, "csrrs", ActionTags::EXECUTE_TAG));
             inst_handlers.emplace(
                 "csrrsi",
-                atlas::Action::createAction<&RvzicsrInsts::csrrsi_64_handler, RvzicsrInsts>(
+                atlas::Action::createAction<&RvzicsrInsts::csrrsi_handler<RV64>, RvzicsrInsts>(
                     nullptr, "csrrsi", ActionTags::EXECUTE_TAG));
             inst_handlers.emplace(
-                "csrrw", atlas::Action::createAction<&RvzicsrInsts::csrrw_64_handler, RvzicsrInsts>(
-                             nullptr, "csrrw", ActionTags::EXECUTE_TAG));
+                "csrrw",
+                atlas::Action::createAction<&RvzicsrInsts::csrrw_handler<RV64>, RvzicsrInsts>(
+                    nullptr, "csrrw", ActionTags::EXECUTE_TAG));
             inst_handlers.emplace(
                 "csrrwi",
-                atlas::Action::createAction<&RvzicsrInsts::csrrwi_64_handler, RvzicsrInsts>(
+                atlas::Action::createAction<&RvzicsrInsts::csrrwi_handler<RV64>, RvzicsrInsts>(
                     nullptr, "csrrwi", ActionTags::EXECUTE_TAG));
         }
         else if constexpr (std::is_same_v<XLEN, RV32>)
         {
-            sparta_assert(false, "RV32 is not supported yet!");
+            inst_handlers.emplace(
+                "csrrc",
+                atlas::Action::createAction<&RvzicsrInsts::csrrc_handler<RV32>, RvzicsrInsts>(
+                    nullptr, "csrrc", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace(
+                "csrrci",
+                atlas::Action::createAction<&RvzicsrInsts::csrrci_handler<RV32>, RvzicsrInsts>(
+                    nullptr, "csrrci", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace(
+                "csrrs",
+                atlas::Action::createAction<&RvzicsrInsts::csrrs_handler<RV32>, RvzicsrInsts>(
+                    nullptr, "csrrs", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace(
+                "csrrsi",
+                atlas::Action::createAction<&RvzicsrInsts::csrrsi_handler<RV32>, RvzicsrInsts>(
+                    nullptr, "csrrsi", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace(
+                "csrrw",
+                atlas::Action::createAction<&RvzicsrInsts::csrrw_handler<RV32>, RvzicsrInsts>(
+                    nullptr, "csrrw", ActionTags::EXECUTE_TAG));
+            inst_handlers.emplace(
+                "csrrwi",
+                atlas::Action::createAction<&RvzicsrInsts::csrrwi_handler<RV32>, RvzicsrInsts>(
+                    nullptr, "csrrwi", ActionTags::EXECUTE_TAG));
         }
     }
 
     template void RvzicsrInsts::getInstHandlers<RV32>(std::map<std::string, Action> &);
     template void RvzicsrInsts::getInstHandlers<RV64>(std::map<std::string, Action> &);
 
-    ActionGroup* RvzicsrInsts::csrrs_64_handler(atlas::AtlasState* state)
+    template <typename XLEN> ActionGroup* RvzicsrInsts::csrrc_handler(atlas::AtlasState* state)
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const auto & rs1 = insn->getRs1();
-        const auto rs1_val = rs1->dmiRead<uint64_t>();
-        const auto write = rs1_val != 0;
-
-        const int csr =
+        const auto rs1 = insn->getRs1();
+        auto rd = insn->getRd();
+        const uint32_t csr =
             insn->getMavisOpcodeInfo()->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
 
-        auto reg = state->getCsrRegister(csr);
-        if (!reg)
+        auto csr_reg = state->getCsrRegister(csr);
+        if (!csr_reg)
         {
             THROW_ILLEGAL_INSTRUCTION;
         }
 
-        const reg_t old = reg->dmiRead<uint64_t>();
-
-        if (write)
+        const XLEN csr_val = READ_CSR_REG(csr);
+        // Don't wqrite CSR is rs1=x0
+        if (rs1 != 0)
         {
-            reg->write(old | rs1_val); // dmiWrite?
+            // rs1 value is treated as a bit mask to clear bits
+            const XLEN rs1_val = READ_INT_REG(rs1);
+            WRITE_CSR_REG(csr, (~rs1_val & csr_val));
         }
 
-        const auto rd_val = sext(old, state->getXlen());
-        insn->getRd()->write(rd_val); // dmiWrite?
+        WRITE_INT_REG(rd, csr_val);
 
         return nullptr;
     }
 
-    ActionGroup* RvzicsrInsts::csrrc_64_handler(atlas::AtlasState* state)
+    template <typename XLEN> ActionGroup* RvzicsrInsts::csrrci_handler(atlas::AtlasState* state)
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const auto & rs1 = insn->getRs1();
-        const auto rs1_val = rs1->dmiRead<uint64_t>();
-        const auto write = rs1_val != 0;
-
+        const XLEN imm = insn->getImmediate();
+        const auto & rd = insn->getRd();
         const int csr =
             insn->getMavisOpcodeInfo()->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
 
-        auto reg = state->getCsrRegister(csr);
-        if (!reg)
+        auto csr_reg = state->getCsrRegister(csr);
+        if (!csr_reg)
         {
             THROW_ILLEGAL_INSTRUCTION;
         }
 
-        const reg_t old = reg->dmiRead<uint64_t>();
-        if (write)
-        {
-            reg->write(old & ~rs1_val); // dmiWrite?
-        }
-
-        const auto rd_val = sext(old, state->getXlen());
-        insn->getRd()->write(rd_val); // dmiWrite?
-
-        return nullptr;
-    }
-
-    ActionGroup* RvzicsrInsts::csrrwi_64_handler(atlas::AtlasState* state)
-    {
-        const AtlasInstPtr & insn = state->getCurrentInst();
-
-        const int csr =
-            insn->getMavisOpcodeInfo()->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
-
-        auto reg = state->getCsrRegister(csr);
-        if (!reg)
-        {
-            THROW_ILLEGAL_INSTRUCTION;
-        }
-
-        const reg_t old = reg->dmiRead<uint64_t>();
-        const uint64_t imm = insn->getSignExtendedImmediate<RV64, 5>();
-        reg->write(imm); // dmiWrite?
-
-        const auto rd_val = sext(old, state->getXlen());
-        insn->getRd()->write(rd_val); // dmiWrite?
-
-        return nullptr;
-    }
-
-    ActionGroup* RvzicsrInsts::csrrw_64_handler(atlas::AtlasState* state)
-    {
-        const AtlasInstPtr & insn = state->getCurrentInst();
-
-        const int csr =
-            insn->getMavisOpcodeInfo()->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
-
-        const auto & rs1 = insn->getRs1();
-        const auto rs1_val = rs1->dmiRead<uint64_t>();
-
-        auto reg = state->getCsrRegister(csr);
-        if (!reg)
-        {
-            THROW_ILLEGAL_INSTRUCTION;
-        }
-
-        const reg_t old = reg->dmiRead<uint64_t>();
-        reg->write(old | rs1_val); // dmiWrite?
-
-        const auto rd_val = sext(old, state->getXlen());
-        insn->getRd()->write(rd_val); // dmiWrite?
-
-        return nullptr;
-    }
-
-    ActionGroup* RvzicsrInsts::csrrsi_64_handler(atlas::AtlasState* state)
-    {
-        const AtlasInstPtr & insn = state->getCurrentInst();
-
-        const int csr =
-            insn->getMavisOpcodeInfo()->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
-
-        auto reg = state->getCsrRegister(csr);
-        if (!reg)
-        {
-            THROW_ILLEGAL_INSTRUCTION;
-        }
-
-        const reg_t old = reg->dmiRead<uint64_t>();
-        const uint64_t imm = insn->getSignExtendedImmediate<RV64, 5>();
+        const XLEN csr_val = READ_CSR_REG(csr);
         if (imm)
         {
-            reg->write(old | imm); // dmiWrite?
+            WRITE_CSR_REG(csr, (~imm & csr_val));
         }
 
-        const auto rd_val = sext(old, state->getXlen());
-        insn->getRd()->write(rd_val); // dmiWrite?
+        WRITE_INT_REG(rd, csr_val);
 
         return nullptr;
     }
 
-    ActionGroup* RvzicsrInsts::csrrci_64_handler(atlas::AtlasState* state)
+    template <typename XLEN> ActionGroup* RvzicsrInsts::csrrs_handler(atlas::AtlasState* state)
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
+        const auto & rs1 = insn->getRs1();
+        const auto & rd = insn->getRd();
         const int csr =
             insn->getMavisOpcodeInfo()->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
 
-        auto reg = state->getCsrRegister(csr);
-        if (!reg)
+        auto csr_reg = state->getCsrRegister(csr);
+        if (!csr_reg)
         {
             THROW_ILLEGAL_INSTRUCTION;
         }
 
-        const reg_t old = reg->dmiRead<uint64_t>();
-        const uint64_t imm = insn->getSignExtendedImmediate<RV64, 5>();
-        if (imm)
+        const XLEN csr_val = READ_CSR_REG(csr);
+        if (rs1 != 0)
         {
-            reg->write(old & ~imm); // dmiWrite?
+            // rs1 value is treated as a bit mask to set bits
+            const XLEN rs1_val = READ_INT_REG(rs1);
+            WRITE_CSR_REG(csr, (rs1_val | csr_val));
         }
 
-        const auto rd_val = sext(old, state->getXlen());
-        insn->getRd()->write(rd_val); // dmiWrite?
+        WRITE_INT_REG(rd, csr_val);
 
         return nullptr;
     }
 
+    template <typename XLEN> ActionGroup* RvzicsrInsts::csrrsi_handler(atlas::AtlasState* state)
+    {
+        const AtlasInstPtr & insn = state->getCurrentInst();
+
+        const XLEN imm = insn->getImmediate();
+        const auto & rd = insn->getRd();
+        const int csr =
+            insn->getMavisOpcodeInfo()->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
+
+        auto csr_reg = state->getCsrRegister(csr);
+        if (!csr_reg)
+        {
+            THROW_ILLEGAL_INSTRUCTION;
+        }
+
+        const XLEN csr_val = READ_CSR_REG(csr);
+        if (imm)
+        {
+            // imm value is treated as a bit mask
+            WRITE_CSR_REG(csr, (imm | csr_val));
+        }
+
+        WRITE_INT_REG(rd, csr_val);
+
+        return nullptr;
+    }
+
+    template <typename XLEN> ActionGroup* RvzicsrInsts::csrrw_handler(atlas::AtlasState* state)
+    {
+        const AtlasInstPtr & insn = state->getCurrentInst();
+
+        const auto & rs1 = insn->getRs1();
+        const auto & rd = insn->getRd();
+        const int csr =
+            insn->getMavisOpcodeInfo()->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
+
+        auto csr_reg = state->getCsrRegister(csr);
+        if (!csr_reg)
+        {
+            THROW_ILLEGAL_INSTRUCTION;
+        }
+
+        const XLEN rs1_val = READ_INT_REG(rs1);
+        // Only read CSR if rd!=x0
+        if (rd != 0)
+        {
+            const XLEN csr_val = zext(READ_CSR_REG(csr), state->getXlen());
+            // TODO: Use macro to avoid writing to x0
+            WRITE_INT_REG(rd, csr_val);
+        }
+
+        WRITE_CSR_REG(csr, rs1_val);
+
+        return nullptr;
+    }
+
+    template <typename XLEN> ActionGroup* RvzicsrInsts::csrrwi_handler(atlas::AtlasState* state)
+    {
+        const AtlasInstPtr & insn = state->getCurrentInst();
+
+        const XLEN imm = insn->getImmediate();
+        const auto & rd = insn->getRd();
+        const int csr =
+            insn->getMavisOpcodeInfo()->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
+
+        auto csr_reg = state->getCsrRegister(csr);
+        if (!csr_reg)
+        {
+            THROW_ILLEGAL_INSTRUCTION;
+        }
+
+        // Only read CSR if rd!=x0
+        if (rd != 0)
+        {
+            const XLEN csr_val = zext(READ_CSR_REG(csr), state->getXlen());
+            // TODO: Use macro to avoid writing to x0
+            WRITE_INT_REG(rd, csr_val);
+        }
+
+        WRITE_CSR_REG(csr, imm);
+
+        return nullptr;
+    }
 } // namespace atlas

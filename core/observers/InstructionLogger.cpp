@@ -24,29 +24,46 @@ namespace atlas
 
         pc_ = state->getPc();
         AtlasInstPtr inst = state->getCurrentInst();
-        opcode_ = inst->getOpcode();
-
-        // Get value of source registers
-        if (inst->hasRs1())
+        if (inst)
         {
-            const auto rs1 = inst->getRs1();
-            const std::vector<uint8_t> value = convertToByteVector(rs1->dmiRead<uint64_t>());
-            src_regs_.emplace_back(getRegId(rs1), value);
-        }
+            opcode_ = inst->getOpcode();
 
-        if (inst->hasRs2())
-        {
-            const auto rs2 = inst->getRs2();
-            const std::vector<uint8_t> value = convertToByteVector(rs2->dmiRead<uint64_t>());
-            src_regs_.emplace_back(getRegId(rs2), value);
-        }
+            // Get value of source registers
+            if (inst->hasRs1())
+            {
+                const auto rs1_reg = inst->getRs1Reg();
+                const std::vector<uint8_t> value =
+                    convertToByteVector(rs1_reg->dmiRead<uint64_t>());
+                src_regs_.emplace_back(getRegId(rs1_reg), value);
+            }
 
-        // Get initial value of destination registers
-        if (inst->hasRd())
-        {
-            const auto rd = inst->getRd();
-            const std::vector<uint8_t> value = convertToByteVector(rd->dmiRead<uint64_t>());
-            dst_regs_.emplace_back(getRegId(rd), value);
+            if (inst->hasRs2())
+            {
+                const auto rs2_reg = inst->getRs2Reg();
+                const std::vector<uint8_t> value =
+                    convertToByteVector(rs2_reg->dmiRead<uint64_t>());
+                src_regs_.emplace_back(getRegId(rs2_reg), value);
+            }
+
+            // Get initial value of destination registers
+            if (inst->hasRd())
+            {
+                const auto rd_reg = inst->getRdReg();
+                const std::vector<uint8_t> value = convertToByteVector(rd_reg->dmiRead<uint64_t>());
+                dst_regs_.emplace_back(getRegId(rd_reg), value);
+            }
+
+            // For instructions that read/write CSRs
+            if (inst->hasCsr())
+            {
+                const auto csr_reg = state->getCsrRegister(inst->getCsr());
+                if (csr_reg)
+                {
+                    const std::vector<uint8_t> value =
+                        convertToByteVector(csr_reg->dmiRead<uint64_t>());
+                    dst_regs_.emplace_back(getRegId(csr_reg), value);
+                }
+            }
         }
 
         return nullptr;
@@ -54,6 +71,9 @@ namespace atlas
 
     ActionGroup* InstructionLogger::preException(AtlasState* state)
     {
+        preExecute(state);
+
+        // Get value of source registers
         trap_cause_ = state->getExceptionUnit()->getUnhandledException();
         return nullptr;
     }
@@ -62,14 +82,38 @@ namespace atlas
     {
         // Get final value of destination registers
         AtlasInstPtr inst = state->getCurrentInst();
-        sparta_assert(inst != nullptr, "Instruction is not valid for logging!");
 
-        if (inst->hasRd())
+        if (trap_cause_.isValid() == false)
         {
-            sparta_assert(dst_regs_.size() == 1);
-            const auto & rd = inst->getRd();
-            const std::vector<uint8_t> value = convertToByteVector(rd->dmiRead<uint64_t>());
-            dst_regs_[0].setValue(value);
+            sparta_assert(inst != nullptr, "Instruction is not valid for logging!");
+        }
+
+        if (inst)
+        {
+            for (auto & dst_reg : dst_regs_)
+            {
+                sparta::Register* reg = nullptr;
+                switch (dst_reg.reg_id.reg_type)
+                {
+                    case RegType::INTEGER:
+                        reg = state->getIntRegister(dst_reg.reg_id.reg_num);
+                        break;
+                    case RegType::FLOATING_POINT:
+                        reg = state->getFpRegister(dst_reg.reg_id.reg_num);
+                        break;
+                    case RegType::VECTOR:
+                        reg = state->getVecRegister(dst_reg.reg_id.reg_num);
+                        break;
+                    case RegType::CSR:
+                        reg = state->getCsrRegister(dst_reg.reg_id.reg_num);
+                        break;
+                    default:
+                        sparta_assert(false, "Invalid register type!");
+                }
+                sparta_assert(reg != nullptr);
+                const std::vector<uint8_t> value = convertToByteVector(reg->dmiRead<uint64_t>());
+                dst_reg.setValue(value);
+            }
         }
 
         // Write to instruction logger
@@ -79,15 +123,23 @@ namespace atlas
             INSTLOG("<" << symbols.at(pc_) << ">");
         }
 
-        INSTLOG(HEX8(pc_) << ": " << inst->dasmString() << " (" << HEX8(opcode_)
-                          << ") uid:" << inst->getUid());
+        if (inst)
+        {
+            INSTLOG(HEX8(pc_) << ": " << inst->dasmString() << " (" << HEX8(opcode_)
+                              << ") uid:" << inst->getUid());
+        }
+        else
+        {
+            // TODO: Only display opcode for certain exception types
+            INSTLOG(HEX8(pc_) << ": ??? (" << HEX8(opcode_) << ") uid: ?");
+        }
 
         if (trap_cause_.isValid())
         {
             INSTLOG("trap cause: " << HEX16((uint64_t)trap_cause_.getValue()));
         }
 
-        if (inst->hasImmediate())
+        if (inst && inst->hasImmediate())
         {
             const int64_t imm_val = inst->getImmediate();
             INSTLOG("       imm: " << HEX16(imm_val));

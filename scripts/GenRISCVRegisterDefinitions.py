@@ -36,13 +36,13 @@ def main():
 
     # Add register for the PC
     num = 32
-    reg_int.add_custom_register("pc", num, "Program counter", 8, [], {}, 0, True)
+    reg_int.add_custom_register("pc", num, "Program counter", 8, [], {}, True)
 
     # Add registers for atomic load-reservation and store-conditional instructions
     num += 1
-    reg_int.add_custom_register("resv_addr", num, "Load reservation address", 8, [], {}, 0, True)
+    reg_int.add_custom_register("resv_addr", num, "Load reservation address", 8, [], {}, True)
     num += 1
-    reg_int.add_custom_register("resv_valid", num, "Load reservation valid", 8, [], {}, 0, True)
+    reg_int.add_custom_register("resv_valid", num, "Load reservation valid", 8, [], {}, True)
 
     reg_int.write_json("reg_int.json")
     reg_fp.write_json("reg_fp.json")
@@ -64,13 +64,13 @@ def main():
 
     # Add register for the PC
     num = 32
-    reg_int.add_custom_register("pc", num, "Program counter", 4, [], {}, 0, True)
+    reg_int.add_custom_register("pc", num, "Program counter", 4, [], {}, True)
 
     # Add registers for atomic load-reservation and store-conditional instructions
     num += 1
-    reg_int.add_custom_register("resv_addr", num, "Load reservation address", 4, [], {}, 0, True)
+    reg_int.add_custom_register("resv_addr", num, "Load reservation address", 4, [], {}, True)
     num += 1
-    reg_int.add_custom_register("resv_valid", num, "Load reservation valid", 4, [], {}, 0, True)
+    reg_int.add_custom_register("resv_valid", num, "Load reservation valid", 4, [], {}, True)
 
     reg_int.write_json("reg_int.json");
     reg_fp.write_json("reg_fp.json");

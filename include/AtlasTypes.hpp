@@ -47,8 +47,8 @@ namespace atlas
 
     enum class PrivMode
     {
-        USER,
-        SUPERVISOR,
+        USER = 0,
+        SUPERVISOR = 1,
         // HYPERVISOR,
         MACHINE = 3,
         // VIRTUAL_USER,

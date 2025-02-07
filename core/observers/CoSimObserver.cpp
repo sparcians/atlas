@@ -24,29 +24,42 @@ namespace atlas
         last_event_.curr_pc_ = state->getPc();
         // TODO: curr_priv_
 
-        if (inst->hasRs1())
+        if (inst)
         {
-            const auto rs1 = inst->getRs1();
-            const std::vector<uint8_t> value = convertToByteVector(rs1->dmiRead<uint64_t>());
-            src_regs_.emplace_back(getRegId(rs1), value);
+            if (inst->hasRs1())
+            {
+                const auto rs1 = inst->getRs1Reg();
+                const std::vector<uint8_t> value = convertToByteVector(rs1->dmiRead<uint64_t>());
+                src_regs_.emplace_back(getRegId(rs1), value);
+            }
+
+            if (inst->hasRs2())
+            {
+                const auto rs2 = inst->getRs2Reg();
+                const std::vector<uint8_t> value = convertToByteVector(rs2->dmiRead<uint64_t>());
+                src_regs_.emplace_back(getRegId(rs2), value);
+            }
+
+            // Get initial value of destination registers
+            if (inst->hasRd())
+            {
+                const auto rd = inst->getRdReg();
+                const std::vector<uint8_t> value = convertToByteVector(rd->dmiRead<uint64_t>());
+                dst_regs_.emplace_back(getRegId(rd), value);
+            }
+
+            last_event_.mavis_opcode_info_ = inst->getMavisOpcodeInfo();
         }
 
-        if (inst->hasRs2())
-        {
-            const auto rs2 = inst->getRs2();
-            const std::vector<uint8_t> value = convertToByteVector(rs2->dmiRead<uint64_t>());
-            src_regs_.emplace_back(getRegId(rs2), value);
-        }
+        return nullptr;
+    }
 
-        // Get initial value of destination registers
-        if (inst->hasRd())
-        {
-            const auto rd = inst->getRd();
-            const std::vector<uint8_t> value = convertToByteVector(rd->dmiRead<uint64_t>());
-            dst_regs_.emplace_back(getRegId(rd), value);
-        }
+    ActionGroup* CoSimObserver::preException(AtlasState* state)
+    {
+        preExecute(state);
 
-        last_event_.mavis_opcode_info_ = inst->getMavisOpcodeInfo();
+        // Get value of source registers
+        trap_cause_ = state->getExceptionUnit()->getUnhandledException();
         return nullptr;
     }
 
@@ -54,14 +67,13 @@ namespace atlas
     {
         // Get final value of destination registers
         AtlasInstPtr inst = state->getCurrentInst();
-        sparta_assert(inst != nullptr, "Instruction is not valid for logging!");
 
-        if (inst->hasRd())
+        if (inst && inst->hasRd())
         {
             sparta_assert(dst_regs_.size() == 1);
-            const auto & rd = inst->getRd();
+            const auto & rd_reg = inst->getRdReg();
             std::vector<uint8_t> value(sizeof(uint64_t));
-            const uint64_t rd_value = rd->dmiRead<uint64_t>();
+            const uint64_t rd_value = rd_reg->dmiRead<uint64_t>();
             std::memcpy(value.data(), &rd_value, sizeof(uint64_t));
             dst_regs_[0].setValue(value);
         }

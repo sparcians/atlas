@@ -58,6 +58,7 @@ namespace atlas
         supported_isa_string_(std::string("rv" + std::to_string(xlen_) + "g_zicsr_zifencei")),
         isa_file_path_(p->isa_file_path),
         uarch_file_path_(p->uarch_file_path),
+        csr_values_json_(p->csr_values),
         extension_manager_(mavis::extension_manager::riscv::RISCVExtensionManager::fromISA(
             supported_isa_string_, isa_file_path_ + std::string("/riscv_isa_spec.json"),
             isa_file_path_)),
@@ -149,6 +150,32 @@ namespace atlas
         if (inst_logger_.observed())
         {
             addObserver(std::make_unique<InstructionLogger>(inst_logger_));
+        }
+    }
+
+    void AtlasState::onBindTreeLate_()
+    {
+        // Write initial values to CSR registers
+        std::ifstream ifs(csr_values_json_);
+        nlohmann::json csr_values_json = nlohmann::json::parse(ifs);
+        for (const auto & [csr_name, hex_str] : csr_values_json.items())
+        {
+            sparta::Register* csr_reg = findRegister(csr_name);
+            if (csr_reg)
+            {
+                sparta_assert(csr_reg->getGroupNum()
+                                  == (sparta::RegisterBase::group_num_type)RegType::CSR,
+                              "Provided initial value for not-CSR register: " << csr_name);
+                const uint64_t csr_val = std::stoull(std::string(hex_str), nullptr, 16);
+                std::cout << csr_name << ": " << HEX16(csr_val) << std::endl;
+                csr_reg->dmiWrite(csr_val);
+            }
+            else
+            {
+                std::cout
+                    << "WARNING: Provided initial value for CSR register that does not exist! "
+                    << csr_name << std::endl;
+            }
         }
     }
 
@@ -466,7 +493,11 @@ namespace atlas
     {
         // Set PC
         pc_ = next_pc_;
-        next_pc_ = 0;
+        DLOG("PC: 0x" << std::hex << pc_);
+
+        // Set Privilege Mode
+        priv_mode_ = next_priv_mode_;
+        DLOG("Privilege Mode: " << (uint32_t)priv_mode_);
 
         // Increment instruction count
         ++sim_state_.inst_count;
@@ -524,12 +555,11 @@ namespace atlas
 
         const AtlasInstPtr & insn = getCurrentInst();
 
-        int hart = getHartId();
-        std::string rs1_name = insn->hasRs1() ? insn->getRs1()->getName() : "";
-        uint64_t rs1_val = insn->hasRs1() ? insn->getRs1()->dmiRead<uint64_t>() : 0;
-        std::string rs2_name = insn->hasRs2() ? insn->getRs2()->getName() : "";
-        uint64_t rs2_val = insn->hasRs2() ? insn->getRs2()->dmiRead<uint64_t>() : 0;
-        std::string rd_name = insn->hasRd() ? insn->getRd()->getName() : "";
+        const std::string rs1_name = insn->hasRs1() ? insn->getRs1Reg()->getName() : "";
+        uint64_t rs1_val = insn->hasRs1() ? insn->getRs1Reg()->dmiRead<uint64_t>() : 0;
+        const std::string rs2_name = insn->hasRs2() ? insn->getRs2Reg()->getName() : "";
+        uint64_t rs2_val = insn->hasRs2() ? insn->getRs2Reg()->dmiRead<uint64_t>() : 0;
+        const std::string rd_name = insn->hasRd() ? insn->getRdReg()->getName() : "";
 
         uint64_t rd_val_before = 0;
         uint64_t rd_val_after = 0;
@@ -540,23 +570,23 @@ namespace atlas
             Observer* obs = !observers_.empty() ? observers_.front().get() : nullptr;
             sparta_assert(obs, "No observers enabled, nothing to debug!");
 
-            auto rd = insn->getRd();
+            auto rd_reg = insn->getRdReg();
             rd_val_before = obs->getPrevRdValue();
-            rd_val_after = rd->dmiRead<uint64_t>();
+            rd_val_after = rd_reg->dmiRead<uint64_t>();
 
-            switch (rd->getGroupNum())
+            switch (rd_reg->getGroupNum())
             {
                 case 0:
                     // INT
-                    cosim_rd_val_after = cosim_query_->getIntRegValue(getHartId(), rd->getID());
+                    cosim_rd_val_after = cosim_query_->getIntRegValue(getHartId(), rd_reg->getID());
                     break;
                 case 1:
                     // FP
-                    cosim_rd_val_after = cosim_query_->getFpRegValue(getHartId(), rd->getID());
+                    cosim_rd_val_after = cosim_query_->getFpRegValue(getHartId(), rd_reg->getID());
                     break;
                 case 2:
                     // VEC
-                    cosim_rd_val_after = cosim_query_->getVecRegValue(getHartId(), rd->getID());
+                    cosim_rd_val_after = cosim_query_->getVecRegValue(getHartId(), rd_reg->getID());
                     break;
                 case 3:
                     // Let this go to the default case assert. CSRs should not be written to in RD.
@@ -597,7 +627,7 @@ namespace atlas
         int result_code = compareWithCoSimAndSync_();
 
         std::unique_ptr<simdb::WorkerTask> task(
-            new InstSnapshotter(cosim_db_.get(), hart, rs1_name, rs1_val, rs2_name, rs2_val,
+            new InstSnapshotter(cosim_db_.get(), hart_id_, rs1_name, rs1_val, rs2_name, rs2_val,
                                 rd_name, rd_val_before, rd_val_after, cosim_rd_val_after, has_imm,
                                 imm, disasm, mnemonic, opcode, pc, priv, result_code));
 
@@ -605,21 +635,34 @@ namespace atlas
 
         if (!all_csr_vals.empty())
         {
-            task.reset(new CsrValuesSnapshotter(cosim_db_.get(), hart, pc, all_csr_vals));
+            task.reset(new CsrValuesSnapshotter(cosim_db_.get(), hart_id_, pc, all_csr_vals));
             cosim_db_->getTaskQueue()->addWorkerTask(std::move(task));
         }
     }
 
-    uint64_t AtlasState::getMStatusInitialValue(const AtlasState* state, const uint64_t xlen_val)
+    void AtlasState::boot()
     {
-        // TODO cnyce
-        (void)state;
-        (void)xlen_val;
-        return 42949672960;
-    }
+        std::cout << "Booting hartid " << std::dec << hart_id_ << std::endl;
+        {
+            AtlasState* state = this;
 
-    void AtlasState::postInit()
-    {
+            POKE_CSR_REG(MHARTID, hart_id_);
+
+            // TODO: Initiali MISA CSR with XLEN and enabled extensions
+            const uint64_t xlen_val = (xlen_ == 64) ? 2 : 1;
+            POKE_CSR_FIELD(MISA, mxl, xlen_val);
+
+            // Initialize MSTATUS/STATUS with User and Supervisor mode XLEN
+            POKE_CSR_FIELD(MSTATUS, uxl, xlen_val);
+            POKE_CSR_FIELD(MSTATUS, sxl, xlen_val);
+            POKE_CSR_FIELD(SSTATUS, uxl, xlen_val);
+
+            std::cout << state->getCsrRegister(MHARTID) << std::endl;
+            std::cout << state->getCsrRegister(MISA) << std::endl;
+            std::cout << state->getCsrRegister(MSTATUS) << std::endl;
+            std::cout << state->getCsrRegister(SSTATUS) << std::endl;
+        }
+
         if (interactive_mode_)
         {
             auto observer = std::make_unique<SimController>();

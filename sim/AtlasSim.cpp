@@ -54,9 +54,7 @@ namespace atlas
     {
         for (auto state : state_)
         {
-            const auto mstatus = state->getMStatusInitialValue();
-            POKE_CSR_REG(MSTATUS, mstatus);
-            state->postInit();
+            state->boot();
         }
 
         getSimulationConfiguration()->scheduler_exacting_run = true;

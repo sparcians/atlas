@@ -72,7 +72,7 @@ namespace atlas
         virtual void reset_()
         {
             pc_ = 0;
-            opcode_ = 0;
+            opcode_ = std::numeric_limits<uint64_t>::max();
             src_regs_.clear();
             dst_regs_.clear();
             trap_cause_.clearValid();

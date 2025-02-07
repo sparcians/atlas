@@ -62,8 +62,7 @@
         const auto mask = ((1ULL << (high_bit - low_bit + 1)) - 1) << low_bit;                     \
         csr_value &= ~mask;                                                                        \
                                                                                                    \
-        uint64_t new_field_value = field_value;                                                    \
-        new_field_value <<= low_bit;                                                               \
+        const uint64_t new_field_value = field_value << low_bit;                                   \
         csr_value |= new_field_value;                                                              \
                                                                                                    \
         state->getCsrRegister(reg_ident)->write(csr_value);                                        \
@@ -72,3 +71,18 @@
 #define PEEK_CSR_REG(reg_ident) READ_CSR_REG(reg_ident)
 
 #define POKE_CSR_REG(reg_ident, reg_value) state->getCsrRegister(reg_ident)->dmiWrite(reg_value);
+
+#define POKE_CSR_FIELD(reg_ident, field_name, field_value)                                         \
+    {                                                                                              \
+        auto csr_value = state->getCsrRegister(reg_ident)->dmiRead<uint64_t>();                    \
+                                                                                                   \
+        const auto low_bit = atlas::getCsrBitRange(reg_ident, #field_name).first;                  \
+        const auto high_bit = atlas::getCsrBitRange(reg_ident, #field_name).second;                \
+        const auto mask = ((1ULL << (high_bit - low_bit + 1)) - 1) << low_bit;                     \
+        csr_value &= ~mask;                                                                        \
+                                                                                                   \
+        const uint64_t new_field_value = field_value << low_bit;                                   \
+        csr_value |= new_field_value;                                                              \
+                                                                                                   \
+        state->getCsrRegister(reg_ident)->dmiWrite(csr_value);                                     \
+    }

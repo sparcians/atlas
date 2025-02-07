@@ -63,6 +63,8 @@ namespace atlas
             PARAMETER(std::string, isa_string, "rv64g", "ISA string")
             PARAMETER(std::string, isa_file_path, "mavis_json", "Where are the Mavis isa files?")
             PARAMETER(std::string, uarch_file_path, "arch", "Where are the Atlas uarch files?")
+            PARAMETER(std::string, csr_values, "arch/default_csr_values.json",
+                      "Provides initial values of CSRs")
             PARAMETER(bool, stop_sim_on_wfi, false, "Executing a WFI instruction stops simulation")
         };
 
@@ -94,13 +96,6 @@ namespace atlas
         void setNextPrivMode(PrivMode next_priv_mode) { next_priv_mode_ = next_priv_mode; }
 
         PrivMode getNextPrivMode() const { return next_priv_mode_; }
-
-        uint64_t getMStatusInitialValue() const
-        {
-            return AtlasState::getMStatusInitialValue(this, getXlen());
-        }
-
-        static uint64_t getMStatusInitialValue(const AtlasState* state, const uint64_t xlen_val);
 
         struct SimState
         {
@@ -197,13 +192,14 @@ namespace atlas
 
         // For standalone Atlas simulations, this method will be called
         // at the top of AtlasSim::run()
-        void postInit();
+        void boot();
 
         // One-time cleanup phase after simulation end.
         void cleanup();
 
       private:
         void onBindTreeEarly_() override;
+        void onBindTreeLate_() override;
 
         ActionGroup* preExecute_(AtlasState* state);
         ActionGroup* postExecute_(AtlasState* state);
@@ -254,6 +250,9 @@ namespace atlas
         // Path to Atlas
         const std::string uarch_file_path_;
 
+        // CSR Initial Values JSON
+        const std::string csr_values_json_;
+
         // Mavis extension manager
         mavis::extension_manager::riscv::RISCVExtensionManager extension_manager_;
 
@@ -273,7 +272,7 @@ namespace atlas
         PrivMode priv_mode_ = PrivMode::MACHINE;
 
         //! Next privilege mode
-        PrivMode next_priv_mode_ = PrivMode::INVALID;
+        PrivMode next_priv_mode_ = PrivMode::MACHINE;
 
         //! Unique instruction ID
         uint64_t uid_ = 0;

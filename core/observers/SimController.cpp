@@ -381,7 +381,7 @@ namespace atlas
                         else if (!inst->hasRs1())
                             sendError_("No rs1");
                         else
-                            sendString_(inst->getRs1()->getName());
+                            sendString_(inst->getRs1Reg()->getName());
                         return true;
                     }
 
@@ -393,7 +393,7 @@ namespace atlas
                         else if (!inst->hasRs2())
                             sendError_("No rs2");
                         else
-                            sendString_(inst->getRs2()->getName());
+                            sendString_(inst->getRs2Reg()->getName());
                         return true;
                     }
 
@@ -405,7 +405,7 @@ namespace atlas
                         else if (!inst->hasRd())
                             sendError_("No rd");
                         else
-                            sendString_(inst->getRd()->getName());
+                            sendString_(inst->getRdReg()->getName());
                         return true;
                     }
 

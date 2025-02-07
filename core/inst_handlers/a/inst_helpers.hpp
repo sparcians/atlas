@@ -15,7 +15,7 @@ namespace atlas
         static_assert(std::is_same_v<T, RV64> || std::is_same_v<T, RV32>);
 
         const AtlasInstPtr & inst = state->getCurrentInst();
-        const T rs1_val = inst->getRs1()->dmiRead<uint64_t>();
+        const T rs1_val = inst->getRs1Reg()->dmiRead<uint64_t>();
         constexpr uint32_t IMM_SIZE = 12;
         const T imm = inst->hasImmediate() ? inst->getSignExtendedImmediate<T, IMM_SIZE>() : 0;
         const T vaddr = rs1_val + imm;
@@ -47,8 +47,8 @@ namespace atlas
         {
             rd_val = state->readMemory<SIZE>(paddr);
         }
-        inst->getRd()->write(rd_val);
-        const RV rs2_val = inst->getRs2()->dmiRead<uint64_t>();
+        inst->getRdReg()->write(rd_val);
+        const RV rs2_val = inst->getRs2Reg()->dmiRead<uint64_t>();
         state->writeMemory<SIZE>(paddr, binary_op(rd_val, rs2_val));
         return nullptr;
     }

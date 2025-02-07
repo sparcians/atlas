@@ -184,7 +184,6 @@ class GenRegisterJSON():
                 "size":          self.reg_size,
                 "aliases":       alias,
                 "fields":        fields,
-                "initial_value": 0,
                 "enabled":       True}))
 
     def gen_fp_reg_defs(self):
@@ -210,7 +209,6 @@ class GenRegisterJSON():
                 "size":          8,
                 "aliases":       alias,
                 "fields":        fields,
-                "initial_value": 0,
                 "enabled":       True}))
 
     def gen_vec_reg_defs(self):
@@ -228,7 +226,6 @@ class GenRegisterJSON():
                 "size":          self.reg_size,
                 "aliases":       alias,
                 "fields":        fields,
-                "initial_value": 0,
                 "enabled":       True}))
 
 
@@ -245,10 +242,9 @@ class GenRegisterJSON():
                 "size":          8,
                 "aliases":       ["csr"+str(k)],
                 "fields":        v[2],
-                "initial_value": v[3],
                 "enabled":       True}))
 
-    def add_custom_register(self, name, num, desc, size, aliases, fields, initial_value, enabled):
+    def add_custom_register(self, name, num, desc, size, aliases, fields, enabled):
         self.reg_defs.append(self.__CreateRegDict({
             "name":          name,
             "num":           num,
@@ -256,7 +252,6 @@ class GenRegisterJSON():
             "size":          size,
             "aliases":       aliases,
             "fields":        fields,
-            "initial_value": initial_value,
             "enabled":       enabled
         }))
 
@@ -269,12 +264,6 @@ class GenRegisterJSON():
         # Remove the 'fields' key if it is empty
         if not reg_dict["fields"]:
             del reg_dict["fields"]
-
-        # Format the 'initial_value' to hex, or remove it if it is 0
-        if reg_dict["initial_value"]:
-            reg_dict["initial_value"] = hex(reg_dict["initial_value"])
-        else:
-            del reg_dict["initial_value"]
 
         # Remove the 'enabled' key if it is True
         if reg_dict["enabled"]:

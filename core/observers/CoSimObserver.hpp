@@ -27,6 +27,7 @@ namespace atlas
         }
 
         ActionGroup* preExecute(AtlasState* state) override;
+        ActionGroup* preException(AtlasState* state) override;
         ActionGroup* postExecute(AtlasState* state) override;
 
       private:

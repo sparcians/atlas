@@ -501,10 +501,10 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const XLEN rs1_val = insn->getRs1()->dmiRead<XLEN>();
-        const XLEN rs2_val = insn->getRs2()->dmiRead<XLEN>();
+        const XLEN rs1_val = READ_INT_REG(insn->getRs1());
+        const XLEN rs2_val = READ_INT_REG(insn->getRs2());
         const XLEN rd_val = OPERATOR()(rs1_val, rs2_val);
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -513,11 +513,11 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const uint64_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
-        const uint64_t rs2_val = insn->getRs2()->dmiRead<uint64_t>();
+        const uint64_t rs1_val = READ_INT_REG(insn->getRs1());
+        const uint64_t rs2_val = READ_INT_REG(insn->getRs2());
         // Casting from int32_t to int64_t will sign extend the value
         const uint64_t rd_val = ((int64_t)(int32_t)(rs1_val + rs2_val));
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -526,11 +526,11 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const uint64_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
-        const uint64_t rs2_val = insn->getRs2()->dmiRead<uint64_t>();
+        const uint64_t rs1_val = READ_INT_REG(insn->getRs1());
+        const uint64_t rs2_val = READ_INT_REG(insn->getRs2());
         // Casting from int32_t to int64_t will sign extend the value
         const uint64_t rd_val = ((int64_t)(int32_t)(rs1_val - rs2_val));
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -540,11 +540,11 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const uint64_t rs1_val = insn->getRs1()->dmiRead<XLEN>();
+        const uint64_t rs1_val = READ_INT_REG(insn->getRs1());
         constexpr uint32_t IMM_SIZE = 12;
         const uint64_t imm = insn->getSignExtendedImmediate<XLEN, IMM_SIZE>();
         const uint64_t rd_val = OPERATOR()(rs1_val, imm);
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -555,10 +555,10 @@ namespace atlas
 
         const uint32_t IMM_SIZE = 12;
         const uint64_t imm = insn->getSignExtendedImmediate<RV64, IMM_SIZE>();
-        const uint32_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
+        const uint32_t rs1_val = READ_INT_REG(insn->getRs1());
         // Casting from int32_t to int64_t will sign extend the value
         const uint64_t rd_val = ((int64_t)(int32_t)(rs1_val + imm));
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -567,8 +567,8 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const uint64_t rs1_val = insn->getRs1()->dmiRead<XLEN>();
-        insn->getRd()->dmiWrite(rs1_val);
+        const uint64_t rs1_val = READ_INT_REG(insn->getRs1());
+        WRITE_INT_REG(insn->getRd(), rs1_val);
 
         return nullptr;
     }
@@ -583,7 +583,7 @@ namespace atlas
     ActionGroup* RviInsts::compute_address_handler(atlas::AtlasState* state)
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
-        const uint64_t rs1_val = insn->getRs1()->dmiRead<XLEN>();
+        const uint64_t rs1_val = READ_INT_REG(insn->getRs1());
         constexpr uint64_t IMM_SIZE = 12;
         const uint64_t imm = insn->getSignExtendedImmediate<XLEN, IMM_SIZE>();
         const uint64_t vaddr = rs1_val + imm;
@@ -598,11 +598,13 @@ namespace atlas
         const uint64_t paddr = state->getTranslationState()->getTranslationResult().getPaddr();
         if constexpr (SIGN_EXTEND)
         {
-            insn->getRd()->dmiWrite<XLEN>(signExtend<SIZE, XLEN>(state->readMemory<SIZE>(paddr)));
+            const XLEN rd_val = signExtend<SIZE, XLEN>(state->readMemory<SIZE>(paddr));
+            WRITE_INT_REG(insn->getRd(), rd_val);
         }
         else
         {
-            insn->getRd()->dmiWrite<XLEN>(state->readMemory<SIZE>(paddr));
+            const XLEN rd_val = state->readMemory<SIZE>(paddr);
+            WRITE_INT_REG(insn->getRd(), rd_val);
         }
         return nullptr;
     }
@@ -611,7 +613,7 @@ namespace atlas
     ActionGroup* RviInsts::store_handler(atlas::AtlasState* state)
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
-        const uint64_t rs2_val = insn->getRs2()->dmiRead<XLEN>();
+        const uint64_t rs2_val = READ_INT_REG(insn->getRs2());
         const uint64_t paddr = state->getTranslationState()->getTranslationResult().getPaddr();
         state->writeMemory<SIZE>(paddr, rs2_val);
         return nullptr;
@@ -621,8 +623,8 @@ namespace atlas
     ActionGroup* RviInsts::branch_handler(atlas::AtlasState* state)
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
-        const XLEN rs1_val = insn->getRs1()->dmiRead<XLEN>();
-        const XLEN rs2_val = insn->getRs2()->dmiRead<XLEN>();
+        const XLEN rs1_val = READ_INT_REG(insn->getRs1());
+        const XLEN rs2_val = READ_INT_REG(insn->getRs2());
 
         if (OPERATOR()(rs1_val, rs2_val))
         {
@@ -643,7 +645,7 @@ namespace atlas
         XLEN rd_val = state->getPc() + insn->getOpcodeSize();
         const XLEN jump_target = state->getPc() + insn->getImmediate();
         state->setNextPc(jump_target);
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -653,12 +655,12 @@ namespace atlas
         const AtlasInstPtr & insn = state->getCurrentInst();
 
         XLEN rd_val = state->getPc() + insn->getOpcodeSize();
-        const XLEN rs1_val = insn->getRs1()->dmiRead<XLEN>();
+        const XLEN rs1_val = READ_INT_REG(insn->getRs1());
         constexpr uint32_t IMM_SIZE = 12;
         const XLEN imm = insn->getSignExtendedImmediate<XLEN, IMM_SIZE>();
         const XLEN jump_target = (rs1_val + imm) & ~std::make_signed_t<XLEN>(1);
         state->setNextPc(jump_target);
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -669,7 +671,7 @@ namespace atlas
 
         const uint32_t IMM_SIZE = 12;
         const uint64_t imm = insn->getSignExtendedImmediate<XLEN, IMM_SIZE>();
-        insn->getRd()->dmiWrite(imm);
+        WRITE_INT_REG(insn->getRd(), imm);
 
         return nullptr;
     }
@@ -680,7 +682,7 @@ namespace atlas
 
         const uint32_t IMM_SIZE = 32;
         const uint64_t imm = insn->getSignExtendedImmediate<XLEN, IMM_SIZE>();
-        insn->getRd()->dmiWrite(imm);
+        WRITE_INT_REG(insn->getRd(), imm);
 
         return nullptr;
     }
@@ -694,7 +696,7 @@ namespace atlas
         const XLEN pc = state->getPc();
         const XLEN rd_val = ((std::make_signed_t<XLEN>)(imm + pc) << (64 - (state->getXlen())))
                             >> (64 - (state->getXlen()));
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -703,10 +705,10 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const uint64_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
-        const uint64_t rs2_val = insn->getRs2()->dmiRead<uint64_t>();
+        const uint64_t rs1_val = READ_INT_REG(insn->getRs1());
+        const uint64_t rs2_val = READ_INT_REG(insn->getRs2());
         const uint64_t rd_val = (int64_t)(rs1_val >> (rs2_val & (state->getXlen() - 1)));
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -715,11 +717,11 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const uint32_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
+        const uint32_t rs1_val = READ_INT_REG(insn->getRs1());
         const uint64_t shift_amount = insn->getImmediate() & (state->getXlen() - 1);
         // Casting from int32_t to int64_t will sign extend the value
         const uint64_t rd_val = (int64_t)(int32_t)(rs1_val >> shift_amount);
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -728,10 +730,10 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const uint64_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
-        const uint64_t rs2_val = insn->getRs2()->dmiRead<uint64_t>();
+        const uint64_t rs1_val = READ_INT_REG(insn->getRs1());
+        const uint64_t rs2_val = READ_INT_REG(insn->getRs2());
         const uint64_t rd_val = rs1_val << (rs2_val & (state->getXlen() - 1));
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -741,10 +743,10 @@ namespace atlas
         const AtlasInstPtr & insn = state->getCurrentInst();
 
         // require(SHAMT < state->getXlen());
-        const int64_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
+        const int64_t rs1_val = READ_INT_REG(insn->getRs1());
         const uint64_t shift_amount = insn->getImmediate() & (state->getXlen() - 1);
         const int64_t rd_val = (int64_t)(rs1_val >> shift_amount);
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -753,11 +755,11 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const int32_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
-        const uint64_t rs2_val = insn->getRs2()->dmiRead<uint64_t>();
+        const int32_t rs1_val = READ_INT_REG(insn->getRs1());
+        const uint64_t rs2_val = READ_INT_REG(insn->getRs2());
         // Casting from int32_t to int64_t will sign extend the value
         const uint64_t rd_val = (int64_t)(int32_t)(rs1_val >> (rs2_val & 0x1F));
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -767,10 +769,10 @@ namespace atlas
         const AtlasInstPtr & insn = state->getCurrentInst();
 
         // require(SHAMT < state->getXlen());
-        const uint64_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs1_val = READ_INT_REG(insn->getRs1());
         const uint64_t shift_amount = insn->getImmediate() & (state->getXlen() - 1);
         const int64_t rd_val = (int64_t)(rs1_val >> shift_amount);
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -779,11 +781,11 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const uint32_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
-        const uint32_t rs2_val = insn->getRs2()->dmiRead<uint64_t>();
+        const uint32_t rs1_val = READ_INT_REG(insn->getRs1());
+        const uint32_t rs2_val = READ_INT_REG(insn->getRs2());
         // Casting from int32_t to int64_t will sign extend the value
         const int64_t rd_val = (int64_t)(int32_t)(rs1_val << (rs2_val & 0x1F));
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -792,11 +794,11 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const uint32_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
+        const uint32_t rs1_val = READ_INT_REG(insn->getRs1());
         const uint64_t shift_amount = insn->getImmediate() & 0x1F;
         // Casting from int32_t to int64_t will sign extend the value
         const int64_t rd_val = (int64_t)(int32_t)(rs1_val << shift_amount);
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -805,11 +807,11 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const int32_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
+        const int32_t rs1_val = READ_INT_REG(insn->getRs1());
         const uint64_t shift_amount = insn->getImmediate() & (state->getXlen() - 1);
         // Casting from int32_t to int64_t will sign extend the value
         const uint64_t rd_val = (int64_t)(int32_t)(rs1_val >> shift_amount);
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -818,10 +820,10 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const int64_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
-        const uint64_t rs2_val = insn->getRs2()->dmiRead<uint64_t>();
+        const int64_t rs1_val = READ_INT_REG(insn->getRs1());
+        const uint64_t rs2_val = READ_INT_REG(insn->getRs2());
         const uint64_t rd_val = (int64_t)(rs1_val >> (rs2_val & (state->getXlen() - 1)));
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -831,10 +833,10 @@ namespace atlas
         const AtlasInstPtr & insn = state->getCurrentInst();
 
         // require(SHAMT < state->getXlen());
-        const uint64_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
+        const uint64_t rs1_val = READ_INT_REG(insn->getRs1());
         const uint64_t shift_amount = insn->getImmediate() & (state->getXlen() - 1);
         const uint64_t rd_val = rs1_val << shift_amount;
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -843,11 +845,11 @@ namespace atlas
     {
         const AtlasInstPtr & insn = state->getCurrentInst();
 
-        const uint32_t rs1_val = insn->getRs1()->dmiRead<uint64_t>();
-        const uint64_t rs2_val = insn->getRs2()->dmiRead<uint64_t>();
+        const uint32_t rs1_val = READ_INT_REG(insn->getRs1());
+        const uint64_t rs2_val = READ_INT_REG(insn->getRs2());
         // Casting from int32_t to int64_t will sign extend the value
         const uint64_t rd_val = (int64_t)(int32_t)(rs1_val >> (rs2_val & 0x1F));
-        insn->getRd()->dmiWrite(rd_val);
+        WRITE_INT_REG(insn->getRd(), rd_val);
 
         return nullptr;
     }
@@ -888,7 +890,8 @@ namespace atlas
             WRITE_CSR_FIELD(MSTATUS, mpie, (XLEN)1);
 
             // Reset MPP
-            WRITE_CSR_FIELD(MSTATUS, mpp, (XLEN)PrivMode::MACHINE);
+            // TODO: Check if User mode is available
+            WRITE_CSR_FIELD(MSTATUS, mpp, (XLEN)PrivMode::USER);
         }
         else
         {
@@ -940,13 +943,13 @@ namespace atlas
         ///////////////////////////////////////////////////////////////////////
 
         // Command
-        const uint64_t cmd = state->getIntRegister(17)->dmiRead<uint64_t>(); // a7
+        const uint64_t cmd = READ_INT_REG(17); // a7
 
         // Only support exit for now so we can end simulation
         if (cmd == 93)
         {
             // Function arguments are a0-a6 (x10-x16)
-            const uint64_t exit_code = state->getIntRegister(10)->dmiRead<uint64_t>();
+            const uint64_t exit_code = READ_INT_REG(10);
 
             AtlasState::SimState* sim_state = state->getSimState();
             sim_state->workload_exit_code = exit_code;
