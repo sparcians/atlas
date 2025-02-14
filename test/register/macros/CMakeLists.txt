@@ -3,7 +3,7 @@ project(AtlasRegisterMacros_Test)
 add_executable(AtlasRegisterMacros_test RegisterMacros_test.cpp)
 target_link_libraries(AtlasRegisterMacros_test atlassim atlascore atlasinsts softfloat atlassys ${SPARTA_LIBS} mavis)
 
-sparta_named_test(RegisterMacros_test_run AtlasRegisterMacros_test)
+atlas_named_test(RegisterMacros_test_run AtlasRegisterMacros_test)
 
 file (CREATE_LINK ${PROJECT_SOURCE_DIR}/../../../arch                     ${CMAKE_CURRENT_BINARY_DIR}/arch SYMBOLIC)
 file (CREATE_LINK ${PROJECT_SOURCE_DIR}/../../../mavis/json               ${CMAKE_CURRENT_BINARY_DIR}/mavis_json SYMBOLIC)

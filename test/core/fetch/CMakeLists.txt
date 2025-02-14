@@ -7,4 +7,4 @@ file (CREATE_LINK ${PROJECT_SOURCE_DIR}/../../../core/inst_handlers/rv64  ${CMAK
 add_executable(Fetch_test Fetch_test.cpp)
 target_link_libraries(Fetch_test atlascore atlasinsts softfloat atlassys atlassim ${SPARTA_LIBS} mavis)
 
-sparta_named_test(Fetch_test_run Fetch_test)
+atlas_named_test(Fetch_test_run Fetch_test)

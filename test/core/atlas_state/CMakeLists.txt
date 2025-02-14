@@ -7,4 +7,4 @@ file (CREATE_LINK ${PROJECT_SOURCE_DIR}/../../../core/inst_handlers/rv64  ${CMAK
 add_executable(AtlasState_test AtlasState_test.cpp)
 target_link_libraries(AtlasState_test atlascore atlasinsts softfloat atlassys atlassim ${SPARTA_LIBS} mavis)
 
-sparta_named_test(AtlasState_test_run AtlasState_test)
+atlas_named_test(AtlasState_test_run AtlasState_test)

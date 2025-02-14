@@ -62,7 +62,7 @@
         const auto mask = ((1ULL << (high_bit - low_bit + 1)) - 1) << low_bit;                     \
         csr_value &= ~mask;                                                                        \
                                                                                                    \
-        const uint64_t new_field_value = field_value << low_bit;                                   \
+        const uint64_t new_field_value = (uint64_t)field_value << low_bit;                         \
         csr_value |= new_field_value;                                                              \
                                                                                                    \
         state->getCsrRegister(reg_ident)->write(csr_value);                                        \

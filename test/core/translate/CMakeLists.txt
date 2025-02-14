@@ -7,4 +7,4 @@ file (CREATE_LINK ${PROJECT_SOURCE_DIR}/../../../core/inst_handlers/rv64  ${CMAK
 add_executable(Translate_test Translate_test.cpp)
 target_link_libraries(Translate_test atlassim atlascore atlasinsts softfloat atlassys ${SPARTA_LIBS} mavis)
 
-sparta_named_test(Translate_test_run Translate_test)
+atlas_named_test(Translate_test_run Translate_test)
