@@ -3,6 +3,8 @@
 #include <map>
 #include <string>
 
+#include "core/Execute.hpp"
+
 namespace atlas
 {
     class AtlasState;
@@ -18,6 +20,7 @@ namespace atlas
         static void getInstComputeAddressHandlers(std::map<std::string, Action> & inst_handlers);
         template <typename XLEN>
         static void getInstHandlers(std::map<std::string, Action> & inst_handlers);
+        template <typename XLEN> static void getCsrUpdateActions(Execute::CsrUpdateActionsMap &);
 
       private:
         ActionGroup* fadd_d_64_handler(atlas::AtlasState* state);

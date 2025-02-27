@@ -7,6 +7,11 @@
 #include "core/Exception.hpp"
 #include "core/Trap.hpp"
 
+extern "C"
+{
+#include "source/include/softfloat.h"
+}
+
 namespace atlas
 {
     template <typename XLEN>
@@ -84,6 +89,17 @@ namespace atlas
             csr_update_actions.emplace(
                 SSTATUS, atlas::Action::createAction<&RvzicsrInsts::sstatus_update_handler<RV64>,
                                                      RvzicsrInsts>(nullptr, "sstatus_update"));
+            csr_update_actions.emplace(
+                FCSR,
+                atlas::Action::createAction<&RvzicsrInsts::fcsr_update_handler<RV64>, RvzicsrInsts>(
+                    nullptr, "fcsr_update"));
+            csr_update_actions.emplace(
+                FFLAGS, atlas::Action::createAction<&RvzicsrInsts::fflags_update_handler<RV64>,
+                                                    RvzicsrInsts>(nullptr, "fflags_update"));
+            csr_update_actions.emplace(
+                FRM,
+                atlas::Action::createAction<&RvzicsrInsts::frm_update_handler<RV64>, RvzicsrInsts>(
+                    nullptr, "frm_update"));
         }
         else if constexpr (std::is_same_v<XLEN, RV32>)
         {
@@ -93,6 +109,17 @@ namespace atlas
             csr_update_actions.emplace(
                 SSTATUS, atlas::Action::createAction<&RvzicsrInsts::sstatus_update_handler<RV32>,
                                                      RvzicsrInsts>(nullptr, "sstatus_update"));
+            csr_update_actions.emplace(
+                FCSR,
+                atlas::Action::createAction<&RvzicsrInsts::fcsr_update_handler<RV32>, RvzicsrInsts>(
+                    nullptr, "fcsr_update"));
+            csr_update_actions.emplace(
+                FFLAGS, atlas::Action::createAction<&RvzicsrInsts::fflags_update_handler<RV32>,
+                                                    RvzicsrInsts>(nullptr, "fflags_update"));
+            csr_update_actions.emplace(
+                FRM,
+                atlas::Action::createAction<&RvzicsrInsts::frm_update_handler<RV32>, RvzicsrInsts>(
+                    nullptr, "frm_update"));
         }
     }
 
@@ -271,6 +298,75 @@ namespace atlas
 
         const XLEN sd_val = READ_CSR_FIELD<XLEN>(state, SSTATUS, "sd");
         WRITE_CSR_FIELD<XLEN>(state, MSTATUS, "sd", sd_val);
+
+        return nullptr;
+    }
+
+    template <typename XLEN> void set_softfloat_excpetionFlags(atlas::AtlasState* state)
+    {
+        XLEN softflaot_exceptionFlags_mask = softfloat_flag_inexact | softfloat_flag_underflow
+                                             | softfloat_flag_overflow | softfloat_flag_infinite
+                                             | softfloat_flag_invalid;
+        softfloat_exceptionFlags =
+            READ_CSR_REG<XLEN>(state, FFLAGS) & softflaot_exceptionFlags_mask;
+    }
+
+    template <typename XLEN>
+    ActionGroup* RvzicsrInsts::fcsr_update_handler(atlas::AtlasState* state)
+    {
+        // FFLAGS
+        const XLEN nx_val = READ_CSR_FIELD<XLEN>(state, FCSR, "NX");
+        WRITE_CSR_FIELD<XLEN>(state, FFLAGS, "NX", nx_val);
+
+        const XLEN uf_val = READ_CSR_FIELD<XLEN>(state, FCSR, "UF");
+        WRITE_CSR_FIELD<XLEN>(state, FFLAGS, "UF", uf_val);
+
+        const XLEN of_val = READ_CSR_FIELD<XLEN>(state, FCSR, "OF");
+        WRITE_CSR_FIELD<XLEN>(state, FFLAGS, "OF", of_val);
+
+        const XLEN dz_val = READ_CSR_FIELD<XLEN>(state, FCSR, "DZ");
+        WRITE_CSR_FIELD<XLEN>(state, FFLAGS, "DZ", dz_val);
+
+        const XLEN nv_val = READ_CSR_FIELD<XLEN>(state, FCSR, "NV");
+        WRITE_CSR_FIELD<XLEN>(state, FFLAGS, "NV", nv_val);
+
+        // FRM
+        const XLEN frm_val = READ_CSR_FIELD<XLEN>(state, FCSR, "frm");
+        WRITE_CSR_REG<XLEN>(state, FRM, frm_val);
+
+        set_softfloat_excpetionFlags<XLEN>(state);
+
+        return nullptr;
+    }
+
+    template <typename XLEN> ActionGroup* RvzicsrInsts::fflags_update_handler(AtlasState* state)
+    {
+        // FCSR
+        const XLEN nx_val = READ_CSR_FIELD<XLEN>(state, FFLAGS, "NX");
+        WRITE_CSR_FIELD<XLEN>(state, FCSR, "NX", nx_val);
+
+        const XLEN uf_val = READ_CSR_FIELD<XLEN>(state, FFLAGS, "UF");
+        WRITE_CSR_FIELD<XLEN>(state, FCSR, "UF", uf_val);
+
+        const XLEN of_val = READ_CSR_FIELD<XLEN>(state, FFLAGS, "OF");
+        WRITE_CSR_FIELD<XLEN>(state, FCSR, "OF", of_val);
+
+        const XLEN dz_val = READ_CSR_FIELD<XLEN>(state, FFLAGS, "DZ");
+        WRITE_CSR_FIELD<XLEN>(state, FCSR, "DZ", dz_val);
+
+        const XLEN nv_val = READ_CSR_FIELD<XLEN>(state, FFLAGS, "NV");
+        WRITE_CSR_FIELD<XLEN>(state, FCSR, "NV", nv_val);
+
+        set_softfloat_excpetionFlags<XLEN>(state);
+
+        return nullptr;
+    }
+
+    template <typename XLEN> ActionGroup* RvzicsrInsts::frm_update_handler(AtlasState* state)
+    {
+        // FCSR
+        const XLEN frm_val = READ_CSR_REG<XLEN>(state, FRM);
+        WRITE_CSR_FIELD<XLEN>(state, FCSR, "frm", frm_val);
 
         return nullptr;
     }
