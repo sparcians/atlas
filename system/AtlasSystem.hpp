@@ -3,10 +3,14 @@
 #include "elfio/elfio.hpp"
 
 #include "include/AtlasTypes.hpp"
+#include "system/SimpleUART.hpp"
+#include "system/MagicMemory.hpp"
 
 #include "sparta/simulation/Unit.hpp"
 #include "sparta/simulation/ParameterSet.hpp"
 #include "sparta/memory/AddressTypes.hpp"
+#include "sparta/simulation/ResourceTreeNode.hpp"
+#include "sparta/simulation/ResourceFactory.hpp"
 
 namespace sparta::memory
 {
@@ -29,6 +33,7 @@ namespace atlas
           public:
             AtlasSystemParameters(sparta::TreeNode* node) : sparta::ParameterSet(node) {}
 
+            PARAMETER(bool, enable_uart, false, "Enable a Uart")
             HIDDEN_PARAMETER(std::string, workload, "", "Workload to load into memory")
         };
 
@@ -52,8 +57,16 @@ namespace atlas
         constexpr static uint64_t ATLAS_MEMORY_FILL = 0x0;
 
       private:
-        // Factories and tree nodes
+        // Tree nodes
         std::vector<std::unique_ptr<sparta::TreeNode>> tree_nodes_;
+
+        // Device factories
+        sparta::ResourceFactory<SimpleUART, SimpleUART::SimpleUARTParameters> uart_fact_;
+        sparta::ResourceFactory<MagicMemory, MagicMemory::MagicMemoryParameters> magic_mem_fact_;
+
+        // Devices
+        SimpleUART* uart_ = nullptr;
+        MagicMemory* magic_mem_ = nullptr;
 
         // Memory and memory maps
         std::unique_ptr<sparta::memory::SimpleMemoryMapNode> memory_map_;
@@ -71,6 +84,7 @@ namespace atlas
         };
 
         std::vector<MemorySection> memory_sections_;
+        sparta::utils::ValidValue<MemorySection> magic_memory_section_;
 
         void createMemoryMappings_(sparta::TreeNode* sys_node);
 
