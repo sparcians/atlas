@@ -126,48 +126,47 @@ namespace atlas
         // register.
         template <typename XLEN, typename SIZE> SIZE checkNanBoxing(XLEN num)
         {
-            static_assert(sizeof(XLEN) > sizeof(SIZE));
-
-            const Constants<SIZE> & cons = getConst<SIZE>();
-            constexpr XLEN mask = SIZE(-1);
-            SIZE value = cons.CAN_NAN;
-            if ((num & ~mask) == ~mask) // upper bits all 1's
+            if constexpr (sizeof(XLEN) > sizeof(SIZE))
             {
-                value = num; // truncated
+                const Constants<SIZE> & cons = getConst<SIZE>();
+                constexpr XLEN mask = SIZE(-1);
+                SIZE value = cons.CAN_NAN;
+                if ((num & ~mask) == ~mask) // upper bits all 1's
+                {
+                    value = num; // truncated
+                }
+                return value;
             }
-            return value;
+            return num;
         }
 
         // NaN-boxing a narrower SIZE floating point value for wider floating point register.
         template <typename XLEN, typename SIZE> inline XLEN nanBoxing(XLEN num)
         {
-            static_assert(sizeof(XLEN) > sizeof(SIZE));
-            constexpr XLEN mask = SIZE(-1);
-            return ~mask | (num & mask);
+            if constexpr (sizeof(XLEN) > sizeof(SIZE))
+            {
+                constexpr XLEN mask = SIZE(-1);
+                return ~mask | (num & mask);
+            }
+            return num;
         }
 
-        template <typename XLEN, typename SIZE, bool LOAD>
-        ActionGroup* floatLsHandler(AtlasState* state)
+        template <typename SIZE, bool LOAD> ActionGroup* floatLsHandler(AtlasState* state)
         {
-            static_assert(std::is_same<XLEN, RV64>::value || std::is_same<XLEN, RV32>::value);
             static_assert(std::is_same<SIZE, SP>::value || std::is_same<SIZE, DP>::value);
-            static_assert(sizeof(XLEN) >= sizeof(SIZE));
 
             const AtlasInstPtr & inst = state->getCurrentInst();
-            const XLEN paddr = state->getTranslationState()->getTranslationResult().getPaddr();
+            const Addr paddr = state->getTranslationState()->getTranslationResult().getPaddr();
 
             if constexpr (LOAD)
             {
-                XLEN value = state->readMemory<XLEN>(paddr);
-                if constexpr (sizeof(XLEN) > sizeof(SIZE))
-                {
-                    value = nanBoxing<XLEN, SIZE>(value);
-                }
-                WRITE_FP_REG<XLEN>(state, inst->getRd(), value);
+                RV64 value = state->readMemory<SIZE>(paddr);
+                value = nanBoxing<RV64, SIZE>(value);
+                WRITE_FP_REG<RV64>(state, inst->getRd(), value);
             }
             else
             {
-                state->writeMemory<SIZE>(paddr, READ_FP_REG<XLEN>(state, inst->getRs2()));
+                state->writeMemory<SIZE>(paddr, READ_FP_REG<RV64>(state, inst->getRs2()));
             }
             return nullptr;
         }

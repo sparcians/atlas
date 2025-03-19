@@ -38,8 +38,8 @@ namespace atlas
         RviInsts::getInstHandlers<RV32>(rv32_inst_actions_);
         RvmInsts::getInstHandlers<RV32>(rv32_inst_actions_);
         RvaInsts::getInstHandlers<RV32>(rv32_inst_actions_);
-        // RvfInsts::getInstHandlers<RV32>(rv32_inst_actions_);
-        // RvdInsts::getInstHandlers<RV32>(rv32_inst_actions_);
+        RvfInsts::getInstHandlers<RV32>(rv32_inst_actions_);
+        RvdInsts::getInstHandlers<RV32>(rv32_inst_actions_);
         RvzicsrInsts::getInstHandlers<RV32>(rv32_inst_actions_);
         RvzifenceiInsts::getInstHandlers<RV32>(rv32_inst_actions_);
 
@@ -52,8 +52,8 @@ namespace atlas
         // Get RV32 instruction compute address handlers
         RviInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
         RvaInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
-        // RvfInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
-        // RvdInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
+        RvfInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
+        RvdInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
 
         // Get CSR update handlers
         RvzicsrInsts::getCsrUpdateActions<RV64>(rv64_csr_update_actions_);
