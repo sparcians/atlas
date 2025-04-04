@@ -389,7 +389,12 @@ CSR64_DEFS = {
 
     # Machine Configuration
     0x30a: ["menvcfg",  "Machine environment configuration register.", {
-        "WPRI"  : { "high_bit" : 63, "low_bit" :  8, "readonly" : False, "desc" : "reserved" },
+        "STCE"  : { "high_bit" : 63, "low_bit" : 63, "readonly" : False, "desc" : "Supervisor Timer Interrupts enable" },
+        "PBMTE" : { "high_bit" : 62, "low_bit" : 62, "readonly" : False, "desc" : "Page-based memory type enable" },
+        "ADUE"  : { "high_bit" : 61, "low_bit" : 61, "readonly" : False, "desc" : "Update PTE A/D bits enable" },
+        "CDE"   : { "high_bit" : 60, "low_bit" : 60, "readonly" : False, "desc" : "(Counter Delegation enable" },
+        "DTE"   : { "high_bit" : 59, "low_bit" : 59, "readonly" : False, "desc" : "Double trap enable" },
+        "WPRI"  : { "high_bit" : 58, "low_bit" :  8, "readonly" : False, "desc" : "reserved" },
         "CBZE"  : { "high_bit" :  7, "low_bit" :  7, "readonly" : False, "desc" : "Cache block zero instruction enable" },
         "CBCFE" : { "high_bit" :  6, "low_bit" :  6, "readonly" : False, "desc" : "Cache block clean and flush instruction enable" },
         "CBIE"  : { "high_bit" :  5, "low_bit" :  4, "readonly" : False, "desc" : "Cache block invalidate instruction enable" },

@@ -304,9 +304,9 @@ def gen_csr_field_idxs_header(reg_size):
                 if i > 0:
                     fout.write('\n')
 
-                fout.write('        // Register {} '.format(reg_name.upper()))
+                fout.write('        // Register {}'.format(reg_name.upper()))
                 if i > 0:
-                    fout.write('(aliased to {}) \n'.format(reg_names[0].upper()))
+                    fout.write(' (aliased to {})\n'.format(reg_names[0].upper()))
                     fout.write('        using {} = {};\n\n'.format(reg_name.upper(), reg_names[0].upper()))
                     continue
 

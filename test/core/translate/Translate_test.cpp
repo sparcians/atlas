@@ -276,6 +276,7 @@ class AtlasTranslateTester
         const uint32_t lvl2_base_paddr = 0x20000;
         atlas::PageTable<atlas::RV32, atlas::MMUMode::SV32> lvl2_pagetable(lvl2_base_paddr);
         atlas::PageTableEntry<atlas::RV32, atlas::MMUMode::SV32> lvl2_pte{0x8000002f};
+        lvl2_pte.setAccessed();
         const uint32_t lvl2_index = (vaddr & 0x3FF000) >> 12;
         const uint32_t lvl2_paddr = lvl2_pagetable.getAddrOfIndex(lvl2_index);
         std::cout << "Loading Level 2 PTE at address 0x" << std::hex << lvl2_paddr

@@ -29,11 +29,17 @@ namespace atlas
         // Dirty bit, same for all modes
         bool isDirty() const { return pte_val_ & translate_types::Sv32::PteFields::dirty.bitmask; }
 
+        // Set the page dirty
+        void setDirty() { pte_val_ |= translate_types::Sv32::PteFields::dirty.bitmask; }
+
         // Accessed bit, same for all modes
         bool isAccessed() const
         {
             return pte_val_ & translate_types::Sv32::PteFields::accessed.bitmask;
         }
+
+        // Set accessed
+        void setAccessed() { pte_val_ |= translate_types::Sv32::PteFields::accessed.bitmask; }
 
         // Global bit, same for all modes
         bool isGlobal() const
@@ -62,7 +68,17 @@ namespace atlas
         // Valid bit, same fpr all modes
         bool isValid() const { return pte_val_ & translate_types::Sv32::PteFields::valid.bitmask; }
 
+        // Is this a Leaf PTE entry
         bool isLeaf() const { return canRead() || canExecute(); }
+
+        // Is this PTE accessable to the type
+        bool isAccessable(bool store) const
+        {
+            const decltype(pte_val_) access_mask =
+                translate_types::Sv32::PteFields::accessed.bitmask
+                | (store ? translate_types::Sv32::PteFields::dirty.bitmask : 0);
+            return pte_val_ & access_mask;
+        }
 
       private:
         XLEN pte_val_;
