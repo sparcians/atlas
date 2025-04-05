@@ -140,11 +140,38 @@ if(NOT CLANGFORMAT_EXECUTABLE)
   set(CLANGFORMAT_EXECUTABLE clang-format)
 endif()
 
+execute_process (
+  COMMAND
+     bash -c "${CLANGFORMAT_EXECUTABLE} --version"
+  OUTPUT_VARIABLE
+     CLANGFORMAT_VERSION_OUTPUT
+)
+
+set(REQUIRED_CLANGFORMAT_VERSION "14")
+
+# Extract the version number from the output
+string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLANGFORMAT_VERSION ${CLANGFORMAT_VERSION_OUTPUT})
+
+# Compare the found version with the required version
+if (CLANGFORMAT_VERSION VERSION_LESS REQUIRED_CLANGFORMAT_VERSION)
+    message(FATAL_ERROR "clang-format version ${CLANGFORMAT_VERSION} found. Version ${REQUIRED_CLANGFORMAT_VERSION} or later is required.")
+else()
+    message(STATUS "clang-format version ${CLANGFORMAT_VERSION} found.")
+endif()
+
+execute_process (
+  COMMAND
+     find core system sim arch include cosim test -name "*.[ch]pp"
+  OUTPUT_FILE
+     ${CMAKE_SOURCE_DIR}/clang-format-files.out
+  WORKING_DIRECTORY
+     ${CMAKE_SOURCE_DIR}
+)
+
 # CPUTopology is pretty clean as it is.  There's an option to NOT
 # collapse the array of structures in clang-format v16, but we're not
 # there yet
 add_custom_target(clangformat
-  find core system sim arch include cosim test -name "*.[hc]pp" > clang-format-files.out
   COMMAND
      ${CLANGFORMAT_EXECUTABLE} -i --files=clang-format-files.out
   WORKING_DIRECTORY
@@ -154,7 +181,6 @@ add_custom_target(clangformat
   )
 
 add_custom_target(clangformat-check
-  find core system sim arch include cosim test -name "*.[hc]pp" > clang-format-files.out
   COMMAND
      ${CLANGFORMAT_EXECUTABLE} --Werror -n --files=clang-format-files.out
   WORKING_DIRECTORY

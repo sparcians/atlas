@@ -20,6 +20,7 @@ message(STATUS "Found " ${NUM_CORES} " cores in machine (for ctest)")
 
 # Add regress target
 add_custom_target(atlas_regress)
+add_dependencies(atlas_regress AutogenArchFiles)
 
 # Add valgrind regress target
 set(VALGRIND_TEST_PREFIX "^valgrind_") # Only tests with this prefix

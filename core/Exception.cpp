@@ -225,5 +225,6 @@ namespace atlas
             case InterruptCause::COUNTER_OVERFLOW:
                 return 0;
         }
+        return 0;
     }
 } // namespace atlas

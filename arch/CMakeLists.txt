@@ -80,4 +80,4 @@ add_custom_command(
   DEPENDS ${DEPENDS_INST_JSON_FILES}
 )
 
-add_custom_target(AutogenArchFiles ALL DEPENDS ${AUTOGEN_REGISTER_FILES} ${AUTOGEN_INST_FILES})
+add_custom_target(AutogenArchFiles ALL DEPENDS ${AUTOGEN_CSR_HEADERS} ${AUTOGEN_REGISTER_FILES} ${AUTOGEN_INST_FILES})

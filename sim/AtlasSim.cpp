@@ -45,7 +45,7 @@ namespace atlas
             const std::string cmd = "mv " + cosim_db_->getDatabaseFile() + " "
                                     + std::filesystem::path(workload_).filename().string() + ".wdb";
             cosim_db_.reset();
-            (void)system(cmd.c_str());
+            std::ignore = system(cmd.c_str());
         }
     }
 
