@@ -15,9 +15,6 @@ namespace atlas
       public:
         using base_type = RvaInsts;
 
-        using W = uint32_t;
-        using D = uint64_t;
-
         template <typename XLEN>
         static void getInstComputeAddressHandlers(std::map<std::string, Action> & inst_handlers);
         template <typename XLEN>

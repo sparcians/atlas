@@ -13,6 +13,7 @@
 #include "core/inst_handlers/m/RvmInsts.hpp"
 #include "core/inst_handlers/zicsr/RvzicsrInsts.hpp"
 #include "core/inst_handlers/zifencei/RvzifenceiInsts.hpp"
+#include "core/inst_handlers/v/RvvInsts.hpp"
 
 namespace atlas
 {
@@ -33,6 +34,7 @@ namespace atlas
         RvdInsts::getInstHandlers<RV64>(rv64_inst_actions_);
         RvzicsrInsts::getInstHandlers<RV64>(rv64_inst_actions_);
         RvzifenceiInsts::getInstHandlers<RV64>(rv64_inst_actions_);
+        RvvInsts::getInstHandlers<RV64>(rv64_inst_actions_);
 
         // Get RV32 instruction handlers
         RviInsts::getInstHandlers<RV32>(rv32_inst_actions_);
@@ -42,6 +44,7 @@ namespace atlas
         RvdInsts::getInstHandlers<RV32>(rv32_inst_actions_);
         RvzicsrInsts::getInstHandlers<RV32>(rv32_inst_actions_);
         RvzifenceiInsts::getInstHandlers<RV32>(rv32_inst_actions_);
+        RvvInsts::getInstHandlers<RV32>(rv32_inst_actions_);
 
         // Get RV64 instruction compute address handlers
         RviInsts::getInstComputeAddressHandlers<RV64>(rv64_inst_compute_address_actions_);

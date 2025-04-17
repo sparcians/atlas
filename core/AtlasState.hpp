@@ -44,6 +44,7 @@ namespace atlas
     class Translate;
     class Exception;
     class SimController;
+    class VectorState;
 
     using MavisType =
         Mavis<AtlasInst, AtlasExtractor, AtlasInstAllocatorWrapper<AtlasInstAllocator>,
@@ -73,7 +74,7 @@ namespace atlas
         AtlasState(sparta::TreeNode* core_node, const AtlasStateParameters* p);
 
         // Not default -- defined in source file to reduce massive inlining
-        ~AtlasState();
+        virtual ~AtlasState();
 
         HartId getHartId() const { return hart_id_; }
 
@@ -157,6 +158,10 @@ namespace atlas
         const SimState* getSimState() const { return &sim_state_; }
 
         SimState* getSimState() { return &sim_state_; }
+
+        const VectorState* getVectorState() const { return vector_state_ptr_; }
+
+        VectorState* getVectorState() { return vector_state_ptr_; }
 
         const AtlasInstPtr & getCurrentInst() { return sim_state_.current_inst; }
 
@@ -354,6 +359,9 @@ namespace atlas
         //! Simulation state
         SimState sim_state_;
 
+        //! Vector state
+        VectorState* vector_state_ptr_ = nullptr;
+
         // Increment PC Action
         ActionGroup* incrementPc_(AtlasState* state);
         atlas::Action increment_pc_action_;
@@ -434,17 +442,15 @@ namespace atlas
         state->getFpRegister(reg_ident)->dmiWrite<XLEN>(reg_value);
     }
 
-    template <typename XLEN> static inline XLEN READ_VEC_REG(AtlasState* state, uint32_t reg_ident)
+    template <typename VLEN> static inline VLEN READ_VEC_REG(AtlasState* state, uint32_t reg_ident)
     {
-        static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
-        return state->getVecRegister(reg_ident)->dmiRead<XLEN>();
+        return state->getVecRegister(reg_ident)->dmiRead<VLEN>();
     }
 
-    template <typename XLEN>
-    static inline void WRITE_VEC_REG(AtlasState* state, uint32_t reg_ident, uint64_t reg_value)
+    template <typename VLEN>
+    static inline void WRITE_VEC_REG(AtlasState* state, uint32_t reg_ident, VLEN reg_value)
     {
-        static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
-        state->getVecRegister(reg_ident)->dmiWrite<XLEN>(reg_value);
+        state->getVecRegister(reg_ident)->dmiWrite<VLEN>(reg_value);
     }
 
     template <typename XLEN> static inline XLEN READ_CSR_REG(AtlasState* state, uint32_t reg_ident)

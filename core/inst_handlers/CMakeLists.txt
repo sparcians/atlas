@@ -5,6 +5,7 @@ add_subdirectory(m)
 add_subdirectory(a)
 add_subdirectory(f)
 add_subdirectory(d)
+add_subdirectory(v)
 add_subdirectory(zicsr)
 add_subdirectory(zifencei)
 
@@ -17,5 +18,6 @@ target_link_libraries(atlasinsts
     rvd
     rvzicsr
     rvzifencei
+    rvv
 )
 add_dependencies(atlasinsts AutogenArchFiles)

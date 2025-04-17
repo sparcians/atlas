@@ -19,9 +19,6 @@ namespace atlas
         using base_type = RvfInstsBase;
 
       protected:
-        using SP = uint32_t;
-        using DP = uint64_t;
-
         template <typename XLEN> inline uint_fast8_t getRM(AtlasState* state)
         {
             auto inst = state->getCurrentInst();

@@ -1,7 +1,7 @@
 RVZVE32X_INST = [
-    {'mnemonic': 'vsetvli', 'handler': 'nop', 'cost': 1, 'tags': '.json', 'memory': False, 'cof': False},
-    {'mnemonic': 'vsetvl', 'handler': 'nop', 'cost': 1, 'tags': '.json', 'memory': False, 'cof': False},
-    {'mnemonic': 'vsetivli', 'handler': 'nop', 'cost': 1, 'tags': '.json', 'memory': False, 'cof': False},
+    {'mnemonic': 'vsetvli', 'handler': 'vsetvli', 'cost': 1, 'tags': '.json', 'memory': False, 'cof': False},
+    {'mnemonic': 'vsetvl', 'handler': 'vsetvl', 'cost': 1, 'tags': '.json', 'memory': False, 'cof': False},
+    {'mnemonic': 'vsetivli', 'handler': 'vsetivli', 'cost': 1, 'tags': '.json', 'memory': False, 'cof': False},
     {'mnemonic': 'vle8.v', 'handler': 'nop', 'cost': 1, 'tags': '.json', 'memory': True, 'cof': False},
     {'mnemonic': 'vle16.v', 'handler': 'nop', 'cost': 1, 'tags': '.json', 'memory': True, 'cof': False},
     {'mnemonic': 'vle32.v', 'handler': 'nop', 'cost': 1, 'tags': '.json', 'memory': True, 'cof': False},
