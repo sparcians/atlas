@@ -37,8 +37,8 @@ namespace atlas
             if (memory_section.data != nullptr)
             {
                 std::cout << "  -- Loading section " << memory_section.name << " (" << std::dec
-                          << memory_section.file_size << "B) "
-                          << " to 0x" << std::hex << memory_section.start_address << std::endl;
+                          << memory_section.file_size << "B) " << " to 0x" << std::hex
+                          << memory_section.start_address << std::endl;
                 bool success = memory_map_->tryPoke(memory_section.start_address,
                                                     memory_section.file_size, memory_section.data);
                 if (!success)

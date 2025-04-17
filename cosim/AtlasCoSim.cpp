@@ -139,8 +139,7 @@ namespace atlas
 
         // Find event in the event list
         const cosim::EventList & event_list = event_list_.at(hart_id);
-        auto it = std::find_if(event_list.begin(), event_list.end(),
-                               [event](const cosim::Event & e)
+        auto it = std::find_if(event_list.begin(), event_list.end(), [event](const cosim::Event & e)
                                { return e.getEuid() == event->getEuid(); });
         sparta_assert(it != event_list.end(), "Event not found in event list!");
 
