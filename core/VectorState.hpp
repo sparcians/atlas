@@ -12,13 +12,23 @@ namespace atlas
       public:
         inline uint8_t getLMUL() const { return lmul_; }
 
+        inline void setLMUL(uint8_t value) { lmul_ = value; }
+
         inline uint8_t getSEW() const { return sew_; }
+
+        inline void setSEW(uint8_t value) { sew_ = value; }
 
         inline bool getVTA() const { return vta_; }
 
+        inline void setVTA(uint8_t value) { vta_ = value; }
+
         inline bool getVMA() const { return vma_; }
 
+        inline void setVMA(uint8_t value) { vma_ = value; }
+
         inline uint8_t getVL() const { return vl_; }
+
+        inline void setVL(uint8_t value) { vl_ = value; }
 
         inline uint8_t getVSTART() const { return vstart_; }
 
