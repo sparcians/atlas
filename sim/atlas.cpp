@@ -5,6 +5,22 @@ const char USAGE[] = "Usage:\n"
                      "./atlas [-i inst limit] <workload>"
                      "\n";
 
+struct regOverride
+{
+    std::string name;
+    std::string value;
+};
+
+inline std::ostream & operator<<(std::ostream & os, regOverride const & v)
+{
+    return os << "regOverride {" << v.name << ", " << v.value << "}";
+}
+
+static inline std::istream & operator>>(std::istream & is, regOverride & into)
+{
+    return is >> std::skipws >> into.name >> into.value;
+}
+
 int main(int argc, char** argv)
 {
     uint64_t ilimit = 0;
@@ -39,6 +55,7 @@ int main(int argc, char** argv)
              "Stop simulation after the instruction limit has been reached")
             ("interactive", "Enable interactive mode (IDE)")
             ("spike-formatting", "Format the Instruction Logger similar to Spike")
+            ("reg", po::value<std::vector<regOverride>>()->multitoken(), "Override initial value of a register")
             ("workload,w", po::value<std::string>(&workload), "Worklad to run (ELF or JSON)");
 
         // Add any positional command-line options
@@ -77,6 +94,31 @@ int main(int argc, char** argv)
         if (vm.count("spike-formatting") > 0)
         {
             sim.useSpikeFormatting();
+        }
+
+        const atlas::HartId hart_id = 0;
+        atlas::AtlasState* state = sim.getAtlasState(hart_id);
+        if (vm.count("reg"))
+        {
+            auto & reg_overrides = vm["reg"].as<std::vector<regOverride>>();
+            for (auto reg_override : reg_overrides)
+            {
+                bool hex_value = reg_override.value.find("0x", 0) != std::string::npos;
+                const uint64_t reg_value =
+                    std::strtoull(reg_override.value.c_str(), nullptr, (hex_value ? 16 : 10));
+
+                const bool MUST_EXIST = true;
+                sparta::Register* reg = state->findRegister(reg_override.name, MUST_EXIST);
+                if (state->getXlen() == 64)
+                {
+                    reg->dmiWrite<uint64_t>(reg_value);
+                }
+                else
+                {
+                    reg->dmiWrite<uint32_t>(reg_value);
+                }
+                std::cout << reg << std::endl;
+            }
         }
 
         cls.runSimulator(&sim);

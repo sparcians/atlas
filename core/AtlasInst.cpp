@@ -68,10 +68,13 @@ namespace atlas
             opcode_info->getSourceOpInfoList())),
         rd_info_(
             getOperand<mavis::InstMetaData::OperandFieldID::RD>(opcode_info->getDestOpInfoList())),
+        rd2_info_(
+            getOperand<mavis::InstMetaData::OperandFieldID::RD2>(opcode_info->getDestOpInfoList())),
         rs1_reg_(getSpartaReg(state, rs1_info_)),
         rs2_reg_(getSpartaReg(state, rs2_info_)),
         rs3_reg_(getSpartaReg(state, rs3_info_)),
         rd_reg_(getSpartaReg(state, rd_info_)),
+        rd2_reg_(getSpartaReg(state, rd2_info_)),
         inst_action_group_(extractor_info_->inst_action_group_)
     {
     }
