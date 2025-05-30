@@ -1,9 +1,8 @@
 #include "core/inst_handlers/v/RvvlsInsts.hpp"
 #include "core/AtlasState.hpp"
-#include "core/VectorState.hpp"
 #include "core/ActionGroup.hpp"
+#include "core/VectorState.hpp"
 #include "include/ActionTags.hpp"
-#include "include/AtlasUtils.hpp"
 
 namespace atlas
 {
@@ -222,25 +221,6 @@ namespace atlas
     template void RvvlsInsts::getInstHandlers<RV32>(std::map<std::string, Action> &);
     template void RvvlsInsts::getInstHandlers<RV64>(std::map<std::string, Action> &);
 
-    inline uint8_t decodeEEW(uint64_t width)
-    {
-        switch (width)
-        {
-            case 0b000:
-                return 8;
-            case 0b101:
-                return 16;
-            case 0b110:
-                return 32;
-            case 0b111:
-                return 64;
-            default:
-                sparta_assert(false, "Unsupported EEW Width Encoding.");
-                break;
-        }
-        return 0;
-    }
-
     template <typename XLEN, typename VLEN, typename EEW, RvvlsInsts::AddressingMode mode>
     Action::ItrType RvvlsInsts::vlseComputeAddressHandler_(atlas::AtlasState* state,
                                                            Action::ItrType action_it)
@@ -248,10 +228,10 @@ namespace atlas
         static_assert(std::is_same<XLEN, RV64>::value || std::is_same<XLEN, RV32>::value);
 
         const AtlasInstPtr inst = state->getCurrentInst();
-        VectorState* vector_state = state->getVectorState();
+        VectorConfig* vector_config_ptr = state->getVectorConfig();
         const uint8_t eewb = sizeof(EEW);
-        const uint8_t vl = vector_state->getVL();
-        const uint8_t vstart = vector_state->getVSTART();
+        const uint8_t vl = vector_config_ptr->getVL();
+        const uint8_t vstart = vector_config_ptr->getVSTART();
         const VLEN mask = READ_VEC_REG<VLEN>(state, 0);
         const XLEN rs1_val = READ_INT_REG<XLEN>(state, inst->getRs1());
 
@@ -284,12 +264,12 @@ namespace atlas
         static_assert(std::is_same<XLEN, RV64>::value || std::is_same<XLEN, RV32>::value);
 
         const AtlasInstPtr inst = state->getCurrentInst();
-        VectorState* vector_state = state->getVectorState();
+        VectorConfig* vector_config_ptr = state->getVectorConfig();
         const uint8_t vlenb = sizeof(VLEN);
         const uint8_t eewb = sizeof(EEW);
-        const uint8_t sewb = vector_state->getSEW() / 8;
-        const uint8_t vl = vector_state->getVL();
-        const uint8_t vstart = vector_state->getVSTART();
+        const uint8_t sewb = vector_config_ptr->getSEW() / 8;
+        const uint8_t vl = vector_config_ptr->getVL();
+        const uint8_t vstart = vector_config_ptr->getVSTART();
         const VLEN mask = READ_VEC_REG<VLEN>(state, 0);
         const XLEN rs1_val = READ_INT_REG<XLEN>(state, inst->getRs1());
 
@@ -318,11 +298,11 @@ namespace atlas
     Action::ItrType RvvlsInsts::vlseHandler_(atlas::AtlasState* state, Action::ItrType action_it)
     {
         const AtlasInstPtr inst = state->getCurrentInst();
-        VectorState* vector_state = state->getVectorState();
+        VectorConfig* vector_config_ptr = state->getVectorConfig();
         constexpr uint8_t vlenb = sizeof(VLEN);
         constexpr uint8_t ewb = sizeof(EW);
-        const uint8_t vl = vector_state->getVL();
-        const uint8_t vstart = vector_state->getVSTART();
+        const uint8_t vl = vector_config_ptr->getVL();
+        const uint8_t vstart = vector_config_ptr->getVSTART();
         const uint32_t rd = inst->getRd();
         const VLEN mask = READ_VEC_REG<VLEN>(state, 0);
         const uint8_t stop = std::min<uint8_t>(vl, (vstart / (vlenb / ewb) + 1) * (vlenb / ewb));
@@ -357,7 +337,7 @@ namespace atlas
         {
             WRITE_VEC_REG<VLEN>(state, rd + vstart / (vlenb / ewb), rd_val);
         }
-        vector_state->setVSTART(index);
+        vector_config_ptr->setVSTART(index);
         if (index != vl)
         {
             return action_it;
@@ -368,8 +348,8 @@ namespace atlas
     template <typename VLEN, bool load>
     Action::ItrType RvvlsInsts::vlseIdxHandler_(atlas::AtlasState* state, Action::ItrType action_it)
     {
-        VectorState* vector_state = state->getVectorState();
-        switch (vector_state->getSEW())
+        VectorConfig* vector_config_ptr = state->getVectorConfig();
+        switch (vector_config_ptr->getSEW())
         {
             case 8:
                 return vlseHandler_<VLEN, uint8_t, load>(state, action_it);

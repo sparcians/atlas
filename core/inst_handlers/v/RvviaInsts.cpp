@@ -1,9 +1,8 @@
 #include "core/inst_handlers/v/RvviaInsts.hpp"
 #include "core/AtlasState.hpp"
-#include "core/VectorState.hpp"
 #include "core/ActionGroup.hpp"
+#include "core/VectorState.hpp"
 #include "include/ActionTags.hpp"
-#include "include/AtlasUtils.hpp"
 
 namespace atlas
 {
@@ -36,11 +35,11 @@ namespace atlas
     Action::ItrType viavv_helper(AtlasState* state, Action::ItrType action_it)
     {
         const AtlasInstPtr & inst = state->getCurrentInst();
-        VectorState* vector_state = state->getVectorState();
+        VectorConfig* vector_config_ptr = state->getVectorConfig();
         uint8_t const vlenb = sizeof(VLEN);
         uint8_t const sewb = sizeof(SEW);
-        uint8_t const vl = vector_state->getVL();
-        uint8_t const vstart = vector_state->getVSTART();
+        uint8_t const vl = vector_config_ptr->getVL();
+        uint8_t const vstart = vector_config_ptr->getVSTART();
         uint32_t const vs1 = inst->getRs1();
         uint32_t const vs2 = inst->getRs2();
         uint32_t const vd = inst->getRd();
@@ -64,7 +63,7 @@ namespace atlas
                    sewb);
         }
         WRITE_VEC_REG<VLEN>(state, vd + vstart / (vlenb / sewb), vd_val);
-        vector_state->setVSTART(index);
+        vector_config_ptr->setVSTART(index);
         if (index != vl)
         {
             return action_it;
@@ -75,8 +74,8 @@ namespace atlas
     template <typename VLEN, template <typename> typename OP>
     Action::ItrType RvviaInsts::viavv_handler_(AtlasState* state, Action::ItrType action_it)
     {
-        VectorState* vector_state = state->getVectorState();
-        switch (vector_state->getSEW())
+        VectorConfig* vector_config_ptr = state->getVectorConfig();
+        switch (vector_config_ptr->getSEW())
         {
             case 8:
                 return viavv_helper<VLEN, uint8_t, OP<uint8_t>>(state, action_it);

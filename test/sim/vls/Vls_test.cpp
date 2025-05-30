@@ -1,6 +1,5 @@
 #include "test/sim/InstructionTester.hpp"
 #include "sparta/utils/SpartaTester.hpp"
-#include "core/VectorState.hpp"
 #include "mavis/Mavis.h"
 
 class VlsInstructionTester : public AtlasInstructionTester
@@ -20,8 +19,8 @@ class VlsInstructionTester : public AtlasInstructionTester
         const uint64_t v1_val = 0x0807060504030201;
         const uint32_t vd = 1, rs1 = 1;
 
-        state->getVectorState()->setVSTART(0);
-        state->getVectorState()->setVL(8); // avl = 8
+        state->getVectorConfig()->setVSTART(0);
+        state->getVectorConfig()->setVL(8); // avl = 8
         state->writeMemory<uint64_t>(addr, v1_val);
         WRITE_INT_REG<XLEN>(state, rs1, addr);
 
@@ -47,8 +46,8 @@ class VlsInstructionTester : public AtlasInstructionTester
         const uint32_t vd = 1, rs1 = 1, rs2 = 2;
         VLEN vd_val;
 
-        state->getVectorState()->setVSTART(0);
-        state->getVectorState()->setVL(8); // avl = 8
+        state->getVectorConfig()->setVSTART(0);
+        state->getVectorConfig()->setVL(8); // avl = 8
         for (size_t i = 0; i < vd_val.size(); ++i)
         {
             state->writeMemory<uint8_t>(addr + i * stride, i);
@@ -78,10 +77,10 @@ class VlsInstructionTester : public AtlasInstructionTester
         const VLEN vs2_val = {0, 2, 4, 6, 8, 10, 12, 14};
         VLEN vd_val1, vd_val2;
 
-        state->getVectorState()->setVSTART(0);
-        state->getVectorState()->setVL(8);    // avl = 8
-        state->getVectorState()->setSEW(16);  // sew = 16
-        state->getVectorState()->setLMUL(16); // lmul = 2
+        state->getVectorConfig()->setVSTART(0);
+        state->getVectorConfig()->setVL(8);    // avl = 8
+        state->getVectorConfig()->setSEW(16);  // sew = 16
+        state->getVectorConfig()->setLMUL(16); // lmul = 2
         for (size_t i = 0; i < vs2_val.size(); ++i)
         {
             state->writeMemory<uint16_t>(addr + vs2_val[i], i);

@@ -1,6 +1,5 @@
 #include "test/sim/InstructionTester.hpp"
 #include "sparta/utils/SpartaTester.hpp"
-#include "core/VectorState.hpp"
 #include "mavis/Mavis.h"
 
 class ViaInstructionTester : public AtlasInstructionTester
@@ -16,10 +15,10 @@ class ViaInstructionTester : public AtlasInstructionTester
     {
         atlas::AtlasState* state = getAtlasState();
 
-        state->getVectorState()->setVSTART(0);
-        state->getVectorState()->setVL(8);   // avl = 8
-        state->getVectorState()->setLMUL(8); // vlmul = 1
-        state->getVectorState()->setSEW(8);  // sew = 8
+        state->getVectorConfig()->setVSTART(0);
+        state->getVectorConfig()->setVL(8);   // avl = 8
+        state->getVectorConfig()->setLMUL(8); // vlmul = 1
+        state->getVectorConfig()->setSEW(8);  // sew = 8
 
         VLEN vs1_val = {0, 1, 2, 3, 4, 5, 6, 7};
         VLEN vs2_val = {1, 2, 3, 4, 5, 6, 7, 8};
@@ -44,10 +43,10 @@ class ViaInstructionTester : public AtlasInstructionTester
     {
         atlas::AtlasState* state = getAtlasState();
 
-        state->getVectorState()->setVSTART(0);
-        state->getVectorState()->setVL(16);   // avl = 16
-        state->getVectorState()->setLMUL(16); // vlmul = 2
-        state->getVectorState()->setSEW(8);   // sew = 8
+        state->getVectorConfig()->setVSTART(0);
+        state->getVectorConfig()->setVL(16);   // avl = 16
+        state->getVectorConfig()->setLMUL(16); // vlmul = 2
+        state->getVectorConfig()->setSEW(8);   // sew = 8
 
         VLEN vs1_val = {0, 1, 2, 3, 4, 5, 6, 7};
         VLEN vs2_val = {1, 2, 3, 4, 5, 6, 7, 8};
