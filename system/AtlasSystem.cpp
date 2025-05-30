@@ -10,7 +10,8 @@ namespace atlas
         sparta::Unit(sys_node),
         syscall_emulation_enabled_(p->enable_syscall_emulation)
     {
-        if (const std::string workload = p->workload; false == workload.empty()) {
+        if (const std::string workload = p->workload; false == workload.empty())
+        {
             loadWorkload_(workload);
         }
 
@@ -38,8 +39,8 @@ namespace atlas
             if (memory_section.data != nullptr)
             {
                 std::cout << "  -- Loading section " << memory_section.name << " (" << std::dec
-                          << memory_section.file_size << "B) "
-                          << " to 0x" << std::hex << memory_section.start_address << std::endl;
+                          << memory_section.file_size << "B) " << " to 0x" << std::hex
+                          << memory_section.start_address << std::endl;
                 bool success = memory_map_->tryPoke(memory_section.start_address,
                                                     memory_section.file_size, memory_section.data);
                 if (!success)
@@ -54,7 +55,8 @@ namespace atlas
     {
         if (elf_reader_.load(workload) == false)
         {
-            throw sparta::SpartaException() << "\n\nERROR: ELF binary '" << workload << "' failed to load! Does it exist?\n";
+            throw sparta::SpartaException()
+                << "\n\nERROR: ELF binary '" << workload << "' failed to load! Does it exist?\n";
         }
 
         std::cout << "\nLoading ELF binary: " << workload << std::endl;

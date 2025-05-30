@@ -1,10 +1,8 @@
 #include "core/inst_handlers/v/RvviaInsts.hpp"
 #include "core/AtlasState.hpp"
-#include "core/VectorState.hpp"
 #include "core/ActionGroup.hpp"
+#include "core/VectorState.hpp"
 #include "include/ActionTags.hpp"
-#include "include/AtlasUtils.hpp"
-#include "core/Execute.hpp"
 
 namespace atlas
 {
@@ -18,16 +16,16 @@ namespace atlas
 
         inst_handlers.emplace(
             "vadd.vv",
-            atlas::Action::createAction<&RvviaInsts::viavv_handler_<XLEN, VLEN, std::plus>,
-                                        RvviaInsts>(nullptr, "vadd.vv", ActionTags::EXECUTE_TAG));
+            atlas::Action::createAction<&RvviaInsts::viavv_handler_<VLEN, std::plus>, RvviaInsts>(
+                nullptr, "vadd.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vadd.vx",
             atlas::Action::createAction<&RvviaInsts::viavx_handler_<XLEN, VLEN, std::plus>,
                                         RvviaInsts>(nullptr, "vadd.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vadd.vi",
-            atlas::Action::createAction<&RvviaInsts::viavi_handler_<XLEN, VLEN, std::plus>,
-                                        RvviaInsts>(nullptr, "vadd.vi", ActionTags::EXECUTE_TAG));
+            atlas::Action::createAction<&RvviaInsts::viavi_handler_<VLEN, std::plus>, RvviaInsts>(
+                nullptr, "vadd.vi", ActionTags::EXECUTE_TAG));
     }
 
     template void RvviaInsts::getInstHandlers<RV32>(std::map<std::string, Action> &);
@@ -37,33 +35,35 @@ namespace atlas
     Action::ItrType viavv_helper(AtlasState* state, Action::ItrType action_it)
     {
         const AtlasInstPtr & inst = state->getCurrentInst();
-        VectorState* vector_state = state->getVectorState();
+        VectorConfig* vector_config_ptr = state->getVectorConfig();
         uint8_t const vlenb = sizeof(VLEN);
         uint8_t const sewb = sizeof(SEW);
-        uint8_t const vl = vector_state->getVL();
-        uint8_t const vstart = vector_state->getVSTART();
-        uint32_t const rs1 = inst->getRs1();
-        uint32_t const rs2 = inst->getRs2();
-        uint32_t const rd = inst->getRd();
+        uint8_t const vl = vector_config_ptr->getVL();
+        uint8_t const vstart = vector_config_ptr->getVSTART();
+        uint32_t const vs1 = inst->getRs1();
+        uint32_t const vs2 = inst->getRs2();
+        uint32_t const vd = inst->getRd();
         if (vstart >= vl)
         {
             return ++action_it;
         }
-        VLEN const rs1_val = READ_VEC_REG<VLEN>(state, rs1 + vstart / (vlenb / sewb));
-        VLEN const rs2_val = READ_VEC_REG<VLEN>(state, rs2 + vstart / (vlenb / sewb));
-        VLEN rd_val = READ_VEC_REG<VLEN>(state, rd + vstart / (vlenb / sewb));
+        VLEN const vs1_val = READ_VEC_REG<VLEN>(state, vs1 + vstart / (vlenb / sewb));
+        VLEN const vs2_val = READ_VEC_REG<VLEN>(state, vs2 + vstart / (vlenb / sewb));
+        VLEN vd_val = READ_VEC_REG<VLEN>(state, vd + vstart / (vlenb / sewb));
         uint8_t const stop = std::min<uint8_t>(vl, (vstart / (vlenb / sewb) + 1) * (vlenb / sewb));
         uint8_t index = vstart;
         for (; index < stop; ++index)
         {
-            SEW result = OP()(*(reinterpret_cast<const uint8_t*>(
-                                  rs1_val.data() + (index % (vlenb / sewb)) * sewb)),
-                              *(reinterpret_cast<const uint8_t*>(
-                                  rs2_val.data() + (index % (vlenb / sewb)) * sewb)));
-            memcpy(rd_val.data() + (index % (vlenb / sewb)) * sewb, &result, sewb);
+            SEW result =
+                OP()(*(reinterpret_cast<const SEW*>(reinterpret_cast<const uint8_t*>(&vs1_val)
+                                                    + (index % (vlenb / sewb)) * sewb)),
+                     *(reinterpret_cast<const SEW*>(reinterpret_cast<const uint8_t*>(&vs2_val)
+                                                    + (index % (vlenb / sewb)) * sewb)));
+            memcpy(reinterpret_cast<uint8_t*>(&vd_val) + (index % (vlenb / sewb)) * sewb, &result,
+                   sewb);
         }
-        WRITE_VEC_REG<VLEN>(state, rd + vstart / (vlenb / sewb), rd_val);
-        vector_state->setVSTART(index);
+        WRITE_VEC_REG<VLEN>(state, vd + vstart / (vlenb / sewb), vd_val);
+        vector_config_ptr->setVSTART(index);
         if (index != vl)
         {
             return action_it;
@@ -71,11 +71,11 @@ namespace atlas
         return ++action_it;
     }
 
-    template <typename XLEN, typename VLEN, template <typename> typename OP>
+    template <typename VLEN, template <typename> typename OP>
     Action::ItrType RvviaInsts::viavv_handler_(AtlasState* state, Action::ItrType action_it)
     {
-        VectorState* vector_state = state->getVectorState();
-        switch (vector_state->getSEW())
+        VectorConfig* vector_config_ptr = state->getVectorConfig();
+        switch (vector_config_ptr->getSEW())
         {
             case 8:
                 return viavv_helper<VLEN, uint8_t, OP<uint8_t>>(state, action_it);
@@ -103,7 +103,7 @@ namespace atlas
         return ++action_it;
     }
 
-    template <typename XLEN, typename VLEN, template <typename> typename OP>
+    template <typename VLEN, template <typename> typename OP>
     Action::ItrType RvviaInsts::viavi_handler_(AtlasState* state, Action::ItrType action_it)
     {
         (void)state;

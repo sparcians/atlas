@@ -15,6 +15,7 @@
 #include "core/inst_handlers/zifencei/RvzifenceiInsts.hpp"
 #include "core/inst_handlers/v/RvvcsInsts.hpp"
 #include "core/inst_handlers/v/RvviaInsts.hpp"
+#include "core/inst_handlers/v/RvvlsInsts.hpp"
 
 namespace atlas
 {
@@ -37,6 +38,7 @@ namespace atlas
         RvzifenceiInsts::getInstHandlers<RV64>(rv64_inst_actions_);
         RvvcsInsts::getInstHandlers<RV64>(rv64_inst_actions_);
         RvviaInsts::getInstHandlers<RV64>(rv64_inst_actions_);
+        RvvlsInsts::getInstHandlers<RV64>(rv64_inst_actions_);
 
         // Get RV32 instruction handlers
         RviInsts::getInstHandlers<RV32>(rv32_inst_actions_);
@@ -48,18 +50,21 @@ namespace atlas
         RvzifenceiInsts::getInstHandlers<RV32>(rv32_inst_actions_);
         RvvcsInsts::getInstHandlers<RV32>(rv32_inst_actions_);
         RvviaInsts::getInstHandlers<RV32>(rv32_inst_actions_);
+        RvvlsInsts::getInstHandlers<RV32>(rv32_inst_actions_);
 
         // Get RV64 instruction compute address handlers
         RviInsts::getInstComputeAddressHandlers<RV64>(rv64_inst_compute_address_actions_);
         RvaInsts::getInstComputeAddressHandlers<RV64>(rv64_inst_compute_address_actions_);
         RvfInsts::getInstComputeAddressHandlers<RV64>(rv64_inst_compute_address_actions_);
         RvdInsts::getInstComputeAddressHandlers<RV64>(rv64_inst_compute_address_actions_);
+        RvvlsInsts::getInstComputeAddressHandlers<RV64>(rv64_inst_compute_address_actions_);
 
         // Get RV32 instruction compute address handlers
         RviInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
         RvaInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
         RvfInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
         RvdInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
+        RvvlsInsts::getInstComputeAddressHandlers<RV32>(rv32_inst_compute_address_actions_);
 
         // Get CSR update handlers
         RvzicsrInsts::getCsrUpdateActions<RV64>(rv64_csr_update_actions_);

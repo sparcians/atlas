@@ -48,7 +48,7 @@ class VcsInstructionTester : public AtlasInstructionTester
     void testVsetivli()
     {
         atlas::AtlasState* state = getAtlasState();
-        const uint64_t pc = 0x1000;
+        const atlas::Addr pc = 0x1000;
         const uint32_t rd = 3;
         uint32_t opcode;
 
@@ -94,7 +94,7 @@ class VcsInstructionTester : public AtlasInstructionTester
         offset += 1;
         opcode |= 1 << offset;
         offset += 1;
-        assert(offset == 32);
+        EXPECT_EQUAL(offset, 32);
         return opcode;
     }
 
