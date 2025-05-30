@@ -179,9 +179,6 @@ namespace atlas
         // Cache immediate value, unsigned and signed
         const uint64_t immediate_value_;
 
-        // Next PC
-        Addr next_pc_;
-
         // Registers
         const mavis::OperandInfo::Element* rs1_info_;
         const mavis::OperandInfo::Element* rs2_info_;

@@ -1,0 +1,20 @@
+name: atlas2
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - cmake=3.30
+  - make
+  - python=3.10.14
+  - clang=15
+  - clangxx=15
+  - llvm-tools
+  - cppcheck
+  - lld
+  - boost=1.78
+  - boost-cpp=1.78
+  - yaml-cpp
+  - sqlite
+  - hdf5
+  - rapidjson
+  - zlib

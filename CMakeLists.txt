@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.30)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT DEFINED CMAKE_C_COMPILER)
     set(CMAKE_C_COMPILER "clang")
@@ -10,9 +10,6 @@ endif()
 if(NOT DEFINED CMAKE_CXX_COMPILER)
     set(CMAKE_CXX_COMPILER "clang++")
 endif()
-
-# HDF5 and PThreads do not have static libraries
-#set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 
 message(STATUS "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 message(STATUS "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
@@ -45,9 +42,6 @@ else()
     -Wuninitialized -Wsequence-point -Wno-inline -Wunknown-pragmas
     -Woverloaded-virtual -Wmissing-field-initializers -pipe)
 endif()
-
-find_package (Boost 1.74.0 REQUIRED COMPONENTS program_options)
-message (STATUS "Using BOOST ${Boost_VERSION_STRING}")
 
 # Use ccache if installed
 find_program (CCACHE_PROGRAM ccache)
