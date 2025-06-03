@@ -2,6 +2,7 @@
 
 #include "sim/AtlasSim.hpp"
 #include "core/AtlasState.hpp"
+#include "core/VectorState.hpp"
 #include "include/AtlasTypes.hpp"
 
 class AtlasInstructionTester

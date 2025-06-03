@@ -111,6 +111,11 @@ namespace atlas
             return opcode_info_->getSpecialField(mavis::OpcodeInfo::SpecialField::AVL);
         }
 
+        uint64_t getVM() const
+        {
+            return opcode_info_->getSpecialField(mavis::OpcodeInfo::SpecialField::VM);
+        }
+
         sparta::Register* getRs1Reg() const
         {
             sparta_assert(rs1_reg_, "Operand RS1 is a nullptr! " << *this);

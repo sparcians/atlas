@@ -97,6 +97,21 @@ void testVecRegs()
     EXPECT_EQUAL(v0_reg_val, rand_val);
 }
 
+void testVecElems()
+{
+    RegisterTester tester;
+    atlas::AtlasState* state = tester.getAtlasState();
+
+    // Generate a random uint64_t
+    uint8_t rand_val = dis(gen);
+    uint8_t rand_idx = dis(gen) % 8;
+
+    // Verify the v0 register
+    WRITE_VEC_ELEM<uint8_t>(state, atlas::V0, rand_val, rand_idx);
+    auto v0_reg_val = READ_VEC_ELEM<uint8_t>(state, atlas::V0, rand_idx);
+    EXPECT_EQUAL(v0_reg_val, rand_val);
+}
+
 void testCsrRegs()
 {
     RegisterTester tester;
@@ -264,6 +279,7 @@ int main()
     testIntRegs();
     testFpRegs();
     testVecRegs();
+    testVecElems();
     testCsrRegs();
 
     REPORT_ERROR;
