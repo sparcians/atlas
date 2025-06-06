@@ -32,9 +32,25 @@ namespace atlas
     Action::ItrType viavvHelper(AtlasState* state, Action::ItrType action_it)
     {
         const AtlasInstPtr & inst = state->getCurrentInst();
-        VectorElements<ElemWidth> elems_vs1{state, inst->getRs1(), false};
-        VectorElements<ElemWidth> elems_vs2{state, inst->getRs2(), false};
-        VectorElements<ElemWidth> elems_vd{state, inst->getRd(), false};
+        const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+        MaskElements::MaskBitIterator mask_iter_vs1{&mask_elems,
+                                                    state->getVectorConfig()->getVSTART()};
+        MaskElements::MaskBitIterator mask_iter_vs2{&mask_elems,
+                                                    state->getVectorConfig()->getVSTART()};
+        MaskElements::MaskBitIterator mask_iter_vd{&mask_elems,
+                                                   state->getVectorConfig()->getVSTART()};
+        MaskElements::MaskBitIterator* mask_iter_vs1_ptr =
+            inst->getVM() ? nullptr : &mask_iter_vs1;
+        MaskElements::MaskBitIterator* mask_iter_vs2_ptr =
+            inst->getVM() ? nullptr : &mask_iter_vs1;
+        MaskElements::MaskBitIterator* mask_iter_vd_ptr =
+            inst->getVM() ? nullptr : &mask_iter_vd;
+        Elements<Element<ElemWidth>> elems_vs1{state, state->getVectorConfig(),
+                                               inst->getRs1(), mask_iter_vs1_ptr};
+        Elements<Element<ElemWidth>> elems_vs2{state, state->getVectorConfig(),
+                                               inst->getRs2(), mask_iter_vs2_ptr};
+        Elements<Element<ElemWidth>> elems_vd{state, state->getVectorConfig(),
+                                              inst->getRd(), mask_iter_vd_ptr};
 
         for (auto iter_vs1 = elems_vs1.begin(), iter_vs2 = elems_vs2.begin(),
                   iter_vd = elems_vd.begin();
@@ -49,8 +65,8 @@ namespace atlas
     template <template <typename> typename FunctorTemp>
     Action::ItrType RvviaInsts::viavvHandler_(AtlasState* state, Action::ItrType action_it)
     {
-        VectorConfig* vector_config_ptr = state->getVectorConfig();
-        switch (vector_config_ptr->getSEW())
+        VectorConfig* vector_config = state->getVectorConfig();
+        switch (vector_config->getSEW())
         {
             case 8:
                 return viavvHelper<8, FunctorTemp<uint8_t>>(state, action_it);

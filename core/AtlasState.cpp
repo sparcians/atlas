@@ -49,7 +49,7 @@ namespace atlas
             isa_file_path_)),
         stop_sim_on_wfi_(p->stop_sim_on_wfi),
         hypervisor_enabled_(extension_manager_.isEnabled("h")),
-        vector_config_ptr_(new VectorConfig()),
+        vector_config_(new VectorConfig{}),
         inst_logger_(core_tn, "inst", "Atlas Instruction Logger"),
         finish_action_group_("finish_inst"),
         stop_sim_action_group_("stop_sim")
@@ -100,9 +100,9 @@ namespace atlas
     // Not default -- defined in source file to reduce massive inlining
     AtlasState::~AtlasState()
     {
-        if (vector_config_ptr_)
+        if (vector_config_)
         {
-            delete vector_config_ptr_;
+            delete vector_config_;
         }
     }
 

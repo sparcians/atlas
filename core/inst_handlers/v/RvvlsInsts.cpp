@@ -194,6 +194,7 @@ namespace atlas
         static_assert(std::is_same<XLEN, RV64>::value || std::is_same<XLEN, RV32>::value);
 
         const AtlasInstPtr inst = state->getCurrentInst();
+        VectorConfig* config = state->getVectorConfig();
         const uint8_t eewb = ElemWidth / 8;
         const XLEN rs1_val = READ_INT_REG<XLEN>(state, inst->getRs1());
 
@@ -206,12 +207,24 @@ namespace atlas
         {
             stride = READ_INT_REG<XLEN>(state, inst->getRs2());
         }
-        // A dummy VectorElements just to access the mask.
-        VectorElements<ElemWidth> elems_dummy{state, atlas::V0, !inst->getVM()};
-        for (auto iter_dummy = elems_dummy.begin(); iter_dummy != elems_dummy.end(); ++iter_dummy)
+        if (inst->getVM())
         {
-            inst->getTranslationState()->makeRequest(rs1_val + iter_dummy.getIndex() * stride,
-                                                     eewb);
+            for ( uint8_t i = config->getVSTART(); i < config->getVL(); ++i)
+            {
+                inst->getTranslationState()->makeRequest(rs1_val + i * stride, eewb);
+            }
+        }
+        else // masked
+        {
+            const MaskElements mask_elems{state, config, atlas::V0};
+            for (auto mask_iter =
+                    MaskElements::MaskBitIterator{&mask_elems, config->getVSTART()};
+                mask_iter != MaskElements::MaskBitIterator{&mask_elems, config->getVL()};
+                ++mask_iter)
+            {
+                inst->getTranslationState()->makeRequest(rs1_val + mask_iter.getIndex() * stride,
+                                                            eewb);
+            }
         }
         return ++action_it;
     }
@@ -223,11 +236,16 @@ namespace atlas
         static_assert(std::is_same<XLEN, RV64>::value || std::is_same<XLEN, RV32>::value);
 
         const AtlasInstPtr inst = state->getCurrentInst();
-        VectorConfig* vector_config_ptr = state->getVectorConfig();
-        const uint8_t sewb = vector_config_ptr->getSEW() / 8;
+        VectorConfig* vector_config = state->getVectorConfig();
+        const uint8_t sewb = vector_config->getSEW() / 8;
         const XLEN rs1_val = READ_INT_REG<XLEN>(state, inst->getRs1());
+        const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+        MaskElements::MaskBitIterator mask_iter{&mask_elems,
+                                                state->getVectorConfig()->getVSTART()};
+        MaskElements::MaskBitIterator* mask_iter_ptr = inst->getVM() ? nullptr : &mask_iter;
+        Elements<Element<ElemWidth>> elems_vs2{state, state->getVectorConfig(),
+                                               inst->getRs2(), mask_iter_ptr};
 
-        VectorElements<ElemWidth> elems_vs2{state, inst->getRs2(), !inst->getVM()};
         for (auto stride : elems_vs2)
         {
             inst->getTranslationState()->makeRequest(rs1_val + stride.getVal(), sewb);
@@ -237,11 +255,17 @@ namespace atlas
     }
 
     template <uint8_t ElemWidth, bool load>
-    Action::ItrType RvvlsInsts::vlseHandler_(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvlsInsts::vlseHandler_(atlas::AtlasState* state,
+                                             Action::ItrType action_it)
     {
         const AtlasInstPtr inst = state->getCurrentInst();
+        const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+        MaskElements::MaskBitIterator mask_iter{&mask_elems,
+                                                state->getVectorConfig()->getVSTART()};
+        MaskElements::MaskBitIterator* mask_iter_ptr = inst->getVM() ? nullptr : &mask_iter;
+        Elements<Element<ElemWidth>> elems_vd{state, state->getVectorConfig(),
+                                              inst->getRd(), mask_iter_ptr};
 
-        VectorElements<ElemWidth> elems_vd{state, inst->getRd(), !inst->getVM()};
         for (auto iter_vd = elems_vd.begin(); iter_vd != elems_vd.end(); ++iter_vd)
         {
             if constexpr (load)
@@ -264,10 +288,11 @@ namespace atlas
     }
 
     template <bool load>
-    Action::ItrType RvvlsInsts::vlseIdxHandler_(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvlsInsts::vlseIdxHandler_(atlas::AtlasState* state,
+                                                Action::ItrType action_it)
     {
-        VectorConfig* vector_config_ptr = state->getVectorConfig();
-        switch (vector_config_ptr->getSEW())
+        VectorConfig* vector_config = state->getVectorConfig();
+        switch (vector_config->getSEW())
         {
             case 8:
                 return vlseHandler_<8, load>(state, action_it);
