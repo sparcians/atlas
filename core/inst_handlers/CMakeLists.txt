@@ -3,6 +3,7 @@ project(Atlas)
 add_subdirectory(i)
 add_subdirectory(m)
 add_subdirectory(a)
+add_subdirectory(b)
 add_subdirectory(f)
 add_subdirectory(d)
 add_subdirectory(v)
@@ -16,6 +17,7 @@ target_link_libraries(atlasinsts
     rva
     rvf
     rvd
+    rvb
     rvzicsr
     rvzifencei
     rvv
