@@ -29,6 +29,8 @@ namespace atlas
 
         ActionGroup* getActionGroup() { return &execute_action_group_; }
 
+        bool getSystemCallEmulation() const { return enable_syscall_emulation_; }
+
         using InstHandlersMap = std::map<std::string, Action>;
         using CsrUpdateActionsMap = std::map<uint32_t, Action>;
 
@@ -72,6 +74,8 @@ namespace atlas
         }
 
       private:
+        const bool enable_syscall_emulation_;
+
         Action::ItrType execute_(atlas::AtlasState* state, Action::ItrType action_it);
 
         ActionGroup execute_action_group_{"Execute"};

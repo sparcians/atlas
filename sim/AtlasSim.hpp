@@ -1,5 +1,9 @@
 #pragma once
 
+#include <vector>
+#include <string>
+#include <cinttypes>
+
 #include "core/AtlasState.hpp"
 #include "core/Fetch.hpp"
 #include "core/translate/Translate.hpp"
@@ -14,7 +18,14 @@ namespace atlas
     class AtlasSim : public sparta::app::Simulation
     {
       public:
-        AtlasSim(sparta::Scheduler* scheduler, const std::string & workload, uint64_t ilimit);
+
+        using RegValueOverridePairs = std::vector<std::pair<std::string, std::string>>;
+        using WorkloadAndArguments = std::vector<std::string>;
+
+        AtlasSim(sparta::Scheduler* scheduler,
+                 const WorkloadAndArguments & workload_and_args,
+                 const RegValueOverridePairs & reg_value_overrides,
+                 uint64_t ilimit);
         ~AtlasSim();
 
         // Run the simulator
@@ -57,7 +68,8 @@ namespace atlas
         // Atlas system
         AtlasSystem * system_ = nullptr;
 
-        const std::string workload_;
+        const WorkloadAndArguments workload_and_args_;
+        const RegValueOverridePairs reg_value_overrides_;
         const uint64_t ilimit_;
         std::shared_ptr<CoSimQuery> cosim_query_;
 

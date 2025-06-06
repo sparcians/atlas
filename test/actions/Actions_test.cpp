@@ -39,9 +39,8 @@ int main()
 {
     // Create the simulator
     sparta::Scheduler scheduler_;
-    const std::string workload = "";
     const uint64_t ilimit = 0;
-    atlas::AtlasSim atlas_sim {&scheduler_, workload, ilimit};
+    atlas::AtlasSim atlas_sim {&scheduler_, {}, {}, ilimit};
 
     atlas_sim.buildTree();
     atlas_sim.configureTree();

@@ -3,25 +3,24 @@
 
 #include "sim/AtlasSim.hpp"
 #include "sparta/app/CommandLineSimulator.hpp"
-#include "sparta/utils/LogUtils.hpp"
 
 const char USAGE[] =
     "Usage:\n"
     "./atlas [-i inst limit] [--reg \"name value\"] [--interactive] [--spike-formatting] <workload>"
     "\n";
 
-struct regOverride
+struct RegOverride
 {
     std::string name;
     std::string value;
 };
 
-inline std::ostream & operator<<(std::ostream & os, regOverride const & v)
+inline std::ostream & operator<<(std::ostream & os, RegOverride const & v)
 {
-    return os << "regOverride {" << v.name << ", " << v.value << "}";
+    return os << "RegOverride {" << v.name << ", " << v.value << "}";
 }
 
-static inline std::istream & operator>>(std::istream & is, regOverride & into)
+static inline std::istream & operator>>(std::istream & is, RegOverride & into)
 {
     return is >> std::skipws >> into.name >> into.value;
 }
@@ -58,7 +57,7 @@ int main(int argc, char** argv)
         app_opts.add_options()
             ("inst-limit,i", po::value<uint64_t>(&ilimit),
              "Stop simulation after the instruction limit has been reached")
-            ("reg", po::value<std::vector<regOverride>>()->multitoken(), "Override initial value of a register")
+            ("reg", po::value<std::vector<RegOverride>>()->multitoken(), "Override initial value of a register")
             ("interactive", "Enable interactive mode (IDE)")
             ("spike-formatting", "Format the Instruction Logger similar to Spike")
             ("workload,w", po::value<std::string>(&workload), "Worklad to run (ELF or JSON)");
@@ -82,12 +81,26 @@ int main(int argc, char** argv)
             std::cout << USAGE;
             return 1;
         }
+        // Workload command line arguments
+        std::vector<std::string> workload_args;
+        sparta::utils::tokenize_on_whitespace(workload, workload_args);
 
         const auto & vm = cls.getVariablesMap();
 
+        // Shove some register overrides in
+        atlas::AtlasSim::RegValueOverridePairs reg_value_overrides;
+        if (vm.count("reg"))
+        {
+            auto & reg_overrides = vm["reg"].as<std::vector<RegOverride>>();
+            for (auto reg_override : reg_overrides)
+            {
+                reg_value_overrides.emplace_back(std::make_pair(reg_override.name, reg_override.value));
+            }
+        }
+
         // Create the simulator
         sparta::Scheduler scheduler;
-        atlas::AtlasSim sim(&scheduler, workload, ilimit);
+        atlas::AtlasSim sim(&scheduler, workload_args, reg_value_overrides, ilimit);
 
         cls.populateSimulation(&sim);
 
@@ -99,33 +112,6 @@ int main(int argc, char** argv)
         if (vm.count("spike-formatting") > 0)
         {
             sim.useSpikeFormatting();
-        }
-
-        const atlas::HartId hart_id = 0;
-        atlas::AtlasState* state = sim.getAtlasState(hart_id);
-        if (vm.count("reg"))
-        {
-            auto & reg_overrides = vm["reg"].as<std::vector<regOverride>>();
-            for (auto reg_override : reg_overrides)
-            {
-                const uint64_t reg_value = std::strtoull(reg_override.value.c_str(), nullptr, 0);
-
-                const bool MUST_EXIST = true;
-                sparta::Register* reg = state->findRegister(reg_override.name, MUST_EXIST);
-                if (state->getXlen() == 64)
-                {
-                    reg->dmiWrite<uint64_t>(reg_value);
-                }
-                else
-                {
-                    reg->dmiWrite<uint32_t>(reg_value);
-                }
-                std::cout << "Writing " << std::quoted(reg->getName());
-                if (reg->getAliases().size() != 0) {
-                    std::cout << " aka " << reg->getAliases();
-                }
-                std::cout << " to " << HEX16(reg_value) << std::endl;
-            }
         }
 
         cls.runSimulator(&sim);

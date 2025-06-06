@@ -89,12 +89,6 @@ namespace atlas
 
         std::string workload_;
 
-        //! Bad handler
-        void badSystemCallHandler_(const SystemCallStack &, sparta::memory::BlockingMemoryIF*)
-        {
-            throw("System Call is known, but not supported");
-        }
-
         std::unique_ptr<SysCallHandlers> callbacks_;
     };
 } // namespace atlas

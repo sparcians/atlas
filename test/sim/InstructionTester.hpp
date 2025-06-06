@@ -11,9 +11,8 @@ class AtlasInstructionTester
     AtlasInstructionTester()
     {
         // Create the simulator
-        const std::string workload = "";
         const uint64_t ilimit = 0;
-        atlas_sim_.reset(new atlas::AtlasSim(&scheduler_, workload, ilimit));
+        atlas_sim_.reset(new atlas::AtlasSim(&scheduler_, {}, {}, ilimit));
 
         atlas_sim_->buildTree();
         atlas_sim_->configureTree();

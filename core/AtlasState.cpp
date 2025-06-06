@@ -445,6 +445,161 @@ namespace atlas
         return ++action_it;
     }
 
+    // Initialze a program stack (argc, argv, envp, auxv, etc)
+    // Useful info about ELF binaries: https://lwn.net/Articles/631631/
+    // This is used mostly for system call emulation
+    void AtlasState::setupProgramStack(const std::vector<std::string> & program_arguments)
+    {
+        if (false == getExecuteUnit()->getSystemCallEmulation()) {
+            // System call emulation is not enabled.  There's a good
+            // chance we might be running a bare metal binary so no
+            // need to set up prog arguments.  In any event, we better
+            // not receive any either.
+            sparta_assert(program_arguments.size() == 1,
+                          "System Call emulation is not enabled, but the program is given arguments: "
+                          << program_arguments);
+            return;
+        }
+
+        //
+        // Taken from this awesome article:
+        //
+        // http://articles.manugarg.com/aboutelfauxiliaryvectors.html
+        //
+        // position          content                       size (bytes) + comment
+        //------------------------------------------------------------------------
+        // stack pointer ->  [ argc = number of args ]     4
+        //                   [ argv[0] (pointer) ]         4   (program name)
+        //                   [ argv[1] (pointer) ]         4
+        //                   [ argv[..] (pointer) ]        4 * x
+        //                   [ argv[n - 1] (pointer) ]     4
+        //                   [ argv[n] (pointer) ]         4   (= NULL)
+        //                   [ envp[0] (pointer) ]         4
+        //                   [ envp[1] (pointer) ]         4
+        //                   [ envp[..] (pointer) ]        4
+        //                   [ envp[term] (pointer) ]      4   (= NULL)
+        //                   [ auxv[0] (Elf32_auxv_t) ]    8
+        //                   [ auxv[1] (Elf32_auxv_t) ]    8
+        //                   [ auxv[..] (Elf32_auxv_t) ]   8
+        //                   [ auxv[term] (Elf32_auxv_t) ] 8   (= AT_NULL vector)
+        //                   [ padding ]                   0 - 16
+        //                   [ argument ASCIIZ strings ]   >= 0
+        //                   [ environment ASCIIZ str. ]   >= 0
+        // (0xbffffffc)      [ end marker ]                4   (= NULL)
+        // (0xc0000000)      < bottom of stack >           0   (virtual)
+        //
+        // The argument stack contains env, followed by command line
+        // arguments, auxv data, ELF aux vector info, environment,
+        // argv, and then argc.  The SP starts at argc and grows
+        // towards upward.
+
+        // Get the SP (aka x2)
+        const bool MUST_EXIST = true;
+        sparta::Register* reg = findRegister("sp", MUST_EXIST);
+        uint64_t sp = 0;
+        if (xlen_ == 64) {
+            sp = reg->dmiRead<RV64>();
+        }
+        else {
+            sp = reg->dmiRead<RV64>();
+        }
+        sparta_assert(sp != 0,
+                      "The stack pointer (sp aka x2) is set to 0.  Use --reg \"sp <val>\" "
+                      "to set it to something...smarter");
+
+        auto* memory = sparta::notNull(atlas_system_)->getSystemMemory();
+        sparta_assert(memory != nullptr,
+                      "Got no memory to preload with the argument stack");
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // Set up argc
+        uint64_t data = program_arguments.size();
+        memory->poke(sp, 8, (uint8_t*)&data);
+        sp += 8;
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // Set up argv pointers space -- where the arguments for the
+        // program will be found in memory
+        auto argv_sp_addr = sp; // Remember this address for later
+        sp += 8 * program_arguments.size();
+        data = 0;
+        // Write (null) or end of argv arguments
+        memory->poke(sp, 8, (uint8_t*)&data);
+        sp += 8;
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // Set up envp -- empty for now
+        std::vector<std::string> env_vars;
+        auto envp_sp_addr = sp;
+        sp += 8 * env_vars.size();
+        data = 0;
+        memory->poke(sp, 8, (uint8_t*)&data);  // Write (nil)
+        sp += 8;
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // Set up auxv
+        // Magic...
+        // https://github.com/pytorch/cpuinfo/blob/6c9eb84ba310f237cea13c478be50102e1128e9b/src/riscv/linux/riscv-isa.c
+        const auto AT_HWCAP = 16;
+        const auto COMPAT_HWCAP_ISA_I   (1 << ('I' - 'A'));
+        const auto COMPAT_HWCAP_ISA_M   (1 << ('M' - 'A'));
+        const auto COMPAT_HWCAP_ISA_A   (1 << ('A' - 'A'));
+        const auto COMPAT_HWCAP_ISA_F   (1 << ('F' - 'A'));
+        const auto COMPAT_HWCAP_ISA_D   (1 << ('D' - 'A'));
+        const auto COMPAT_HWCAP_ISA_C   (1 << ('C' - 'A'));
+        const auto COMPAT_HWCAP_ISA_V   (1 << ('V' - 'A'));
+
+        uint64_t a_val = COMPAT_HWCAP_ISA_I | COMPAT_HWCAP_ISA_M | COMPAT_HWCAP_ISA_A;
+        if(extension_manager_.isEnabled("f")) {
+            a_val |= COMPAT_HWCAP_ISA_F;
+        }
+        if(extension_manager_.isEnabled("d")) {
+            a_val |= COMPAT_HWCAP_ISA_D;
+        }
+        if(extension_manager_.isEnabled("c")) {
+            a_val |= COMPAT_HWCAP_ISA_C;
+        }
+        if(extension_manager_.isEnabled("v")) {
+            a_val |= COMPAT_HWCAP_ISA_V;
+        }
+        uint64_t auxv[2] = { AT_HWCAP, a_val };
+        memory->poke(sp, 16, (uint8_t*)&auxv);
+        sp += 16;
+
+        //padding
+        memory->poke(sp, 8, (uint8_t*)&data); // Write (null)
+        sp += 8;
+        memory->poke(sp, 8, (uint8_t*)&data); // Write (null)
+        sp += 8;
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // argv string addresses -- need to pad to 16B boundary
+        sp &= ~0xf;
+        for(const auto & arg : program_arguments) {
+            // Add 1 to include the null character
+            const auto str_len = arg.size()+1;
+            ILOG("Pushing argv: " << arg);
+            memory->poke(sp, str_len, (uint8_t*)arg.data());
+            memory->poke(argv_sp_addr, 8, (uint8_t*)&sp);
+            sp += str_len;
+            argv_sp_addr += 8;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // envp string addresses -- just like argv
+        sp += 16;
+        sp &= ~0xf;
+        for(const auto & envp : env_vars)
+        {
+            const auto str_len = envp.size()+1;
+            memory->poke(sp, str_len, (uint8_t*)envp.data());
+            memory->poke(envp_sp_addr, 8, (uint8_t*)&sp);
+            sp += str_len;
+            envp_sp_addr += 8;
+        }
+
+    }
+
     void AtlasState::boot()
     {
         std::cout << "Booting hartid " << std::dec << hart_id_ << std::endl;

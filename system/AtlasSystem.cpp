@@ -7,11 +7,12 @@ namespace atlas
 {
 
     AtlasSystem::AtlasSystem(sparta::TreeNode* sys_node, const AtlasSystemParameters* p) :
-        sparta::Unit(sys_node)
+        sparta::Unit(sys_node),
+        workload_and_args_(p->workload_and_args)
     {
-        if (const std::string workload = p->workload; false == workload.empty())
+        if (false == workload_and_args_.empty())
         {
-            loadWorkload_(workload);
+            loadWorkload_(workload_and_args_[0]);
         }
 
         if (p->enable_uart)

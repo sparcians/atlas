@@ -34,7 +34,8 @@ namespace atlas
             AtlasSystemParameters(sparta::TreeNode* node) : sparta::ParameterSet(node) {}
 
             PARAMETER(bool, enable_uart, false, "Enable a Uart")
-            HIDDEN_PARAMETER(std::string, workload, "", "Workload to load into memory")
+            HIDDEN_PARAMETER(std::vector<std::string>, workload_and_args,
+                             {}, "Workload and command line arguments")
         };
 
         // Constructor
@@ -45,6 +46,9 @@ namespace atlas
 
         // Get starting PC from ELF
         Addr getStartingPc() const { return starting_pc_; }
+
+        // Get the workload and its program arguments
+        std::vector<std::string> getWorkloadAndArgs() const { return workload_and_args_; }
 
         const std::unordered_map<Addr, std::string> & getSymbols() const { return symbols_; }
 
@@ -96,7 +100,8 @@ namespace atlas
 
         void createMemoryMappings_(sparta::TreeNode* sys_node);
 
-        // Workload
+        // Workload and workload arguments
+        const std::vector<std::string> workload_and_args_;
         void loadWorkload_(const std::string & workload);
         ELFIO::elfio elf_reader_;
         Addr starting_pc_;

@@ -348,6 +348,12 @@ namespace atlas
             }
             else
             {
+                // skip x0 -- you cannot write to x0
+                if (SPARTA_EXPECT_FALSE(dst_reg.reg_id.reg_num == 0 &&
+                                        dst_reg.reg_id.reg_type == RegType::INTEGER))
+                {
+                    continue;
+                }
                 inst_log_writer_->writeDstRegister(dst_reg.reg_id.reg_name, dst_reg.reg_value,
                                                    dst_reg.reg_prev_value);
             }

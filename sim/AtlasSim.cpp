@@ -3,12 +3,17 @@
 #include "include/CSRFieldIdxs64.hpp"
 #include <filesystem>
 
+#include "sparta/utils/LogUtils.hpp"
+
 namespace atlas
 {
-    AtlasSim::AtlasSim(sparta::Scheduler* scheduler, const std::string & workload,
+    AtlasSim::AtlasSim(sparta::Scheduler* scheduler,
+                       const WorkloadAndArguments & workload_and_args,
+                       const RegValueOverridePairs & reg_value_overrides,
                        uint64_t ilimit) :
         sparta::app::Simulation("AtlasSim", scheduler),
-        workload_(workload),
+        workload_and_args_(workload_and_args),
+        reg_value_overrides_(reg_value_overrides),
         ilimit_(ilimit)
     {
     }
@@ -113,9 +118,9 @@ namespace atlas
     void AtlasSim::configureTree_()
     {
         // Set AtlasSystem workload parameter
-        auto system_workload =
-            getRoot()->getChildAs<sparta::ParameterBase>("system.params.workload");
-        system_workload->setValueFromString(workload_);
+        auto system_workload_and_args =
+            getRoot()->getChildAs<sparta::ParameterBase>("system.params.workload_and_args");
+        system_workload_and_args->setValueFromStringVector(workload_and_args_);
     }
 
     void AtlasSim::bindTree_()
@@ -126,7 +131,9 @@ namespace atlas
         SystemCallEmulator *system_call_emulator =
             getRoot()->getChild("system_call_emulator")->getResourceAs<atlas::SystemCallEmulator>();
 
-        system_call_emulator->setWorkload(workload_);
+        if (false == workload_and_args_.empty()) {
+            system_call_emulator->setWorkload(workload_and_args_[0]);
+        }
 
         const uint32_t num_harts = 1;
         for (uint32_t hart_id = 0; hart_id < num_harts; ++hart_id)
@@ -139,6 +146,30 @@ namespace atlas
             state->setAtlasSystem(system_);
             state->setSystemCallEmulator(system_call_emulator);
             state->setPc(system_->getStartingPc());
+
+            for (const auto & reg_override : reg_value_overrides_)
+            {
+                const bool MUST_EXIST = true;
+                sparta::Register* reg = state->findRegister(reg_override.first, MUST_EXIST);
+                const uint64_t reg_value = std::stoull(reg_override.second, nullptr, 0);
+                if (state->getXlen() == 64)
+                {
+                    reg->dmiWrite<uint64_t>(reg_value);
+                }
+                else
+                {
+                    reg->dmiWrite<uint32_t>(reg_value);
+                }
+                std::cout << "Writing " << std::quoted(reg->getName());
+                if (reg->getAliases().size() != 0) {
+                    std::cout << " aka " << reg->getAliases();
+                }
+                std::cout << " to " << HEX16(reg_value) << std::endl;
+            }
+
+            if (false == workload_and_args_.empty()) {
+                state->setupProgramStack(system_->getWorkloadAndArgs());
+            }
         }
     }
 

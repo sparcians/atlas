@@ -25,7 +25,7 @@ class RegisterTester
 
   private:
     sparta::Scheduler scheduler_;
-    atlas::AtlasSim atlas_sim_{&scheduler_, "", 0};
+    atlas::AtlasSim atlas_sim_{&scheduler_, {}, {}, 0};
     atlas::AtlasState* state_ = nullptr;
 };
 

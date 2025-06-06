@@ -46,11 +46,9 @@ namespace atlas
         return success;
     }
 
-    AtlasCoSim::AtlasCoSim(sparta::Scheduler* scheduler, const std::string & workload,
-                           uint64_t ilimit) :
-        AtlasSim(scheduler, workload, ilimit),
+    AtlasCoSim::AtlasCoSim(sparta::Scheduler* scheduler, uint64_t ilimit) :
+        AtlasSim(scheduler, {}, {}, ilimit),
         cosim_logger_(getRoot(), "cosim", "Atlas Cosim Logger")
-
     {
         buildTree();     // Calls AtlasSim::buildTree_
         configureTree(); // Calls AtlasSim::configureTree_

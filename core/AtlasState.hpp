@@ -241,8 +241,11 @@ namespace atlas
             finish_action_group_.setNextActionGroup(&stop_sim_action_group_);
         }
 
-        // For standalone Atlas simulations, this method will be called
-        // at the top of AtlasSim::run()
+        // Initialze a program stack (argc, argv, envp, auxv, etc)
+        void setupProgramStack(const std::vector<std::string> & program_arguments);
+
+        // For standalone Atlas simulations, this method will be
+        // called at the top of AtlasSim::run()
         void boot();
 
         // One-time cleanup phase after simulation end.

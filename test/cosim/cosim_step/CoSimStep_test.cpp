@@ -3,10 +3,9 @@
 
 void testSingleStepNop()
 {
-    const std::string & workload = ""; // leave empty -- not used
     const uint64_t ilimit = 0;
     sparta::Scheduler scheduler;
-    atlas::AtlasCoSim cosim(&scheduler, workload, ilimit);
+    atlas::AtlasCoSim cosim(&scheduler, ilimit);
     cosim.enableLogger();
 
     atlas::AtlasState* state = cosim.getAtlasState();
@@ -74,10 +73,9 @@ void testSingleStepNop()
 
 void testSingleStepAdd()
 {
-    const std::string & workload = "";
     const uint64_t ilimit = 0;
     sparta::Scheduler scheduler;
-    atlas::AtlasCoSim cosim(&scheduler, workload, ilimit);
+    atlas::AtlasCoSim cosim(&scheduler, ilimit);
     cosim.enableLogger();
 
     atlas::AtlasState* state = cosim.getAtlasState();

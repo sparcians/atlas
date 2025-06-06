@@ -27,7 +27,7 @@ namespace atlas
     class AtlasCoSim : public AtlasSim, public atlas::cosim::CoSim
     {
       public:
-        AtlasCoSim(sparta::Scheduler* scheduler, const std::string & workload, uint64_t ilimit);
+        AtlasCoSim(sparta::Scheduler* scheduler, uint64_t ilimit);
         ~AtlasCoSim();
 
         void enableLogger(const std::string & filename = "")
