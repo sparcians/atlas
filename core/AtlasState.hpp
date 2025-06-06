@@ -19,6 +19,8 @@
 #include "sparta/simulation/Unit.hpp"
 #include "sparta/utils/SpartaSharedPointerAllocator.hpp"
 
+#include "core/STFtrace/STFLogger.hpp"
+
 #ifndef REG32_JSON_DIR
 #error "REG32_JSON_DIR must be defined"
 #endif
@@ -53,6 +55,9 @@ namespace atlas
         static constexpr char name[] = "AtlasState";
         using base_type = AtlasState;
 
+        //STFLogger Object
+        atlas::STFLogger stf_logger_;
+
         class AtlasStateParameters : public sparta::ParameterSet
         {
           public:
@@ -65,6 +70,7 @@ namespace atlas
             PARAMETER(std::string, csr_values, "arch/default_csr_values.json",
                       "Provides initial values of CSRs")
             PARAMETER(bool, stop_sim_on_wfi, false, "Executing a WFI instruction stops simulation")
+            PARAMETER(bool, stf_enable, false, "Do you want to enable STF Trace generation?")
         };
 
         AtlasState(sparta::TreeNode* core_node, const AtlasStateParameters* p);
@@ -312,6 +318,9 @@ namespace atlas
 
         //! Stop simulatiion on WFI
         const bool stop_sim_on_wfi_;
+
+        //STF Trace Generation Enable
+        const bool stf_enable_;
 
         //! Do we have hypervisor?
         const bool hypervisor_enabled_;

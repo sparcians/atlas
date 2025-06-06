@@ -16,6 +16,7 @@ add_library(atlascore
     observers/InstructionLogger.cpp
     observers/SimController.cpp
     ../arch/RegisterDefnsJSON.cpp
+    STFtrace/STFLogger.cpp
 )
 
 target_include_directories(atlascore PUBLIC ${CMAKE_BINARY_DIR})

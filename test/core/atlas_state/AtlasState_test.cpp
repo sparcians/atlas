@@ -7,6 +7,7 @@
 #include "sparta/simulation/ResourceFactory.hpp"
 #include "sparta/simulation/ResourceTreeNode.hpp"
 #include "sparta/utils/SpartaTester.hpp"
+#include "core/STFtrace/STFLogger.hpp"
 
 class AtlasStateTester
 {

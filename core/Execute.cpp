@@ -112,6 +112,9 @@ namespace atlas
 
         ILOG(inst);
 
+        //log executed instruction
+        state->stf_logger_.writeInstruction(state->getCurrentInst().get());
+
         // Execute the instruction
         execute_action_group_.setNextActionGroup(inst_action_group);
         return ++action_it;
