@@ -96,10 +96,21 @@ namespace atlas
         {
             WRITE_CSR_REG<XLEN>(state, VTYPE, vtype);
             uint8_t vlmul = READ_CSR_FIELD<XLEN>(state, VTYPE, "vlmul");
-            std::unordered_map<XLEN, uint8_t> vlmul_decode = {{0b101, 1}, {0b110, 2},  {0b111, 4},
-                                                              {0b000, 8}, {0b001, 16}, {0b010, 32},
-                                                              {0b011, 64}};
-            setLMUL(vlmul_decode.at(vlmul));
+
+            static const uint8_t lmul_table[8] = {
+                8,  // 000
+                16, // 001
+                32, // 010
+                64, // 011
+                0,  // 100 (invalid)
+                1,  // 101
+                2,  // 110
+                4   // 111
+            };
+
+            uint8_t lmul = lmul_table[vlmul & 0b111];
+            sparta_assert(lmul, "Invalid vtype VLMUL encoding.");
+            setLMUL(lmul);
             setSEW(8u << READ_CSR_FIELD<XLEN>(state, VTYPE, "vsew"));
             setVTA(READ_CSR_FIELD<XLEN>(state, VTYPE, "vta"));
             setVMA(READ_CSR_FIELD<XLEN>(state, VTYPE, "vma"));
@@ -125,19 +136,21 @@ namespace atlas
 
     inline std::ostream & operator<<(std::ostream & os, const VectorConfig & config)
     {
-        os << "VLEN: " << config.getVLEN() << " ";
+        os << "VLEN: " << (uint32_t)config.getVLEN() << " ";
         os << "LMUL: ";
         if (config.getLMUL() < 8)
         {
-            os << "1/" << 8 / config.getLMUL() << " ";
+            os << "1/" << 8 / (uint32_t)config.getLMUL() << " ";
         }
         else
         {
-            os << config.getLMUL() / 8 << " ";
+            os << (uint32_t)config.getLMUL() / 8 << " ";
         }
-        os << "SEW: " << config.getSEW() << " ";
-        os << "VTA: " << config.getVTA() << " " << "VMA: " << config.getVMA() << " ";
-        os << "VL: " << config.getVL() << " " << "VSTART: " << config.getVSTART() << "; ";
+        os << "SEW: " << (uint32_t)config.getSEW() << " ";
+        os << "VTA: " << std::boolalpha << config.getVTA() << " " << "VMA: " << config.getVMA()
+           << std::noboolalpha << " ";
+        os << "VL: " << (uint32_t)config.getVL() << " "
+           << "VSTART: " << (uint32_t)config.getVSTART() << "; ";
         return os;
     }
 
@@ -179,7 +192,8 @@ namespace atlas
 
     template <uint8_t ElemWidth> struct Element
     {
-        using ValueType = GetUintType<ElemWidth>;
+      public:
+        using ValueType = UintType<ElemWidth>;
 
         class BitIterator : public IteratorIF
         {
@@ -201,15 +215,15 @@ namespace atlas
 
             uint8_t getNextIndex(uint8_t index) const override
             {
-                const uint8_t end_pos = elem_ptr_->end_pos;
-                index = std::max(index, elem_ptr_->start_pos);
+                const uint8_t end_pos = elem_ptr_->getEndPos();
+                index = std::max(index, elem_ptr_->getStartPos());
                 if (index >= end_pos)
                 {
                     return end_pos;
                 }
                 while (index < end_pos)
                 {
-                    if ((elem_ptr_->val >> index) & 1)
+                    if ((elem_ptr_->peekVal() >> index) & 1)
                     {
                         break;
                     }
@@ -222,36 +236,61 @@ namespace atlas
             const Element<ElemWidth>* elem_ptr_;
         }; // class BitIterator
 
-        Element() : state(nullptr), reg_id(0), idx(0), start_pos(0), end_pos(ElemWidth), val(0) {}
+        Element() :
+            state_(nullptr),
+            reg_id_(0),
+            idx_(0),
+            start_pos_(0),
+            end_pos_(ElemWidth),
+            val_(0)
+        {
+        }
 
         virtual ~Element() = default;
 
         uint8_t getWidth() { return ElemWidth; }
 
+        void setState(AtlasState* state) { state_ = state; }
+
+        void setRegId(uint32_t reg_id) { reg_id_ = reg_id; }
+
+        void setIdx(uint32_t idx) { idx_ = idx; }
+
+        uint8_t getStartPos() const { return start_pos_; }
+
+        void setStartPos(uint8_t start_pos) { start_pos_ = start_pos; }
+
+        uint8_t getEndPos() const { return end_pos_; }
+
+        void setEndPos(uint8_t end_pos) { end_pos_ = end_pos; }
+
+        ValueType peekVal() const { return val_; }
+
         ValueType getVal()
         {
-            ValueType bitmask = (((ValueType)1 << (end_pos - start_pos)) - 1) << start_pos;
-            val = READ_VEC_ELEM<ValueType>(state, reg_id, idx) & bitmask;
-            return val;
+            ValueType bitmask = (((ValueType)1 << (end_pos_ - start_pos_)) - 1) << start_pos_;
+            val_ = READ_VEC_ELEM<ValueType>(state_, reg_id_, idx_) & bitmask;
+            return val_;
         }
 
         void setVal(ValueType value)
         {
-            ValueType bitmask = (((ValueType)1 << (end_pos - start_pos)) - 1) << start_pos;
-            val = value & bitmask;
-            WRITE_VEC_ELEM<ValueType>(state, reg_id, val, idx);
+            ValueType bitmask = (((ValueType)1 << (end_pos_ - start_pos_)) - 1) << start_pos_;
+            val_ = value & bitmask;
+            WRITE_VEC_ELEM<ValueType>(state_, reg_id_, val_, idx_);
         }
 
-        BitIterator begin() { return BitIterator(this, start_pos); }
+        BitIterator begin() { return BitIterator(this, start_pos_); }
 
-        BitIterator end() { return BitIterator(this, end_pos); }
+        BitIterator end() { return BitIterator(this, end_pos_); }
 
-        AtlasState* state;
-        uint32_t reg_id;
-        uint32_t idx;
-        uint8_t start_pos;
-        uint8_t end_pos;
-        ValueType val;
+      private:
+        AtlasState* state_;
+        uint32_t reg_id_;
+        uint32_t idx_;
+        uint8_t start_pos_;
+        uint8_t end_pos_;
+        ValueType val_;
     }; // struct Element
 
     template <typename ElemType> class Elements
@@ -274,11 +313,11 @@ namespace atlas
 
             virtual reference operator*()
             {
-                current_.state = elems_ptr_->state_;
-                current_.reg_id =
-                    elems_ptr_->reg_id_
-                    + index_ / (elems_ptr_->config_->getVLEN() / current_.getWidth());
-                current_.idx = index_ % (elems_ptr_->config_->getVLEN() / current_.getWidth());
+                current_.setState(elems_ptr_->state_);
+                current_.setRegId(elems_ptr_->reg_id_
+                                  + index_
+                                        / (elems_ptr_->config_->getVLEN() / current_.getWidth()));
+                current_.setIdx(index_ % (elems_ptr_->config_->getVLEN() / current_.getWidth()));
                 return current_;
             }
 
@@ -294,7 +333,7 @@ namespace atlas
             {
                 if (elems_ptr_->isMasked())
                 {
-                    elems_ptr_->mask_iter_ptr_->getNextIndex(index);
+                    index = elems_ptr_->mask_iter_ptr_->getNextIndex(index);
                 }
                 return index;
             }
@@ -341,24 +380,23 @@ namespace atlas
             MaskElementIterator(const MaskElements* elems_ptr, uint8_t index) :
                 Elements::ElementIterator(elems_ptr, index)
             {
-                index_ = getNextIndex(index_);
             }
 
             reference operator*() override
             {
                 const MaskElements* elems_ptr = static_cast<const MaskElements*>(
                     elems_ptr_); // To gain access to *elems_ptr_* members.
-                current_.state = elems_ptr->state_;
-                current_.reg_id = elems_ptr->reg_id_;
-                current_.idx = index_;
+                current_.setState(elems_ptr->state_);
+                current_.setRegId(elems_ptr->reg_id_);
+                current_.setIdx(index_);
                 // Fix *start_pos_* if first element.
                 if (index_ == elems_ptr->start_pos_)
                 {
-                    current_.start_pos = elems_ptr->config_->getVSTART() % VLEN_MIN;
+                    current_.setStartPos(elems_ptr->config_->getVSTART() % VLEN_MIN);
                 }
                 else
                 {
-                    current_.start_pos = 0;
+                    current_.setStartPos(0);
                 }
                 // Fix *end_pos_* if last element.
                 if (index_ == elems_ptr->end_pos_ - 1)
@@ -366,16 +404,16 @@ namespace atlas
                     uint8_t vl = elems_ptr->config_->getVL();
                     if (vl && vl % VLEN_MIN == 0)
                     {
-                        current_.end_pos = VLEN_MIN;
+                        current_.setEndPos(VLEN_MIN);
                     }
                     else
                     {
-                        current_.end_pos = vl % VLEN_MIN;
+                        current_.setEndPos(vl % VLEN_MIN);
                     }
                 }
                 else
                 {
-                    current_.end_pos = VLEN_MIN;
+                    current_.setEndPos(VLEN_MIN);
                 }
                 return current_;
             }

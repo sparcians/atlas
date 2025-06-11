@@ -46,5 +46,5 @@ namespace atlas
             static_assert(N == 8 || N == 16 || N == 32 || N == 64, "Unsupported size");
     }
 
-    template <std::size_t N> using GetUintType = typename decltype(get_uint_type<N>())::type;
+    template <std::size_t N> using UintType = typename decltype(get_uint_type<N>())::type;
 } // namespace atlas

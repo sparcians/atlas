@@ -1,4 +1,5 @@
 #include "test/sim/InstructionTester.hpp"
+#include "core/VectorState.hpp"
 #include "sparta/utils/SpartaTester.hpp"
 
 class VcsInstructionTester : public AtlasInstructionTester

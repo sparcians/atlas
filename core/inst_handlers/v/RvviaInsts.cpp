@@ -39,18 +39,15 @@ namespace atlas
                                                     state->getVectorConfig()->getVSTART()};
         MaskElements::MaskBitIterator mask_iter_vd{&mask_elems,
                                                    state->getVectorConfig()->getVSTART()};
-        MaskElements::MaskBitIterator* mask_iter_vs1_ptr =
-            inst->getVM() ? nullptr : &mask_iter_vs1;
-        MaskElements::MaskBitIterator* mask_iter_vs2_ptr =
-            inst->getVM() ? nullptr : &mask_iter_vs1;
-        MaskElements::MaskBitIterator* mask_iter_vd_ptr =
-            inst->getVM() ? nullptr : &mask_iter_vd;
-        Elements<Element<ElemWidth>> elems_vs1{state, state->getVectorConfig(),
-                                               inst->getRs1(), mask_iter_vs1_ptr};
-        Elements<Element<ElemWidth>> elems_vs2{state, state->getVectorConfig(),
-                                               inst->getRs2(), mask_iter_vs2_ptr};
-        Elements<Element<ElemWidth>> elems_vd{state, state->getVectorConfig(),
-                                              inst->getRd(), mask_iter_vd_ptr};
+        MaskElements::MaskBitIterator* mask_iter_vs1_ptr = inst->getVM() ? nullptr : &mask_iter_vs1;
+        MaskElements::MaskBitIterator* mask_iter_vs2_ptr = inst->getVM() ? nullptr : &mask_iter_vs1;
+        MaskElements::MaskBitIterator* mask_iter_vd_ptr = inst->getVM() ? nullptr : &mask_iter_vd;
+        Elements<Element<ElemWidth>> elems_vs1{state, state->getVectorConfig(), inst->getRs1(),
+                                               mask_iter_vs1_ptr};
+        Elements<Element<ElemWidth>> elems_vs2{state, state->getVectorConfig(), inst->getRs2(),
+                                               mask_iter_vs2_ptr};
+        Elements<Element<ElemWidth>> elems_vd{state, state->getVectorConfig(), inst->getRd(),
+                                              mask_iter_vd_ptr};
 
         for (auto iter_vs1 = elems_vs1.begin(), iter_vs2 = elems_vs2.begin(),
                   iter_vd = elems_vd.begin();
