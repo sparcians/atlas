@@ -331,6 +331,12 @@ namespace atlas
 
             uint8_t getNextIndex(uint8_t index) const override
             {
+                const uint8_t end_pos = elems_ptr_->end_pos_;
+                index = std::max(index, elems_ptr_->start_pos_);
+                if (index >= end_pos)
+                {
+                    return end_pos;
+                }
                 if (elems_ptr_->isMasked())
                 {
                     index = elems_ptr_->mask_iter_ptr_->getNextIndex(index);
@@ -441,16 +447,18 @@ namespace atlas
             {
                 const uint8_t vl = elems_ptr_->config_->getVL();
                 const uint8_t elem_offset = index / VLEN_MIN;
+                index = std::max(index, elems_ptr_->config_->getVSTART());
                 if (index >= vl)
                 {
                     return vl;
                 }
-                // TODO: Each bit requires a dmiRead of the Element. This is inefficient.
                 for (auto mask_elem_iter = MaskElementIterator{elems_ptr_, elem_offset};
                      mask_elem_iter != MaskElementIterator{elems_ptr_, elems_ptr_->end_pos_};
                      ++mask_elem_iter)
                 {
                     auto mask_elem = *mask_elem_iter;
+                    // TODO: Each bit requires a dmiRead of the Element. This is inefficient.
+                    // We can save *getVal()* call by checking if *mask_elem_iter* has changed.
                     mask_elem.getVal();
                     // If we don't have a hit in the first Element for this index, then we shall
                     // start from bit 0 of next Element.
