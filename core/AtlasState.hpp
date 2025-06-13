@@ -339,7 +339,7 @@ namespace atlas
         SimState sim_state_;
 
         //! Vector state
-        VectorConfig* vector_config_;
+        VectorConfig* vector_config_ = nullptr;
 
         // Increment PC Action
         Action::ItrType incrementPc_(AtlasState* state, Action::ItrType action_it);

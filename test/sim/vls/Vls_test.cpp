@@ -1,5 +1,5 @@
 #include "test/sim/InstructionTester.hpp"
-#include "core/VectorState.hpp"
+#include "core/VecElements.hpp"
 #include "sparta/utils/SpartaTester.hpp"
 #include "mavis/Mavis.h"
 

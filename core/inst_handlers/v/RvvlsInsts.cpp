@@ -1,7 +1,7 @@
 #include "core/inst_handlers/v/RvvlsInsts.hpp"
 #include "core/AtlasState.hpp"
 #include "core/ActionGroup.hpp"
-#include "core/VectorState.hpp"
+#include "core/VecElements.hpp"
 #include "include/ActionTags.hpp"
 
 namespace atlas
@@ -217,9 +217,8 @@ namespace atlas
         else // masked
         {
             const MaskElements mask_elems{state, config, atlas::V0};
-            for (auto mask_iter = MaskElements::MaskBitIterator{&mask_elems, config->getVSTART()};
-                 mask_iter != MaskElements::MaskBitIterator{&mask_elems, config->getVL()};
-                 ++mask_iter)
+            for (auto mask_iter = MaskBitIterator{&mask_elems, config->getVSTART()};
+                 mask_iter != MaskBitIterator{&mask_elems, config->getVL()}; ++mask_iter)
             {
                 inst->getTranslationState()->makeRequest(rs1_val + mask_iter.getIndex() * stride,
                                                          eewb);
@@ -238,15 +237,27 @@ namespace atlas
         VectorConfig* vector_config = state->getVectorConfig();
         const uint8_t sewb = vector_config->getSEW() / 8;
         const XLEN rs1_val = READ_INT_REG<XLEN>(state, inst->getRs1());
-        const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
-        MaskElements::MaskBitIterator mask_iter{&mask_elems, state->getVectorConfig()->getVSTART()};
-        MaskElements::MaskBitIterator* mask_iter_ptr = inst->getVM() ? nullptr : &mask_iter;
-        Elements<Element<ElemWidth>> elems_vs2{state, state->getVectorConfig(), inst->getRs2(),
-                                               mask_iter_ptr};
+        Elements<Element<ElemWidth>, false> elems_vs2{state, state->getVectorConfig(),
+                                                      inst->getRs2()};
 
-        for (auto stride : elems_vs2)
+        if (inst->getVM())
         {
-            inst->getTranslationState()->makeRequest(rs1_val + stride.getVal(), sewb);
+            for (auto stride : elems_vs2)
+            {
+                inst->getTranslationState()->makeRequest(rs1_val + stride.getVal(), sewb);
+            }
+        }
+        else
+        {
+            const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+            for (auto mask_iter =
+                     MaskBitIterator{&mask_elems, state->getVectorConfig()->getVSTART()};
+                 mask_iter != MaskBitIterator{&mask_elems, state->getVectorConfig()->getVL()};
+                 ++mask_iter)
+            {
+                inst->getTranslationState()->makeRequest(
+                    rs1_val + elems_vs2.getElement(mask_iter.getIndex()).getVal(), sewb);
+            }
         }
 
         return ++action_it;
@@ -256,27 +267,51 @@ namespace atlas
     Action::ItrType RvvlsInsts::vlseHandler_(atlas::AtlasState* state, Action::ItrType action_it)
     {
         const AtlasInstPtr inst = state->getCurrentInst();
-        const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
-        MaskElements::MaskBitIterator mask_iter{&mask_elems, state->getVectorConfig()->getVSTART()};
-        MaskElements::MaskBitIterator* mask_iter_ptr = inst->getVM() ? nullptr : &mask_iter;
-        Elements<Element<ElemWidth>> elems_vd{state, state->getVectorConfig(), inst->getRd(),
-                                              mask_iter_ptr};
+        Elements<Element<ElemWidth>, false> elems_vd{state, state->getVectorConfig(),
+                                                     inst->getRd()};
 
-        for (auto & elem_vd : elems_vd)
+        if (inst->getVM()) // unmasked
         {
-            if constexpr (load)
+            for (auto & elem_vd : elems_vd)
             {
-                UintType<ElemWidth> value = state->readMemory<UintType<ElemWidth>>(
-                    inst->getTranslationState()->getResult().getPAddr());
-                inst->getTranslationState()->popResult();
-                elem_vd.setVal(value);
+                if constexpr (load)
+                {
+                    UintType<ElemWidth> value = state->readMemory<UintType<ElemWidth>>(
+                        inst->getTranslationState()->getResult().getPAddr());
+                    inst->getTranslationState()->popResult();
+                    elem_vd.setVal(value);
+                }
+                else
+                {
+                    UintType<ElemWidth> value = elem_vd.getVal();
+                    state->writeMemory<UintType<ElemWidth>>(
+                        inst->getTranslationState()->getResult().getPAddr(), value);
+                    inst->getTranslationState()->popResult();
+                }
             }
-            else
+        }
+        else // masked
+        {
+            const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+            for (auto mask_iter =
+                     MaskBitIterator{&mask_elems, state->getVectorConfig()->getVSTART()};
+                 mask_iter != MaskBitIterator{&mask_elems, state->getVectorConfig()->getVL()};
+                 ++mask_iter)
             {
-                UintType<ElemWidth> value = elem_vd.getVal();
-                state->writeMemory<UintType<ElemWidth>>(
-                    inst->getTranslationState()->getResult().getPAddr(), value);
-                inst->getTranslationState()->popResult();
+                if constexpr (load)
+                {
+                    UintType<ElemWidth> value = state->readMemory<UintType<ElemWidth>>(
+                        inst->getTranslationState()->getResult().getPAddr());
+                    inst->getTranslationState()->popResult();
+                    elems_vd.getElement(mask_iter.getIndex()).setVal(value);
+                }
+                else
+                {
+                    UintType<ElemWidth> value = elems_vd.getElement(mask_iter.getIndex()).getVal();
+                    state->writeMemory<UintType<ElemWidth>>(
+                        inst->getTranslationState()->getResult().getPAddr(), value);
+                    inst->getTranslationState()->popResult();
+                }
             }
         }
 

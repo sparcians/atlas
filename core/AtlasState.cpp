@@ -1,6 +1,6 @@
 #include "core/AtlasState.hpp"
 #include "core/AtlasInst.hpp"
-#include "core/VectorState.hpp"
+#include "core/VecElements.hpp"
 #include "core/Fetch.hpp"
 #include "core/Execute.hpp"
 #include "core/translate/Translate.hpp"

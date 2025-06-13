@@ -1,7 +1,7 @@
 #include "core/inst_handlers/v/RvvcsInsts.hpp"
 #include "core/AtlasState.hpp"
 #include "core/ActionGroup.hpp"
-#include "core/VectorState.hpp"
+#include "core/VecElements.hpp"
 #include "include/ActionTags.hpp"
 
 namespace atlas
