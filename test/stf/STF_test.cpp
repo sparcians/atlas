@@ -11,7 +11,7 @@ int main()
 
     stf::STFWriter stf_writer;
 
-    stf_writer.open("stf_write_test.zstf");
+    stf_writer.open("test.stf");
     stf_writer.addTraceInfo(stf::TraceInfoRecord(stf::STF_GEN::STF_GEN_DROMAJO,
                                                  1, 2, 0, "Trace from Dromajo"));
     stf_writer.setISA(stf::ISA::RISCV);
