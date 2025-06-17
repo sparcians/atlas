@@ -32,7 +32,7 @@ else()
 endif()
 
 if(NOT BUILD_SPARTA_FROM_SOURCE)
-  add_compile_options ( -Werror
+  add_compile_options ( -Werror 
     -Wall -Wextra -Winline -Winit-self -Wunused-function
     -Wuninitialized -Wsequence-point -Wno-inline -Wunknown-pragmas
     -Woverloaded-virtual -Wunused-parameter -Wmissing-field-initializers -pipe)
@@ -126,7 +126,7 @@ add_compile_definitions(REG64_JSON_DIR="${SIM_BASE}/arch/rv64")
 
 # Atlas dependencies
 find_package (Boost REQUIRED COMPONENTS json)
-set (ATLAS_LIBS ${SPARTA_LIBS} ${STF_LIB} mavis Boost::json)
+set (ATLAS_LIBS ${SPARTA_LIBS} ${STF_LINK_LIBS} mavis Boost::json)
 
 add_subdirectory(arch)
 add_subdirectory(core)

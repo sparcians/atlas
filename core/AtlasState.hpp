@@ -19,6 +19,8 @@
 #include "sparta/simulation/Unit.hpp"
 #include "sparta/utils/SpartaSharedPointerAllocator.hpp"
 
+#include "core/observers/STFtrace/STFLogger.hpp"
+
 #ifndef REG32_JSON_DIR
 #error "REG32_JSON_DIR must be defined"
 #endif
@@ -40,6 +42,7 @@ namespace atlas
     class Exception;
     class SimController;
     class VectorState;
+    class STFLogger;
     class SystemCallEmulator;
 
     using MavisType =
@@ -65,6 +68,7 @@ namespace atlas
             PARAMETER(std::string, csr_values, "arch/default_csr_values.json",
                       "Provides initial values of CSRs")
             PARAMETER(bool, stop_sim_on_wfi, false, "Executing a WFI instruction stops simulation")
+            PARAMETER(std::string, stf_filename, "","STF Trace file name (when not given, STF tracing is disabled)")
         };
 
         AtlasState(sparta::TreeNode* core_node, const AtlasStateParameters* p);
@@ -124,11 +128,10 @@ namespace atlas
             virtual_mode_ = virt_mode && (priv_mode != PrivMode::MACHINE);
             priv_mode_ = priv_mode;
         }
-
+        
         using Reservation = sparta::utils::ValidValue<Addr>;
 
         Reservation & getReservation() { return reservation_; }
-
         const Reservation & getReservation() const { return reservation_; }
 
         template <typename XLEN> void changeMMUMode();
@@ -319,6 +322,9 @@ namespace atlas
 
         //! Stop simulatiion on WFI
         const bool stop_sim_on_wfi_;
+
+        //STF Trace Filename
+        std::string stf_filename_;
 
         //! Do we have hypervisor?
         const bool hypervisor_enabled_;
