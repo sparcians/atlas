@@ -15,9 +15,16 @@ add_library(atlascore
     observers/CoSimObserver.cpp
     observers/InstructionLogger.cpp
     observers/SimController.cpp
+    observers/STFLogger.cpp
     ../arch/RegisterDefnsJSON.cpp
+
 )
 
 target_include_directories(atlascore PUBLIC ${CMAKE_BINARY_DIR})
+
+# Tell cmake that stf_lib is a system include directory
+# This suppresses warnings from the stf_lib headers
+target_include_directories(atlascore SYSTEM PUBLIC stf_lib)
+
 add_dependencies(atlascore AutogenArchFiles)
 add_dependencies(atlascore atlasinsts)

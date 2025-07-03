@@ -126,7 +126,7 @@ add_compile_definitions(REG64_JSON_DIR="${SIM_BASE}/arch/rv64")
 
 # Atlas dependencies
 find_package (Boost REQUIRED COMPONENTS json)
-set (ATLAS_LIBS ${SPARTA_LIBS} ${STF_LIB} mavis Boost::json)
+set (ATLAS_LIBS ${SPARTA_LIBS} ${STF_LINK_LIBS} mavis Boost::json)
 
 add_subdirectory(arch)
 add_subdirectory(core)

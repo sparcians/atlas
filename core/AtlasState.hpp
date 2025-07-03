@@ -39,6 +39,8 @@ namespace atlas
     class Translate;
     class Exception;
     class SimController;
+    class VectorState;
+    class STFLogger;
     class SystemCallEmulator;
     class VectorConfig;
 
@@ -70,6 +72,8 @@ namespace atlas
             PARAMETER(std::string, csr_values, "arch/default_csr_values.json",
                       "Provides initial values of CSRs")
             PARAMETER(bool, stop_sim_on_wfi, false, "Executing a WFI instruction stops simulation")
+            PARAMETER(std::string, stf_filename, "",
+                      "STF Trace file name (when not given, STF tracing is disabled)")
 
           private:
             static bool validateVlen_(uint32_t & vlen_val, const sparta::TreeNode*)
@@ -335,6 +339,9 @@ namespace atlas
 
         //! Stop simulatiion on WFI
         const bool stop_sim_on_wfi_;
+
+        // STF Trace Filename
+        const std::string stf_filename_;
 
         //! Do we have hypervisor?
         const bool hypervisor_enabled_;

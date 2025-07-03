@@ -10,6 +10,7 @@
 #include "system/AtlasSystem.hpp"
 #include "core/observers/SimController.hpp"
 #include "core/observers/InstructionLogger.hpp"
+#include "core/observers/STFLogger.hpp"
 
 #include "mavis/mavis/Mavis.h"
 
@@ -52,6 +53,7 @@ namespace atlas
             supported_isa_string_, isa_file_path_ + std::string("/riscv_isa_spec.json"),
             isa_file_path_)),
         stop_sim_on_wfi_(p->stop_sim_on_wfi),
+        stf_filename_(p->stf_filename),
         hypervisor_enabled_(extension_manager_.isEnabled("h")),
         vector_config_(std::make_unique<VectorConfig>()),
         inst_logger_(core_tn, "inst", "Atlas Instruction Logger"),
@@ -193,6 +195,11 @@ namespace atlas
             {
                 addObserver(std::make_unique<InstructionLogger>(inst_logger_, ObserverMode::RV32));
             }
+        }
+
+        if (!stf_filename_.empty())
+        {
+            addObserver(std::make_unique<STFLogger>(xlen_, pc_, stf_filename_, this));
         }
 
         for (auto & obs : observers_)
