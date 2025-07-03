@@ -12,6 +12,7 @@ add_subdirectory(vcs)
 add_subdirectory(via)
 add_subdirectory(vls)
 add_subdirectory(vm)
+# add_subdirectory(vro)     #TODO: Uncomment when handler support added
 
 # ASM Tests
 atlas_named_test(atlas_nop_test atlas -p top.core0.params.stop_sim_on_wfi true workloads/nop.elf)
