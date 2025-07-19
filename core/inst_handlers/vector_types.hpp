@@ -1,6 +1,6 @@
 #pragma once
 
-namespace atlas
+namespace pegasus
 {
     struct OperandMode
     {
@@ -17,4 +17,4 @@ namespace atlas
 
         constexpr OperandMode(Mode dst, Mode src2, Mode src1) : dst(dst), src1(src1), src2(src2) {}
     };
-} // namespace atlas
+} // namespace pegasus

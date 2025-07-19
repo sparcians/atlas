@@ -2,12 +2,12 @@
 #include <functional>
 
 #include "core/inst_handlers/v/RvvIntegerInsts.hpp"
-#include "core/AtlasState.hpp"
+#include "core/PegasusState.hpp"
 #include "core/ActionGroup.hpp"
 #include "core/VecElements.hpp"
 #include "include/ActionTags.hpp"
 
-namespace atlas
+namespace pegasus
 {
     template <typename XLEN>
     void RvvIntegerInsts::getInstHandlers(std::map<std::string, Action> & inst_handlers)
@@ -16,7 +16,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vadd.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -24,7 +24,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vadd.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vadd.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -32,7 +32,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vadd.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vadd.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -41,7 +41,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vand.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -49,7 +49,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vand.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vand.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -57,7 +57,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vand.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vand.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -66,7 +66,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vor.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -74,7 +74,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vor.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vor.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -82,7 +82,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vor.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vor.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -91,7 +91,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vxor.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -99,7 +99,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vxor.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vxor.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -107,7 +107,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vxor.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vxor.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -116,7 +116,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vsub.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -124,7 +124,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vsub.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vsub.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -133,7 +133,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vwadd.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -141,7 +141,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwadd.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwadd.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -149,7 +149,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwadd.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwadd.wv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -157,7 +157,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwadd.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwadd.wx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::X},
@@ -166,7 +166,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vwaddu.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -174,7 +174,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwaddu.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwaddu.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -182,7 +182,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwaddu.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwaddu.wv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -190,7 +190,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwaddu.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwaddu.wx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::X},
@@ -199,7 +199,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vwsub.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -207,7 +207,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwsub.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwsub.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -215,7 +215,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwsub.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwsub.wv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -223,7 +223,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwsub.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwsub.wx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::X},
@@ -232,7 +232,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vwsubu.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -240,7 +240,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwsubu.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwsubu.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -248,7 +248,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwsubu.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwsubu.wv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -256,7 +256,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vwsubu.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vwsubu.wx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viablHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::X},
@@ -265,7 +265,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vadc.vvm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -273,7 +273,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vadc.vvm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vadc.vxm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -281,7 +281,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vadc.vxm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vadc.vim",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::viacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -293,7 +293,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmadc.vvm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmiacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -301,7 +301,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmadc.vvm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmadc.vxm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmiacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -309,7 +309,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmadc.vxm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmadc.vim",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmiacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -317,7 +317,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmadc.vim", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmadc.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmiacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -325,7 +325,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmadc.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmadc.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmiacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -333,7 +333,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmadc.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmadc.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmiacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -345,7 +345,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmsbc.vvm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmiacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -353,7 +353,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsbc.vvm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsbc.vxm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmiacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -361,7 +361,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsbc.vxm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsbc.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmiacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -369,7 +369,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsbc.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsbc.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmiacsbHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -378,7 +378,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmseq.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -386,7 +386,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmseq.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmseq.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -394,7 +394,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmseq.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmseq.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -403,7 +403,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmsne.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -411,7 +411,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsne.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsne.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -419,7 +419,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsne.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsne.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -428,7 +428,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmsltu.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -436,7 +436,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsltu.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsltu.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -445,7 +445,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmslt.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -453,7 +453,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmslt.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmslt.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -462,7 +462,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmsleu.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -470,7 +470,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsleu.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsleu.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -478,7 +478,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsleu.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsleu.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -487,7 +487,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmsle.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -495,7 +495,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsle.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsle.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -503,7 +503,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsle.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsle.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -512,7 +512,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmsgtu.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -520,7 +520,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsgtu.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsgtu.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -528,7 +528,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsgtu.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsgtu.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -537,7 +537,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmsgt.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -545,7 +545,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsgt.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsgt.vx",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::X},
@@ -553,7 +553,7 @@ namespace atlas
                 RvvIntegerInsts>(nullptr, "vmsgt.vx", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsgt.vi",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvIntegerInsts::vmicHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::I},
@@ -565,9 +565,9 @@ namespace atlas
     template void RvvIntegerInsts::getInstHandlers<RV64>(std::map<std::string, Action> &);
 
     template <typename XLEN, size_t elemWidth, OperandMode opMode, typename Functor>
-    Action::ItrType viablHelper(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType viablHelper(PegasusState* state, Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
         Elements<Element<elemWidth>, false> elems_vs1{state, state->getVectorConfig(),
                                                       inst->getRs1()};
         Elements<Element<opMode.src2 == OperandMode::Mode::W ? 2 * elemWidth : elemWidth>, false>
@@ -609,7 +609,7 @@ namespace atlas
         }
         else // masked
         {
-            const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+            const MaskElements mask_elems{state, state->getVectorConfig(), pegasus::V0};
             execute(mask_elems.maskBitIterBegin(), mask_elems.maskBitIterEnd());
         }
 
@@ -618,7 +618,7 @@ namespace atlas
 
     template <typename XLEN, OperandMode opMode, bool isSigned,
               template <typename> typename FunctorTemp>
-    Action::ItrType RvvIntegerInsts::viablHandler_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvIntegerInsts::viablHandler_(PegasusState* state, Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
         if constexpr (isSigned)
@@ -703,10 +703,10 @@ namespace atlas
     }
 
     template <typename XLEN, size_t elemWidth, OperandMode opMode, bool hasMaskOp, typename Functor>
-    Action::ItrType viacsbHelper(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType viacsbHelper(PegasusState* state, Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
-        MaskElements elems_v0{state, state->getVectorConfig(), atlas::V0};
+        const PegasusInstPtr & inst = state->getCurrentInst();
+        MaskElements elems_v0{state, state->getVectorConfig(), pegasus::V0};
         Elements<Element<elemWidth>, false> elems_vs1{state, state->getVectorConfig(),
                                                       inst->getRs1()};
         Elements<Element<elemWidth>, false> elems_vs2{state, state->getVectorConfig(),
@@ -747,7 +747,7 @@ namespace atlas
 
     template <typename XLEN, OperandMode opMode, bool hasMaskOp,
               template <typename> typename FunctorTemp>
-    Action::ItrType RvvIntegerInsts::viacsbHandler_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvIntegerInsts::viacsbHandler_(PegasusState* state, Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
         switch (vector_config->getSEW())
@@ -776,10 +776,10 @@ namespace atlas
     }
 
     template <typename XLEN, size_t elemWidth, OperandMode opMode, bool hasMaskOp, auto detectFunc>
-    Action::ItrType vmiacsbHelper(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType vmiacsbHelper(PegasusState* state, Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
-        MaskElements elems_v0{state, state->getVectorConfig(), atlas::V0};
+        const PegasusInstPtr & inst = state->getCurrentInst();
+        MaskElements elems_v0{state, state->getVectorConfig(), pegasus::V0};
         Elements<Element<elemWidth>, false> elems_vs1{state, state->getVectorConfig(),
                                                       inst->getRs1()};
         Elements<Element<elemWidth>, false> elems_vs2{state, state->getVectorConfig(),
@@ -814,7 +814,7 @@ namespace atlas
     }
 
     template <typename XLEN, OperandMode opMode, bool hasMaskOp, auto detectFunc>
-    Action::ItrType RvvIntegerInsts::vmiacsbHandler_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvIntegerInsts::vmiacsbHandler_(PegasusState* state, Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
         switch (vector_config->getSEW())
@@ -839,9 +839,9 @@ namespace atlas
     }
 
     template <typename XLEN, size_t elemWidth, OperandMode opMode, typename Functor>
-    Action::ItrType vmicHelper(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType vmicHelper(PegasusState* state, Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
         Elements<Element<elemWidth>, false> elems_vs1{state, state->getVectorConfig(),
                                                       inst->getRs1()};
         Elements<Element<elemWidth>, false> elems_vs2{state, state->getVectorConfig(),
@@ -880,7 +880,7 @@ namespace atlas
         }
         else // masked
         {
-            const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+            const MaskElements mask_elems{state, state->getVectorConfig(), pegasus::V0};
             execute(mask_elems.maskBitIterBegin(), mask_elems.maskBitIterEnd());
         }
 
@@ -889,7 +889,7 @@ namespace atlas
 
     template <typename XLEN, OperandMode opMode, bool isSigned,
               template <typename> typename FunctorTemp>
-    Action::ItrType RvvIntegerInsts::vmicHandler_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvIntegerInsts::vmicHandler_(PegasusState* state, Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
         if constexpr (isSigned)
@@ -937,4 +937,4 @@ namespace atlas
         return ++action_it;
     }
 
-} // namespace atlas
+} // namespace pegasus

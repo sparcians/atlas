@@ -5,9 +5,9 @@
 #include <map>
 #include <string>
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
     class ActionGroup;
 
     class RvzifenceiInsts
@@ -20,6 +20,6 @@ namespace atlas
 
       private:
         template <typename XLEN>
-        Action::ItrType fence_iHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fence_iHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
     };
-} // namespace atlas
+} // namespace pegasus

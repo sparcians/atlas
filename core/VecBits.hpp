@@ -5,7 +5,7 @@
 #include "sparta/functional/RegisterBits.hpp"
 #include "core/VecConfig.hpp"
 
-namespace atlas
+namespace pegasus
 {
     inline sparta::RegisterBits getVecBitsMask(const VectorConfig* config)
     {
@@ -31,4 +31,4 @@ namespace atlas
         }
         return i;
     }
-} // namespace atlas
+} // namespace pegasus

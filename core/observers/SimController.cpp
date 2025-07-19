@@ -1,9 +1,9 @@
 #include "core/observers/SimController.hpp"
-#include "core/AtlasState.hpp"
-#include "core/AtlasInst.hpp"
+#include "core/PegasusState.hpp"
+#include "core/PegasusInst.hpp"
 #include "core/Exception.hpp"
 
-namespace atlas
+namespace pegasus
 {
 
     class BreakpointManager
@@ -15,11 +15,11 @@ namespace atlas
 
         void breakOnPostExecute() { break_on_post_execute_ = true; }
 
-        bool shouldBreakOnPreExecute(AtlasState*) const { return break_on_pre_execute_; }
+        bool shouldBreakOnPreExecute(PegasusState*) const { return break_on_pre_execute_; }
 
-        bool shouldBreakOnPreException(AtlasState*) const { return break_on_pre_exception_; }
+        bool shouldBreakOnPreException(PegasusState*) const { return break_on_pre_exception_; }
 
-        bool shouldBreakOnPostExecute(AtlasState*) const { return break_on_post_execute_; }
+        bool shouldBreakOnPostExecute(PegasusState*) const { return break_on_post_execute_; }
 
         void deleteAllBreakpoints()
         {
@@ -37,14 +37,14 @@ namespace atlas
     class SimController::SimEndpoint
     {
       public:
-        void postInit(AtlasState* state)
+        void postInit(PegasusState* state)
         {
-            std::cout << "\nATLAS_IDE_READY\n";
+            std::cout << "\nPEGASUS_IDE_READY\n";
             std::cout.flush();
             enterLoop_(state);
         }
 
-        void preExecute(AtlasState* state)
+        void preExecute(PegasusState* state)
         {
             if (break_on_pre_execute_)
             {
@@ -56,7 +56,7 @@ namespace atlas
             }
         }
 
-        void preException(AtlasState* state)
+        void preException(PegasusState* state)
         {
             if (break_on_pre_exception_)
             {
@@ -68,7 +68,7 @@ namespace atlas
             }
         }
 
-        void postExecute(AtlasState* state, const std::vector<Observer::MemRead> & mem_reads,
+        void postExecute(PegasusState* state, const std::vector<Observer::MemRead> & mem_reads,
                          const std::vector<Observer::MemWrite> & mem_writes)
         {
             if (break_on_post_execute_)
@@ -83,7 +83,7 @@ namespace atlas
             }
         }
 
-        void onSimulationFinished(AtlasState* state)
+        void onSimulationFinished(PegasusState* state)
         {
             sendString_("sim_finished");
             enterLoop_(state);
@@ -206,7 +206,7 @@ namespace atlas
 
         void sendJson_(const std::string & message)
         {
-            std::cout << "ATLAS_IDE_RESPONSE: " << message << "\n";
+            std::cout << "PEGASUS_IDE_RESPONSE: " << message << "\n";
             std::cout.flush();
         }
 
@@ -270,7 +270,7 @@ namespace atlas
             sendJson_(json);
         }
 
-        ActionGroup* enterLoop_(AtlasState* state)
+        ActionGroup* enterLoop_(PegasusState* state)
         {
             while (true)
             {
@@ -278,7 +278,7 @@ namespace atlas
                 const std::string request = receiveRequest_();
                 const SimCommand sim_cmd = getSimCommand_(request, args);
 
-                atlas::ActionGroup* fail_action_group = nullptr;
+                pegasus::ActionGroup* fail_action_group = nullptr;
                 if (!handleSimCommand_(state, sim_cmd, args, fail_action_group))
                 {
                     // sim.finish_execute:
@@ -296,7 +296,7 @@ namespace atlas
 
         // Returns TRUE if we are supposed to remain in the loop. The caller
         // should return fail_action_group to the simulator if we return false.
-        bool handleSimCommand_(AtlasState* state, SimCommand sim_cmd,
+        bool handleSimCommand_(PegasusState* state, SimCommand sim_cmd,
                                const std::vector<std::string> & args,
                                ActionGroup*& fail_action_group)
         {
@@ -521,7 +521,7 @@ namespace atlas
                             break;
                         }
                         auto group_num = std::atoi(args[0].c_str());
-                        atlas::RegisterSet* rset = nullptr;
+                        pegasus::RegisterSet* rset = nullptr;
                         switch (group_num)
                         {
                             case 0:
@@ -799,20 +799,23 @@ namespace atlas
     {
     }
 
-    void SimController::postInit(AtlasState* state) { endpoint_->postInit(state); }
+    void SimController::postInit(PegasusState* state) { endpoint_->postInit(state); }
 
-    void SimController::preExecute_(AtlasState* state) { return endpoint_->preExecute(state); }
+    void SimController::preExecute_(PegasusState* state) { return endpoint_->preExecute(state); }
 
-    void SimController::postExecute_(AtlasState* state)
+    void SimController::postExecute_(PegasusState* state)
     {
         return endpoint_->postExecute(state, mem_reads_, mem_writes_);
     }
 
-    void SimController::preException_(AtlasState* state) { return endpoint_->preException(state); }
+    void SimController::preException_(PegasusState* state)
+    {
+        return endpoint_->preException(state);
+    }
 
-    void SimController::onSimulationFinished(AtlasState* state)
+    void SimController::onSimulationFinished(PegasusState* state)
     {
         endpoint_->onSimulationFinished(state);
     }
 
-} // namespace atlas
+} // namespace pegasus

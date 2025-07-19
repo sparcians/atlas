@@ -6,10 +6,10 @@ on:
 env:
   CACHE_VERSION: v1
 
-name: Atlas Regression
+name: Pegasus Regression
 jobs:
   build_test_job:
-    if: github.repository == 'sparcians/atlas'
+    if: github.repository == 'sparcians/pegasus'
     strategy:
       # Strategy is a matrix of debug and release builds/regression
       matrix:
@@ -17,17 +17,17 @@ jobs:
         BUILD_TYPE: [Release]
         COMPILER: [clang]
 
-    name: Regress-Atlas
+    name: Regress-Pegasus
     runs-on: ${{matrix.os}}
 
     # Set up a global environment variable for build scripts
     env:
-      ATLAS_BUILD_TYPE: ${{matrix.BUILD_TYPE}}
+      PEGASUS_BUILD_TYPE: ${{matrix.BUILD_TYPE}}
       COMPILER: ${{matrix.COMPILER}}
 
     steps:
-      # Get Atlas
-      - name: Clone Atlas
+      # Get Pegasus
+      - name: Clone Pegasus
         uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -67,7 +67,7 @@ jobs:
             ${{matrix.os}}-${{matrix.BUILD_TYPE}}-${{matrix.COMPILER}}-ccache
 
       # Install missing packages to make everything build
-      - name: Install packages needed for sparta/atlas
+      - name: Install packages needed for sparta/pegasus
         run: |
           sudo apt-get update --fix-missing
           sudo apt-get install libboost-all-dev libyaml-cpp-dev rapidjson-dev libhdf5-dev llvm

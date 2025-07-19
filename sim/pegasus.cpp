@@ -1,13 +1,13 @@
 
 #include <iomanip>
 
-#include "sim/AtlasSim.hpp"
+#include "sim/PegasusSim.hpp"
 #include "sparta/app/CommandLineSimulator.hpp"
 
-const char USAGE[] =
-    "Usage:\n"
-    "./atlas [-i inst limit] [--reg \"name value\"] [--interactive] [--spike-formatting] <workload>"
-    "\n";
+const char USAGE[] = "Usage:\n"
+                     "./pegasus [-i inst limit] [--reg \"name value\"] [--interactive] "
+                     "[--spike-formatting] <workload>"
+                     "\n";
 
 struct RegOverride
 {
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
     DEFAULTS.arch_search_dirs = {"arch"}; // Where --arch will be resolved by default
 
     sparta::SimulationInfo::getInstance() =
-        sparta::SimulationInfo("Atlas RISC-V Functional Model", argc, argv, "v0.0.0", "", {});
+        sparta::SimulationInfo("Pegasus RISC-V Functional Model", argc, argv, "v0.0.0", "", {});
     const bool show_field_names = true;
     sparta::SimulationInfo::getInstance().write(std::cout, "# ", "\n", show_field_names);
     std::cout << "# Sparta Version: " << sparta::SimulationInfo::sparta_version << std::endl;
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
         sparta::utils::tokenize_on_whitespace(workload, workload_args);
 
         // Shove some register overrides in
-        atlas::AtlasSim::RegValueOverridePairs reg_value_overrides;
+        pegasus::PegasusSim::RegValueOverridePairs reg_value_overrides;
         if (vm.count("reg"))
         {
             auto & reg_overrides = vm["reg"].as<std::vector<RegOverride>>();
@@ -106,7 +106,7 @@ int main(int argc, char** argv)
 
         // Create the simulator
         sparta::Scheduler scheduler;
-        atlas::AtlasSim sim(&scheduler, workload_args, reg_value_overrides, ilimit);
+        pegasus::PegasusSim sim(&scheduler, workload_args, reg_value_overrides, ilimit);
 
         cls.populateSimulation(&sim);
 
@@ -130,7 +130,7 @@ int main(int argc, char** argv)
         cls.postProcess(&sim);
 
         // Get workload exit code
-        const atlas::AtlasState::SimState* sim_state = sim.getAtlasState()->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = sim.getPegasusState()->getSimState();
         exit_code = sim_state->workload_exit_code;
         std::cout << "Workload exit code: " << std::dec << exit_code << std::endl;
     }

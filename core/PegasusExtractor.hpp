@@ -4,16 +4,16 @@
 #include "mavis/JSONUtils.hpp"
 #include "sparta/utils/SpartaSharedPointerAllocator.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasExtractor
+    class PegasusExtractor
     {
       public:
         // Required by Mavis
-        using PtrType = sparta::SpartaSharedPointer<AtlasExtractor>;
+        using PtrType = sparta::SpartaSharedPointer<PegasusExtractor>;
 
-        AtlasExtractor(const boost::json::object & json, const AtlasState* state);
-        AtlasExtractor(const AtlasExtractor &) = default;
+        PegasusExtractor(const boost::json::object & json, const PegasusState* state);
+        PegasusExtractor(const PegasusExtractor &) = default;
 
         // Required by Mavis
         void update(const boost::json::object &) {}
@@ -33,9 +33,9 @@ namespace atlas
 
         ActionGroup inst_action_group_;
 
-        friend class AtlasInst;
+        friend class PegasusInst;
     };
 
-    using AtlasExtractorPtr = AtlasExtractor::PtrType;
-    using AtlasExtractorAllocator = sparta::SpartaSharedPointerAllocator<AtlasExtractor>;
-} // namespace atlas
+    using PegasusExtractorPtr = PegasusExtractor::PtrType;
+    using PegasusExtractorAllocator = sparta::SpartaSharedPointerAllocator<PegasusExtractor>;
+} // namespace pegasus

@@ -1,27 +1,27 @@
 #pragma once
 
-#include "core/AtlasExtractor.hpp"
+#include "core/PegasusExtractor.hpp"
 #include "mavis/OpcodeInfo.h"
 #include "sparta/utils/SpartaSharedPointerAllocator.hpp"
 
-#include "core/translate/AtlasTranslationState.hpp"
+#include "core/translate/PegasusTranslationState.hpp"
 
 namespace sparta
 {
     class Register;
 }
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
 
-    class AtlasInst
+    class PegasusInst
     {
       public:
-        using PtrType = sparta::SpartaSharedPointer<AtlasInst>;
+        using PtrType = sparta::SpartaSharedPointer<PegasusInst>;
 
-        AtlasInst(const mavis::OpcodeInfo::PtrType & opcode_info,
-                  const AtlasExtractorPtr & extractor_info, AtlasState* state);
+        PegasusInst(const mavis::OpcodeInfo::PtrType & opcode_info,
+                    const PegasusExtractorPtr & extractor_info, PegasusState* state);
 
         uint64_t getUid() const { return uid_; }
 
@@ -166,14 +166,14 @@ namespace atlas
 
         // Translation information.  Specifically, this is for data
         // accesses
-        AtlasTranslationState* getTranslationState() { return &translation_state_; }
+        PegasusTranslationState* getTranslationState() { return &translation_state_; }
 
       private:
         // Unique ID
         uint64_t uid_;
 
         mavis::OpcodeInfo::PtrType opcode_info_;
-        AtlasExtractorPtr extractor_info_;
+        PegasusExtractorPtr extractor_info_;
 
         // Opcode size in bytes, either 4 or 2 (compressed)
         const uint32_t opcode_size_;
@@ -197,17 +197,17 @@ namespace atlas
         sparta::Register* rd2_reg_;
 
         // Translation state for load/store instructions
-        AtlasTranslationState translation_state_;
+        PegasusTranslationState translation_state_;
 
         ActionGroup inst_action_group_;
         bool unimplemented_ = false;
 
-        friend std::ostream & operator<<(std::ostream & os, const AtlasInst & inst);
+        friend std::ostream & operator<<(std::ostream & os, const PegasusInst & inst);
     };
 
-    using AtlasInstPtr = AtlasInst::PtrType;
-    using AtlasInstAllocator = sparta::SpartaSharedPointerAllocator<AtlasInst>;
+    using PegasusInstPtr = PegasusInst::PtrType;
+    using PegasusInstAllocator = sparta::SpartaSharedPointerAllocator<PegasusInst>;
 
-    std::ostream & operator<<(std::ostream & os, const AtlasInst & inst);
-    std::ostream & operator<<(std::ostream & os, const AtlasInstPtr & inst);
-} // namespace atlas
+    std::ostream & operator<<(std::ostream & os, const PegasusInst & inst);
+    std::ostream & operator<<(std::ostream & os, const PegasusInstPtr & inst);
+} // namespace pegasus

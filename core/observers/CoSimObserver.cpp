@@ -1,23 +1,23 @@
 #include "core/observers/CoSimObserver.hpp"
-#include "core/AtlasState.hpp"
-#include "core/AtlasInst.hpp"
-#include "include/AtlasUtils.hpp"
+#include "core/PegasusState.hpp"
+#include "core/PegasusInst.hpp"
+#include "include/PegasusUtils.hpp"
 
-#include "system/AtlasSystem.hpp"
+#include "system/PegasusSystem.hpp"
 
-namespace atlas
+namespace pegasus
 {
     CoSimObserver::CoSimObserver() : Observer(ObserverMode::RV64)
     {
         // TODO: CoSimObserver for rv32
     }
 
-    void CoSimObserver::preExecute_(AtlasState* state)
+    void CoSimObserver::preExecute_(PegasusState* state)
     {
         last_event_ = cosim::Event(++event_uid_, cosim::Event::Type::INSTRUCTION);
         last_event_.hart_id_ = state->getHartId();
 
-        AtlasInstPtr inst = state->getCurrentInst();
+        PegasusInstPtr inst = state->getCurrentInst();
         last_event_.arch_id_ = inst->getUid();
         last_event_.opcode_ = inst->getOpcode();
         last_event_.opcode_size_ = inst->getOpcodeSize();
@@ -32,7 +32,7 @@ namespace atlas
         }
     }
 
-    void CoSimObserver::postExecute_(AtlasState* state)
+    void CoSimObserver::postExecute_(PegasusState* state)
     {
         for (auto & src_reg : src_regs_)
         {
@@ -57,4 +57,4 @@ namespace atlas
         // TODO: for branches, is_change_of_flow_, alternate_next_pc_
         // TODO: next_priv_
     }
-} // namespace atlas
+} // namespace pegasus

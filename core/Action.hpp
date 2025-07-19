@@ -7,9 +7,9 @@
 
 #include "ActionTagFactory.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
     class Action;
     class ActionGroup;
 
@@ -18,7 +18,7 @@ namespace atlas
      *
      * \brief A way to wrap a class's C++ method in a function pointer.
      *
-     * The Atlas simulator will use this class to wrap C++ objects to execute
+     * The Pegasus simulator will use this class to wrap C++ objects to execute
      * the main engine of the simulator. To use this class,the caller must
      * create an Action using the `createAction` static method:
      *
@@ -29,7 +29,7 @@ namespace atlas
      *    };
      *
      *    Foo f;
-     *    atlas::Action op = atlas::Action<&Foo::action>(&f);
+     *    pegasus::Action op = pegasus::Action<&Foo::action>(&f);
      * \endcode
      *
      * And the invokation:
@@ -37,7 +37,7 @@ namespace atlas
      * \code
      *    int x = 0;
      *    float y = 0;
-     *    atlas::Action * next_op = op.execute(&x, &y);
+     *    pegasus::Action * next_op = op.execute(&x, &y);
      * \endcode
      */
     class Action
@@ -60,7 +60,7 @@ namespace atlas
         /*!
          * \brief Defined template specialization for FuncT
          *
-         * The only argument is always `atlas::AtlasState*`
+         * The only argument is always `pegasus::PegasusState*`
          *
          * \tparam RetT       The function's return type
          * \tparam ObjT       The Object type the function belongs to
@@ -69,7 +69,7 @@ namespace atlas
          * \code
          *  class Foo {
          *  public:
-         *      Action * aFunction(AtlasState*);
+         *      Action * aFunction(PegasusState*);
          *  };
          * \endcode
          *
@@ -78,7 +78,7 @@ namespace atlas
          *     `ObjT`     -> `Foo`
          *     `RetT`     -> `Action *`
          */
-        template <class RetT, class ObjT> struct ArgType<RetT (ObjT::*)(AtlasState*, ItrType)>
+        template <class RetT, class ObjT> struct ArgType<RetT (ObjT::*)(PegasusState*, ItrType)>
         {
         };
 
@@ -189,12 +189,12 @@ namespace atlas
 
         /**
          * \brief The invoking function for the action
-         * \param state AtlasState pointer
+         * \param state PegasusState pointer
          * \param op Action pointer
          *
          * All arguments must be pointers
          */
-        ItrType execute(AtlasState* state, ItrType action_it) const
+        ItrType execute(PegasusState* state, ItrType action_it) const
         {
             // For speed, we will use assert (which gets compiled out on release)
             assert(method_);
@@ -254,15 +254,15 @@ namespace atlas
 #endif
 
         //! \brief The internal method stub
-        template <class ObjT, ItrType (ObjT::*TMethod)(AtlasState*, ItrType)>
-        static ItrType method_stub(void* object_ptr, AtlasState* state, ItrType action_it)
+        template <class ObjT, ItrType (ObjT::*TMethod)(PegasusState*, ItrType)>
+        static ItrType method_stub(void* object_ptr, PegasusState* state, ItrType action_it)
         {
             ObjT* p = static_cast<ObjT*>(object_ptr);
 
             return (p->*TMethod)(state, action_it);
         }
 
-        using stub_type = ItrType (*)(void*, AtlasState*, ItrType);
+        using stub_type = ItrType (*)(void*, PegasusState*, ItrType);
         stub_type method_ = nullptr;
 
         //! \brief Name of this Action
@@ -292,4 +292,4 @@ namespace atlas
     {
         return (os << *action_it);
     }
-} // namespace atlas
+} // namespace pegasus

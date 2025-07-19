@@ -1,4 +1,4 @@
-project(Atlas)
+project(Pegasus)
 
 add_subdirectory(i)
 add_subdirectory(m)
@@ -11,8 +11,8 @@ add_subdirectory(zicsr)
 add_subdirectory(zifencei)
 add_subdirectory(zicond)
 
-add_library(atlasinsts)
-target_link_libraries(atlasinsts
+add_library(pegasusinsts)
+target_link_libraries(pegasusinsts
     rvi
     rvm
     rva
@@ -24,4 +24,4 @@ target_link_libraries(atlasinsts
     rvzicond
     rvv
 )
-add_dependencies(atlasinsts AutogenArchFiles)
+add_dependencies(pegasusinsts AutogenArchFiles)

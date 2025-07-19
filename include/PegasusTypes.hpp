@@ -5,7 +5,7 @@
 #include <ostream>
 #include <array>
 
-namespace atlas
+namespace pegasus
 {
     using Addr = uint64_t;
     using Opcode = uint32_t;
@@ -164,4 +164,4 @@ namespace atlas
     // System Call emulation
     using SystemCallStack = std::array<uint64_t, 8>;
 
-} // namespace atlas
+} // namespace pegasus

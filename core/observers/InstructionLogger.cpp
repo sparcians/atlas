@@ -1,14 +1,14 @@
 #include "core/observers/InstructionLogger.hpp"
-#include "core/AtlasState.hpp"
-#include "core/AtlasInst.hpp"
-#include "include/AtlasUtils.hpp"
+#include "core/PegasusState.hpp"
+#include "core/PegasusInst.hpp"
+#include "include/PegasusUtils.hpp"
 
-#include "system/AtlasSystem.hpp"
+#include "system/PegasusSystem.hpp"
 
 #include "sparta/utils/LogUtils.hpp"
 #include "sparta/log/MessageSource.hpp"
 
-namespace atlas
+namespace pegasus
 {
 #ifndef INSTLOG
 #define INSTLOG(msg) SPARTA_LOG(inst_logger_, msg)
@@ -25,7 +25,7 @@ namespace atlas
 
         virtual ~InstLogWriterBase() = default;
 
-        virtual void beginInst(AtlasState* state, const AtlasInst* inst, uint64_t opcode)
+        virtual void beginInst(PegasusState* state, const PegasusInst* inst, uint64_t opcode)
         {
             (void)state;
             (void)inst;
@@ -34,7 +34,7 @@ namespace atlas
 
         virtual void writeSymbols(const std::string & symbols) { (void)symbols; }
 
-        virtual void writeInstHeader(const AtlasInst* inst, uint64_t pc, uint64_t opcode)
+        virtual void writeInstHeader(const PegasusInst* inst, uint64_t pc, uint64_t opcode)
         {
             (void)inst;
             (void)pc;
@@ -82,10 +82,10 @@ namespace atlas
         const uint32_t reg_width_;
     };
 
-    class AtlasInstLogWriter : public InstLogWriterBase
+    class PegasusInstLogWriter : public InstLogWriterBase
     {
       public:
-        AtlasInstLogWriter(sparta::log::MessageSource & inst_logger, const uint32_t reg_width) :
+        PegasusInstLogWriter(sparta::log::MessageSource & inst_logger, const uint32_t reg_width) :
             InstLogWriterBase(inst_logger, reg_width)
         {
         }
@@ -97,7 +97,7 @@ namespace atlas
             postExecute_(inst_oss_.str());
         }
 
-        void writeInstHeader(const AtlasInst* inst, uint64_t pc, uint64_t opcode) override
+        void writeInstHeader(const PegasusInst* inst, uint64_t pc, uint64_t opcode) override
         {
             reset_();
             if (inst)
@@ -237,7 +237,7 @@ namespace atlas
         {
         }
 
-        void beginInst(AtlasState* state, const AtlasInst*, uint64_t opcode) override
+        void beginInst(PegasusState* state, const PegasusInst*, uint64_t opcode) override
         {
             reset_();
             inst_oss_ << "core   " << state->getHartId() << ": " << (int)state->getPrivMode() << " "
@@ -308,7 +308,7 @@ namespace atlas
                                          const ObserverMode arch) :
         Observer(arch),
         inst_logger_(inst_logger),
-        inst_log_writer_(std::make_shared<AtlasInstLogWriter>(inst_logger_, getRegWidth()))
+        inst_log_writer_(std::make_shared<PegasusInstLogWriter>(inst_logger_, getRegWidth()))
     {
     }
 
@@ -317,13 +317,13 @@ namespace atlas
         inst_log_writer_ = std::make_shared<SpikeInstLogWriter>(inst_logger_, getRegWidth());
     }
 
-    void InstructionLogger::postExecute_(AtlasState* state)
+    void InstructionLogger::postExecute_(PegasusState* state)
     {
-        AtlasInstPtr inst = state->getCurrentInst();
+        PegasusInstPtr inst = state->getCurrentInst();
         inst_log_writer_->beginInst(state, inst.get(), opcode_);
 
         // Write to instruction logger
-        const auto & symbols = state->getAtlasSystem()->getSymbols();
+        const auto & symbols = state->getPegasusSystem()->getSymbols();
         if (symbols.find(pc_) != symbols.end())
         {
             inst_log_writer_->writeSymbols(symbols.at(pc_));
@@ -389,4 +389,4 @@ namespace atlas
 
         inst_log_writer_->finishInst();
     }
-} // namespace atlas
+} // namespace pegasus

@@ -1,8 +1,8 @@
-#include "core/AtlasExtractor.hpp"
-#include "core/AtlasState.hpp"
+#include "core/PegasusExtractor.hpp"
+#include "core/PegasusState.hpp"
 #include "core/Execute.hpp"
 
-namespace atlas
+namespace pegasus
 {
     template <typename ValueType>
     ValueType getUarchJsonValue(const boost::json::object & entry, const std::string & key)
@@ -14,8 +14,8 @@ namespace atlas
         return boost::json::value_to<ValueType>(entry.find(key)->value());
     }
 
-    AtlasExtractor::AtlasExtractor(const boost::json::object & uarch_json,
-                                   const AtlasState* state) :
+    PegasusExtractor::PegasusExtractor(const boost::json::object & uarch_json,
+                                       const PegasusState* state) :
         mnemonic_(getUarchJsonValue<std::string>(uarch_json, "mnemonic")),
         inst_handler_name_(getUarchJsonValue<std::string>(uarch_json, "handler")),
         is_memory_inst_(getUarchJsonValue<bool>(uarch_json, "memory")),
@@ -60,4 +60,4 @@ namespace atlas
                                      << " inst handler map: " << inst_handler_name_);
         }
     }
-} // namespace atlas
+} // namespace pegasus

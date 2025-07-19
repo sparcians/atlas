@@ -7,9 +7,9 @@
 #include "sparta/memory/BlockingMemoryIFNode.hpp"
 #include "sparta/memory/MemoryObject.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
 
     /*!
      * \class MagicMemory
@@ -75,7 +75,7 @@ namespace atlas
         // Backend memory
         sparta::memory::MemoryObject memory_;
 
-        AtlasState* state_ = nullptr;
+        PegasusState* state_ = nullptr;
 
         bool tryRead_(sparta::memory::addr_t addr, sparta::memory::addr_t size, uint8_t* buf,
                       const void* in_supplement, void* out_supplement) override final;
@@ -107,4 +107,4 @@ namespace atlas
 
         std::stringstream block_char_msg_;
     };
-} // namespace atlas
+} // namespace pegasus

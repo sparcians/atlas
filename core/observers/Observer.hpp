@@ -4,17 +4,17 @@
 #include "sparta/functional/Register.hpp"
 #include "sparta/memory/BlockingMemoryIFNode.hpp"
 #include "core/Trap.hpp"
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
     class ActionGroup;
 
     // The base class needs to know if we are rv32 or rv64 since it is responsible for
     // reading register values (XLEN).
     //
-    // We do not use templates here (template <typename XLEN>) because then AtlasState
+    // We do not use templates here (template <typename XLEN>) because then PegasusState
     // cannot hold onto arch-agnostic observers (std::vector<std::unique_ptr<Observer>>).
     //
     // Note that if your subclass tells the Observer to use ObserverMode::UNUSED, then
@@ -66,10 +66,7 @@ namespace atlas
 
             template <typename TYPE> RegValue(TYPE value) { setValue<TYPE>(value); }
 
-            void setValue(const std::vector<uint8_t> & value)
-            {
-                value_ = value;
-            }
+            void setValue(const std::vector<uint8_t> & value) { value_ = value; }
 
             template <typename TYPE> void setValue(TYPE value)
             {
@@ -144,11 +141,11 @@ namespace atlas
             RegValue reg_prev_value;
         };
 
-        void preExecute(AtlasState* state);
+        void preExecute(PegasusState* state);
 
-        void postExecute(AtlasState* state);
+        void postExecute(PegasusState* state);
 
-        void preException(AtlasState* state);
+        void preException(PegasusState* state);
 
         virtual void stopSim() {}
 
@@ -210,13 +207,13 @@ namespace atlas
       private:
         sparta::utils::ValidValue<ObserverMode> arch_;
 
-        void inspectInitialState_(AtlasState* state);
+        void inspectInitialState_(PegasusState* state);
 
-        virtual void preExecute_(AtlasState*) {}
+        virtual void preExecute_(PegasusState*) {}
 
-        virtual void postExecute_(AtlasState*) {}
+        virtual void postExecute_(PegasusState*) {}
 
-        virtual void preException_(AtlasState*) {}
+        virtual void preException_(PegasusState*) {}
 
         void reset_()
         {
@@ -252,4 +249,4 @@ namespace atlas
 
     std::ostream & operator<<(std::ostream & os, const Observer::RegValue & reg_value);
 
-} // namespace atlas
+} // namespace pegasus

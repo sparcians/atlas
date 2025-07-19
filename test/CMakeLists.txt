@@ -1,10 +1,10 @@
-project(Atlas_Tests)
+project(Pegasus_Tests)
 
 # Enable testing
 include(CTest)
 
 # Convenience macros and functions for tests
-include(${SIM_BASE}/test/AtlasTestingMacros.cmake)
+include(${SIM_BASE}/test/PegasusTestingMacros.cmake)
 
 # Handy parallel processor library
 include(ProcessorCount)
@@ -19,14 +19,14 @@ endif()
 message(STATUS "Found " ${NUM_CORES} " cores in machine (for ctest)")
 
 # Add regress target
-add_custom_target(atlas_regress)
-add_dependencies(atlas_regress AutogenArchFiles)
+add_custom_target(pegasus_regress)
+add_dependencies(pegasus_regress AutogenArchFiles)
 
 # Add valgrind regress target
 set(VALGRIND_TEST_PREFIX "^valgrind_") # Only tests with this prefix
-add_custom_target (atlas_regress_valgrind)
-add_custom_command(TARGET atlas_regress          POST_BUILD COMMAND ctest -E ${VALGRIND_TEST_PREFIX} -j${NUM_CORES})
-add_custom_command(TARGET atlas_regress_valgrind POST_BUILD COMMAND ctest -R ${VALGRIND_TEST_PREFIX} -D ExperimentalMemCheck -j${NUM_CORES})
+add_custom_target (pegasus_regress_valgrind)
+add_custom_command(TARGET pegasus_regress          POST_BUILD COMMAND ctest -E ${VALGRIND_TEST_PREFIX} -j${NUM_CORES})
+add_custom_command(TARGET pegasus_regress_valgrind POST_BUILD COMMAND ctest -R ${VALGRIND_TEST_PREFIX} -D ExperimentalMemCheck -j${NUM_CORES})
 
 # Tests
 add_subdirectory(actions)

@@ -1,7 +1,7 @@
 import os, time
 from backend.sim_wrapper import SimWrapper
 from backend.sim_api import *
-from backend.atlas_dtypes import *
+from backend.pegasus_dtypes import *
 from backend.c_dtypes import *
 from backend.trap import *
 from pathlib import Path
@@ -58,7 +58,7 @@ class Observer:
     def CreateReport(self):
         return None
 
-## Simple observer which does not overwrite any AtlasState / AtlasInst values.
+## Simple observer which does not overwrite any PegasusState / PegasusInst values.
 class SanityCheckObserver(Observer):
     def __init__(self, logfile):
         self.fout = open(logfile, 'w')
@@ -67,12 +67,12 @@ class SanityCheckObserver(Observer):
         self.csrs_before_exception_handling = None
 
     def OnPreSimulation(self, endpoint):
-        starting_pc = atlas_pc(endpoint)
+        starting_pc = pegasus_pc(endpoint)
         self.fout.write('BEGIN SIMULATION (starting pc: {})\n'.format(starting_pc))
 
     def OnPreExecute(self, endpoint):
-        pc = atlas_pc(endpoint)
-        inst = atlas_current_inst(endpoint)
+        pc = pegasus_pc(endpoint)
+        inst = pegasus_current_inst(endpoint)
         dasm = inst.dasmString()
         kvpairs = [('pc', pc), ('dasm', dasm)]
 
@@ -110,7 +110,7 @@ class SanityCheckObserver(Observer):
         self.csrs_before_exception_handling = None
 
     def OnPreException(self, endpoint):
-        trap_cause = atlas_inst_active_exception(endpoint)
+        trap_cause = pegasus_inst_active_exception(endpoint)
         assert trap_cause >= 0
         cause = TRAP_CAUSES[trap_cause]
 
@@ -118,11 +118,11 @@ class SanityCheckObserver(Observer):
         self.fout.write('----> OnPreException (cause: {})\n'.format(cause))
 
         # Track CSR values before/after exception handling.
-        inst = atlas_current_inst(endpoint)
+        inst = pegasus_current_inst(endpoint)
         if not inst:
             return
 
-        state = inst.getAtlasState()
+        state = inst.getPegasusState()
         csr_rset = state.getCsrRegisterSet()
 
         self.csrs_before_exception_handling = {}
@@ -134,7 +134,7 @@ class SanityCheckObserver(Observer):
                 self.csrs_before_exception_handling[reg_name] = FormatHex(reg_value)
 
     def OnPostExecute(self, endpoint):
-        inst = atlas_current_inst(endpoint)
+        inst = pegasus_current_inst(endpoint)
         if not inst:
             return
 
@@ -155,7 +155,7 @@ class SanityCheckObserver(Observer):
 
         if self.csrs_before_exception_handling is not None:
             for csr_name, before_val in self.csrs_before_exception_handling.items():
-                after_val = atlas_reg_value(endpoint, csr_name)
+                after_val = pegasus_reg_value(endpoint, csr_name)
                 if before_val != after_val:
                     # mstatus:0x0 -> 0x8
                     key = csr_name
@@ -168,13 +168,13 @@ class SanityCheckObserver(Observer):
         self.csrs_before_exception_handling = None
 
     def OnSimulationStuck(self, endpoint):
-        pc = atlas_pc(endpoint)
+        pc = pegasus_pc(endpoint)
         self.fout.write('----> Infinite loop detected at pc: {}\n'.format(pc))
 
     def OnSimFinished(self, endpoint):
-        workload_exit_code = atlas_exit_code(endpoint)
-        test_passed = atlas_test_passed(endpoint)
-        inst_count = atlas_inst_count(endpoint)
+        workload_exit_code = pegasus_exit_code(endpoint)
+        test_passed = pegasus_test_passed(endpoint)
+        inst_count = pegasus_inst_count(endpoint)
 
         # END SIMULATION RESULTS:
         # ----> workload_exit_code: 0
@@ -200,7 +200,7 @@ class SanityCheckObserver(Observer):
     def __del__(self):
         self.close()
 
-## Utility class which runs an observer on an Atlas simulation running in the background.
+## Utility class which runs an observer on an Pegasus simulation running in the background.
 class ObserverSim:
     def __init__(self, riscv_tests_dir, sim_exe_path, test_name):
         self.riscv_tests_dir = riscv_tests_dir
@@ -237,16 +237,16 @@ class ObserverSim:
 
             # Always put a pre_execute breakpoint so we can skip an instruction and
             # go right to simulation finish in the event of an infinite loop.
-            atlas_break_action(sim.endpoint, 'pre_execute')
+            pegasus_break_action(sim.endpoint, 'pre_execute')
 
             if obs.BreakOnPreException():
-                atlas_break_action(sim.endpoint, 'pre_exception')
+                pegasus_break_action(sim.endpoint, 'pre_exception')
 
             if obs.BreakOnPostExecute():
-                atlas_break_action(sim.endpoint, 'post_execute')
+                pegasus_break_action(sim.endpoint, 'post_execute')
 
             # Give the observer a chance to do something at the end of simulation.
-            atlas_break_action(sim.endpoint, 'sim_finish')
+            pegasus_break_action(sim.endpoint, 'sim_finish')
 
             # Look at the pre_execute PC and skip the instruction to terminate
             # the simulation if the same PC is executing twice (about to go into
@@ -279,13 +279,13 @@ class ObserverSim:
             start_time = time.time()
 
             while True:
-                current_action = atlas_continue(sim.endpoint)
+                current_action = pegasus_continue(sim.endpoint)
 
                 if current_action == 'pre_execute':
-                    curr_pre_execute_pc = atlas_pc(sim.endpoint)
+                    curr_pre_execute_pc = pegasus_pc(sim.endpoint)
                     if curr_pre_execute_pc == last_pre_execute_pc:
                         obs.OnSimulationStuck(sim.endpoint)
-                        current_action = atlas_kill_sim(sim.endpoint, 555)
+                        current_action = pegasus_kill_sim(sim.endpoint, 555)
                     else:
                         last_pre_execute_pc = curr_pre_execute_pc
 
@@ -295,7 +295,7 @@ class ObserverSim:
 
                 if timeout and time.time() - start_time > timeout:
                     obs.OnSimulationStuck(sim.endpoint)
-                    atlas_kill_sim(sim.endpoint, 555)
+                    pegasus_kill_sim(sim.endpoint, 555)
                     break
 
         return obs.CreateReport()

@@ -1,6 +1,6 @@
 import wx, multiprocessing, sys
 from backend.sim_api import *
-from backend.atlas_dtypes import *
+from backend.pegasus_dtypes import *
 from backend.observers import *
 from backend.state_db import StateDB
 from backend.state_serializer import StateSerializer
@@ -41,7 +41,7 @@ class InstViewer(wx.Panel):
         obs_sim = ObserverSim(riscv_tests_dir, sim_exe_path, test)
         if obs_sim.reg_info_query is None:
             msg = 'Test will load without "truth" values for comparison. '
-            msg += 'Please follow the steps in <atlas>/spike/README.md to build Spike to enable this feature.'
+            msg += 'Please follow the steps in <pegasus>/spike/README.md to build Spike to enable this feature.'
             wx.MessageBox(msg, 'Warning', wx.OK | wx.ICON_WARNING)
 
         state_db = StateDB()

@@ -1,6 +1,6 @@
 # Overview
 
-In this directory are tests for Atlas as well as a build system for
+In this directory are tests for Pegasus as well as a build system for
 those tests.  The tests are divided into two parts/directories:
 
 1. `asm`: Baremetal, pure .S files

@@ -3,7 +3,7 @@
 #include "sparta/utils/SpartaTester.hpp"
 #include "mavis/Mavis.h"
 
-class VredInstructionTester : public AtlasInstructionTester
+class VredInstructionTester : public PegasusInstructionTester
 {
   public:
     using VLEN = std::array<uint8_t, 8>;
@@ -14,8 +14,8 @@ class VredInstructionTester : public AtlasInstructionTester
 
     void testVredsumvs1()
     {
-        atlas::AtlasState* state = getAtlasState();
-        const atlas::Addr pc = 0x1000;
+        pegasus::PegasusState* state = getPegasusState();
+        const pegasus::Addr pc = 0x1000;
         const uint32_t vd = 10; // scalar destination (reduction result)
         const uint32_t vs1 = 1; // reduction initial value (accumulator)
         const uint32_t vs2 = 2; // vector source
@@ -46,15 +46,15 @@ class VredInstructionTester : public AtlasInstructionTester
         auto vd_val = READ_VEC_REG<VLEN>(state, vd);
         EXPECT_EQUAL(vd_val[0], expected_sum);
 
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 1);
     }
 
     void testVwredsumvs1()
     {
-        atlas::AtlasState* state = getAtlasState();
-        const atlas::Addr pc = 0x1000;
+        pegasus::PegasusState* state = getPegasusState();
+        const pegasus::Addr pc = 0x1000;
         const uint32_t vd = 10; // destination scalar (wide result)
         const uint32_t vs1 = 1; // wide scalar accumulator
         const uint32_t vs2 = 2; // vector input (narrow)
@@ -85,7 +85,7 @@ class VredInstructionTester : public AtlasInstructionTester
         auto vd_val = READ_VEC_REG<VLEN>(state, vd);
         EXPECT_EQUAL(vd_val[0], expected_sum);
 
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 1);
     }
@@ -117,7 +117,7 @@ class VredInstructionTester : public AtlasInstructionTester
     }
 
   private:
-    atlas::AtlasInst::PtrType instPtr_ = nullptr;
+    pegasus::PegasusInst::PtrType instPtr_ = nullptr;
 };
 
 int main()

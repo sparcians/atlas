@@ -32,7 +32,7 @@ TENSTORRENT_TESTS=$GITHUB_WORKSPACE/tenstorrent-tests/release/bare_metal/user
 cd ../
 
 # Run Full Regression
-cd $ATLAS_BUILD_TYPE
+cd $PEGASUS_BUILD_TYPE
 cd sim
 
 # RISC-V Arch Tests

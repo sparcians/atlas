@@ -7,7 +7,7 @@
 
 #include "sparta/functional/Register.hpp"
 
-namespace atlas
+namespace pegasus
 {
 
     class RegisterDefnsFromJSON
@@ -146,4 +146,4 @@ namespace atlas
             group_idx_map_;
     };
 
-} // namespace atlas
+} // namespace pegasus

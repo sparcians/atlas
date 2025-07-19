@@ -3,7 +3,7 @@
 #include <array>
 #include <cinttypes>
 
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 
 #include "sparta/simulation/Unit.hpp"
 #include "sparta/simulation/ParameterSet.hpp"
@@ -12,9 +12,9 @@
 #include "sparta/memory/BlockingMemoryIF.hpp"
 #include "sparta/utils/ValidValue.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasSim;
+    class PegasusSim;
     class SysCallHandlers;
 
     /**
@@ -70,8 +70,8 @@ namespace atlas
         //! Get the default write FD
         int getFDOverrideForWrite(int caller_fd);
 
-        //! Get AtlasSim
-        AtlasSim* getAtlasSim() const { return sim_; }
+        //! Get PegasusSim
+        PegasusSim* getPegasusSim() const { return sim_; }
 
         //! Get the memory map parameters (used by Callback delegate class)
         const std::vector<uint64_t> & getMemMapParams() const { return memory_map_params_; }
@@ -85,10 +85,10 @@ namespace atlas
         sparta::log::MessageSource syscall_log_;
         FILE* file_for_write_ = nullptr;
         int fd_for_write_ = DEFAULT_WRITE_FD;
-        AtlasSim* sim_ = nullptr;
+        PegasusSim* sim_ = nullptr;
 
         std::string workload_;
 
         std::unique_ptr<SysCallHandlers> callbacks_;
     };
-} // namespace atlas
+} // namespace pegasus

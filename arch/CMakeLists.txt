@@ -40,23 +40,23 @@ add_custom_command(
 )
 
 set(AUTOGEN_RV32_INST_JSON_FILES
-  ${SIM_BASE}/arch/rv32/atlas_uarch_rv32i.json
-  ${SIM_BASE}/arch/rv32/atlas_uarch_rv32m.json
-  ${SIM_BASE}/arch/rv32/atlas_uarch_rv32a.json
-  ${SIM_BASE}/arch/rv32/atlas_uarch_rv32f.json
-  ${SIM_BASE}/arch/rv32/atlas_uarch_rv32d.json
-  ${SIM_BASE}/arch/rv32/atlas_uarch_rv32zicsr.json
-  ${SIM_BASE}/arch/rv32/atlas_uarch_rv32zifencei.json
+  ${SIM_BASE}/arch/rv32/pegasus_uarch_rv32i.json
+  ${SIM_BASE}/arch/rv32/pegasus_uarch_rv32m.json
+  ${SIM_BASE}/arch/rv32/pegasus_uarch_rv32a.json
+  ${SIM_BASE}/arch/rv32/pegasus_uarch_rv32f.json
+  ${SIM_BASE}/arch/rv32/pegasus_uarch_rv32d.json
+  ${SIM_BASE}/arch/rv32/pegasus_uarch_rv32zicsr.json
+  ${SIM_BASE}/arch/rv32/pegasus_uarch_rv32zifencei.json
 )
 
 set(AUTOGEN_RV64_INST_JSON_FILES
-  ${SIM_BASE}/arch/rv64/atlas_uarch_rv64i.json
-  ${SIM_BASE}/arch/rv64/atlas_uarch_rv64m.json
-  ${SIM_BASE}/arch/rv64/atlas_uarch_rv64a.json
-  ${SIM_BASE}/arch/rv64/atlas_uarch_rv64f.json
-  ${SIM_BASE}/arch/rv64/atlas_uarch_rv64d.json
-  ${SIM_BASE}/arch/rv64/atlas_uarch_rv64zicsr.json
-  ${SIM_BASE}/arch/rv64/atlas_uarch_rv64zifencei.json
+  ${SIM_BASE}/arch/rv64/pegasus_uarch_rv64i.json
+  ${SIM_BASE}/arch/rv64/pegasus_uarch_rv64m.json
+  ${SIM_BASE}/arch/rv64/pegasus_uarch_rv64a.json
+  ${SIM_BASE}/arch/rv64/pegasus_uarch_rv64f.json
+  ${SIM_BASE}/arch/rv64/pegasus_uarch_rv64d.json
+  ${SIM_BASE}/arch/rv64/pegasus_uarch_rv64zicsr.json
+  ${SIM_BASE}/arch/rv64/pegasus_uarch_rv64zifencei.json
 )
 
 set(AUTOGEN_INST_FILES

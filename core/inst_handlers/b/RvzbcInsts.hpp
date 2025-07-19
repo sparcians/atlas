@@ -1,14 +1,14 @@
 #pragma once
 
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 #include "core/Action.hpp"
 
 #include <map>
 #include <string>
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
 
     class RvzbcInsts
     {
@@ -19,10 +19,10 @@ namespace atlas
 
       private:
         template <typename XLEN>
-        Action::ItrType clmulHandler(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType clmulHandler(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType clmulhHandler(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType clmulhHandler(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType clmulrHandler(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType clmulrHandler(pegasus::PegasusState* state, Action::ItrType action_it);
     };
-} // namespace atlas
+} // namespace pegasus

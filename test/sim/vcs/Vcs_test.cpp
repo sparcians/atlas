@@ -2,7 +2,7 @@
 #include "core/VecElements.hpp"
 #include "sparta/utils/SpartaTester.hpp"
 
-class VcsInstructionTester : public AtlasInstructionTester
+class VcsInstructionTester : public PegasusInstructionTester
 {
 
   public:
@@ -14,17 +14,17 @@ class VcsInstructionTester : public AtlasInstructionTester
     void testVsetvl()
     {
         const uint32_t rs1 = 1, rs2 = 2, rd = 3;
-        atlas::AtlasState* state = getAtlasState();
+        pegasus::PegasusState* state = getPegasusState();
 
         WRITE_INT_REG<XLEN>(state, rs1, 8);            // avl = 8
         XLEN vtype = setVtypeCSR<XLEN>(0, 0, 0, 0, 0); // vlmul = 1, sew = 8
         WRITE_INT_REG<XLEN>(state, rs2, vtype);
-        instPtr_ = makeAtlasInst(std::string{"vsetvl"}, mavis::ExtractorIF::RegListType{rs1, rs2},
-                                 mavis::ExtractorIF::RegListType{rd});
+        instPtr_ = makePegasusInst(std::string{"vsetvl"}, mavis::ExtractorIF::RegListType{rs1, rs2},
+                                   mavis::ExtractorIF::RegListType{rd});
         executeInstruction(instPtr_);
 
         EXPECT_EQUAL(READ_INT_REG<XLEN>(state, rd), 8);
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 1);
     }
@@ -32,24 +32,24 @@ class VcsInstructionTester : public AtlasInstructionTester
     void testVsetvli()
     {
         const uint32_t rs1 = 1, rd = 3;
-        atlas::AtlasState* state = getAtlasState();
+        pegasus::PegasusState* state = getPegasusState();
 
         WRITE_INT_REG<XLEN>(state, rs1, 8);            // avl = 8
         XLEN vtype = setVtypeCSR<XLEN>(0, 0, 0, 0, 0); // vlmul = 1, sew = 8
-        instPtr_ = makeAtlasInst(std::string{"vsetvli"}, mavis::ExtractorIF::RegListType{rs1},
-                                 mavis::ExtractorIF::RegListType{rd}, vtype);
+        instPtr_ = makePegasusInst(std::string{"vsetvli"}, mavis::ExtractorIF::RegListType{rs1},
+                                   mavis::ExtractorIF::RegListType{rd}, vtype);
         executeInstruction(instPtr_);
 
         EXPECT_EQUAL(READ_INT_REG<XLEN>(state, rd), 8);
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 2);
     }
 
     void testVsetivli()
     {
-        atlas::AtlasState* state = getAtlasState();
-        const atlas::Addr pc = 0x1000;
+        pegasus::PegasusState* state = getPegasusState();
+        const pegasus::Addr pc = 0x1000;
         const uint32_t rd = 3;
         uint32_t opcode;
 
@@ -63,7 +63,7 @@ class VcsInstructionTester : public AtlasInstructionTester
 
         EXPECT_EQUAL(READ_INT_REG<XLEN>(state, rd), 16);
 
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 4);
     }
@@ -99,7 +99,7 @@ class VcsInstructionTester : public AtlasInstructionTester
         return opcode;
     }
 
-    atlas::AtlasInst::PtrType instPtr_ = nullptr;
+    pegasus::PegasusInst::PtrType instPtr_ = nullptr;
 };
 
 int main()

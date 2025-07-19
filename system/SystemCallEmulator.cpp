@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include "system/SystemCallEmulator.hpp"
-#include "sim/AtlasSim.hpp"
+#include "sim/PegasusSim.hpp"
 #include "sparta/utils/LogUtils.hpp"
 
 #include <unistd.h>      // for write, etc
@@ -23,7 +23,7 @@
         syscall_log_ << x;                                                                         \
     }
 
-namespace atlas
+namespace pegasus
 {
     class SysCallHandlers
     {
@@ -292,7 +292,7 @@ namespace atlas
         memory_map_params_(p->mem_map_params),
         syscall_log_(my_node, "syscall", "System Call Logger")
     {
-        sim_ = dynamic_cast<AtlasSim*>(my_node->getRoot()->getSimulation());
+        sim_ = dynamic_cast<PegasusSim*>(my_node->getRoot()->getSimulation());
 
         if (p->write_output == "-")
         {
@@ -347,7 +347,7 @@ namespace atlas
         workload_ = workload;
         callbacks_->setWorkload(workload);
 
-        const auto & symbols = sim_->getAtlasSystem()->getSymbols();
+        const auto & symbols = sim_->getPegasusSystem()->getSymbols();
         for (auto symbol : symbols)
         {
             if (symbol.second == "_end")
@@ -529,7 +529,8 @@ namespace atlas
         auto ret = ::unlinkat(dirfd, pathname_str.c_str(), flags);
 
         SYSCALL_LOG(__func__ << "(" << dirfd << "," << HEX16(pathname_addr) << "['" << pathname_str
-                             << "']" << "-> " << ret);
+                             << "']"
+                             << "-> " << ret);
         return ret;
     }
 
@@ -909,16 +910,16 @@ namespace atlas
 
         struct uname_info
         {
-            const char sysname[UTS_CHAR_LENGTH] = "Atlas Core Emulator";
+            const char sysname[UTS_CHAR_LENGTH] = "Pegasus Core Emulator";
             const char nodename[UTS_CHAR_LENGTH] = "";
             const char release[UTS_CHAR_LENGTH] = "4.15.0";
             const char version[UTS_CHAR_LENGTH] = "";
             const char machine[UTS_CHAR_LENGTH] = "";
             const char domainname[UTS_CHAR_LENGTH] = ""; // Domainname (if exists)
-        } atlas_uname_info;
+        } pegasus_uname_info;
 
         memory->poke(uname_data_ptr, sizeof(uname_info),
-                     reinterpret_cast<uint8_t*>(&atlas_uname_info));
+                     reinterpret_cast<uint8_t*>(&pegasus_uname_info));
         SYSCALL_LOG("uname(" << HEX16(uname_data_ptr) << ") -> 0");
         return 0;
     }
@@ -928,7 +929,7 @@ namespace atlas
     {
         const int64_t exit_code = call_stack[1];
         SYSCALL_LOG("exit(" << exit_code << ");");
-        emulator_->getAtlasSim()->endSimulation(exit_code);
+        emulator_->getPegasusSim()->endSimulation(exit_code);
         return exit_code;
     }
 
@@ -968,4 +969,4 @@ namespace atlas
         int64_t ret = -1;
         return ret;
     }
-} // namespace atlas
+} // namespace pegasus

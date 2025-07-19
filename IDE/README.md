@@ -1,8 +1,8 @@
-# Python IDE for Atlas Simulators
-Debug C++ Atlas simulations easier without gdb.
+# Python IDE for Pegasus Simulators
+Debug C++ Pegasus simulations easier without gdb.
 
 ## Launch
-You must setup your environment and build Atlas first. From the Atlas root directory:
+You must setup your environment and build Pegasus first. From the Pegasus root directory:
 
 ```
 conda activate sparta
@@ -15,7 +15,7 @@ make
 Now you can open the IDE with the following command:
 
 ```
-python3 IDE/AtlasIDE.py --riscv-tests-dir <path/to/extracted/riscv/tests> --sim-exe-path ./release/sim/atlas
+python3 IDE/PegasusIDE.py --riscv-tests-dir <path/to/extracted/riscv/tests> --sim-exe-path ./release/sim/pegasus
 ```
 
 ## UI Components
@@ -27,7 +27,7 @@ Only one test can be opened in the IDE at a time. Tests must be loaded from the 
 
 ### Instruction Viewer
 
-View the disassembly and PC for every instruction executed. Clicking on any row will display the Atlas state at this PC after the instruction was executed.
+View the disassembly and PC for every instruction executed. Clicking on any row will display the Pegasus state at this PC after the instruction was executed.
 
 ![alt text](images/inst_viewer.png)
 

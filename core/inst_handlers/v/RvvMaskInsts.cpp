@@ -1,13 +1,13 @@
 #include <limits>
 
 #include "core/inst_handlers/v/RvvMaskInsts.hpp"
-#include "core/AtlasState.hpp"
+#include "core/PegasusState.hpp"
 #include "core/ActionGroup.hpp"
 #include "core/VecElements.hpp"
 #include "include/ActionTags.hpp"
-#include "include/AtlasUtils.hpp"
+#include "include/PegasusUtils.hpp"
 
-namespace atlas
+namespace pegasus
 {
     template <typename XLEN>
     void RvvMaskInsts::getInstHandlers(std::map<std::string, Action> & inst_handlers)
@@ -18,83 +18,88 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmand.mm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvMaskInsts::vmlHandler_<[](ValueType a, ValueType b) { return a & b; }>,
                 RvvMaskInsts>(nullptr, "vmand.mm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmnand.mm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvMaskInsts::vmlHandler_<[](ValueType a, ValueType b) { return ~(a & b); }>,
                 RvvMaskInsts>(nullptr, "vmnand.mm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmandn.mm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvMaskInsts::vmlHandler_<[](ValueType a, ValueType b) { return ~a & b; }>,
                 RvvMaskInsts>(nullptr, "vmandn.mm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmor.mm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvMaskInsts::vmlHandler_<[](ValueType a, ValueType b) { return a | b; }>,
                 RvvMaskInsts>(nullptr, "vmor.mm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmnor.mm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvMaskInsts::vmlHandler_<[](ValueType a, ValueType b) { return ~(a | b); }>,
                 RvvMaskInsts>(nullptr, "vmnor.mm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmorn.mm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvMaskInsts::vmlHandler_<[](ValueType a, ValueType b) { return ~a | b; }>,
                 RvvMaskInsts>(nullptr, "vmorn.mm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmxor.mm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvMaskInsts::vmlHandler_<[](ValueType a, ValueType b) { return a ^ b; }>,
                 RvvMaskInsts>(nullptr, "vmxor.mm", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmxnor.mm",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvMaskInsts::vmlHandler_<[](ValueType a, ValueType b) { return ~(a ^ b); }>,
                 RvvMaskInsts>(nullptr, "vmxnor.mm", ActionTags::EXECUTE_TAG));
 
         inst_handlers.emplace(
-            "vcpop.m", atlas::Action::createAction<&RvvMaskInsts::vcpHandler_<XLEN>, RvvMaskInsts>(
-                           nullptr, "vcpop.m", ActionTags::EXECUTE_TAG));
+            "vcpop.m",
+            pegasus::Action::createAction<&RvvMaskInsts::vcpHandler_<XLEN>, RvvMaskInsts>(
+                nullptr, "vcpop.m", ActionTags::EXECUTE_TAG));
 
         inst_handlers.emplace(
             "vfirst.m",
-            atlas::Action::createAction<&RvvMaskInsts::vfirstHandler_<XLEN>, RvvMaskInsts>(
+            pegasus::Action::createAction<&RvvMaskInsts::vfirstHandler_<XLEN>, RvvMaskInsts>(
                 nullptr, "vfirst.m", ActionTags::EXECUTE_TAG));
 
         inst_handlers.emplace(
             "vmsbf.m",
-            atlas::Action::createAction<&RvvMaskInsts::vsxfHandler_<SetFirstMode::BEFORE>,
-                                        RvvMaskInsts>(nullptr, "vmsbf.m", ActionTags::EXECUTE_TAG));
+            pegasus::Action::createAction<&RvvMaskInsts::vsxfHandler_<SetFirstMode::BEFORE>,
+                                          RvvMaskInsts>(nullptr, "vmsbf.m",
+                                                        ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsif.m",
-            atlas::Action::createAction<&RvvMaskInsts::vsxfHandler_<SetFirstMode::INCLUDING>,
-                                        RvvMaskInsts>(nullptr, "vmsif.m", ActionTags::EXECUTE_TAG));
+            pegasus::Action::createAction<&RvvMaskInsts::vsxfHandler_<SetFirstMode::INCLUDING>,
+                                          RvvMaskInsts>(nullptr, "vmsif.m",
+                                                        ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmsof.m",
-            atlas::Action::createAction<&RvvMaskInsts::vsxfHandler_<SetFirstMode::ONLY>,
-                                        RvvMaskInsts>(nullptr, "vmsof.m", ActionTags::EXECUTE_TAG));
+            pegasus::Action::createAction<&RvvMaskInsts::vsxfHandler_<SetFirstMode::ONLY>,
+                                          RvvMaskInsts>(nullptr, "vmsof.m",
+                                                        ActionTags::EXECUTE_TAG));
 
         inst_handlers.emplace(
-            "viota.m", atlas::Action::createAction<&RvvMaskInsts::viotaHandler_, RvvMaskInsts>(
+            "viota.m", pegasus::Action::createAction<&RvvMaskInsts::viotaHandler_, RvvMaskInsts>(
                            nullptr, "viota.m", ActionTags::EXECUTE_TAG));
 
-        inst_handlers.emplace("vid.v",
-                              atlas::Action::createAction<&RvvMaskInsts::veiHandler_, RvvMaskInsts>(
-                                  nullptr, "vid.v", ActionTags::EXECUTE_TAG));
+        inst_handlers.emplace(
+            "vid.v", pegasus::Action::createAction<&RvvMaskInsts::veiHandler_, RvvMaskInsts>(
+                         nullptr, "vid.v", ActionTags::EXECUTE_TAG));
     }
 
     template void RvvMaskInsts::getInstHandlers<RV32>(std::map<std::string, Action> &);
     template void RvvMaskInsts::getInstHandlers<RV64>(std::map<std::string, Action> &);
 
     template <auto func>
-    Action::ItrType RvvMaskInsts::vmlHandler_(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvMaskInsts::vmlHandler_(pegasus::PegasusState* state,
+                                              Action::ItrType action_it)
     {
-        const AtlasInstPtr inst = state->getCurrentInst();
+        const PegasusInstPtr inst = state->getCurrentInst();
         MaskElements elems_vs1{state, state->getVectorConfig(), inst->getRs1()};
         MaskElements elems_vs2{state, state->getVectorConfig(), inst->getRs2()};
         MaskElements elems_vd{state, state->getVectorConfig(), inst->getRd()};
@@ -110,11 +115,12 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvvMaskInsts::vcpHandler_(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvMaskInsts::vcpHandler_(pegasus::PegasusState* state,
+                                              Action::ItrType action_it)
     {
-        const AtlasInstPtr inst = state->getCurrentInst();
+        const PegasusInstPtr inst = state->getCurrentInst();
         MaskElements elems_vs2{state, state->getVectorConfig(), inst->getRs2()};
-        MaskElements elems_v0{state, state->getVectorConfig(), atlas::V0};
+        MaskElements elems_v0{state, state->getVectorConfig(), pegasus::V0};
         size_t count = 0;
 
         for (auto elem_iter = elems_vs2.begin(); elem_iter != elems_vs2.end(); ++elem_iter)
@@ -137,12 +143,12 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvvMaskInsts::vfirstHandler_(atlas::AtlasState* state,
+    Action::ItrType RvvMaskInsts::vfirstHandler_(pegasus::PegasusState* state,
                                                  Action::ItrType action_it)
     {
-        const AtlasInstPtr inst = state->getCurrentInst();
+        const PegasusInstPtr inst = state->getCurrentInst();
         MaskElements elems_vs2{state, state->getVectorConfig(), inst->getRs2()};
-        MaskElements elems_v0{state, state->getVectorConfig(), atlas::V0};
+        MaskElements elems_v0{state, state->getVectorConfig(), pegasus::V0};
 
         for (auto elem_iter = elems_vs2.begin(); elem_iter != elems_vs2.end(); ++elem_iter)
         {
@@ -167,12 +173,13 @@ namespace atlas
     }
 
     template <RvvMaskInsts::SetFirstMode sfMode>
-    Action::ItrType RvvMaskInsts::vsxfHandler_(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvMaskInsts::vsxfHandler_(pegasus::PegasusState* state,
+                                               Action::ItrType action_it)
     {
-        const AtlasInstPtr inst = state->getCurrentInst();
+        const PegasusInstPtr inst = state->getCurrentInst();
         MaskElements elems_vs2{state, state->getVectorConfig(), inst->getRs2()};
         MaskElements elems_vd{state, state->getVectorConfig(), inst->getRd()};
-        MaskElements elems_v0{state, state->getVectorConfig(), atlas::V0};
+        MaskElements elems_v0{state, state->getVectorConfig(), pegasus::V0};
         bool found = false;
 
         for (auto elem_iter = elems_vs2.begin(); elem_iter != elems_vs2.end(); ++elem_iter)
@@ -233,13 +240,13 @@ namespace atlas
     }
 
     template <size_t elemWidth>
-    Action::ItrType viotaHelper(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType viotaHelper(pegasus::PegasusState* state, Action::ItrType action_it)
     {
         using ElemsType = Elements<Element<elemWidth>, false>;
 
-        const AtlasInstPtr inst = state->getCurrentInst();
+        const PegasusInstPtr inst = state->getCurrentInst();
         MaskElements elems_vs2{state, state->getVectorConfig(), inst->getRs2()};
-        MaskElements elems_v0{state, state->getVectorConfig(), atlas::V0};
+        MaskElements elems_v0{state, state->getVectorConfig(), pegasus::V0};
         ElemsType elems_vd{state, state->getVectorConfig(), inst->getRd()};
         size_t count = 0;
         auto iter_v0 = elems_v0.maskBitIterBegin();
@@ -295,7 +302,7 @@ namespace atlas
         return ++action_it;
     }
 
-    Action::ItrType RvvMaskInsts::viotaHandler_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvMaskInsts::viotaHandler_(PegasusState* state, Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
         switch (vector_config->getSEW())
@@ -320,13 +327,13 @@ namespace atlas
     }
 
     template <size_t elemWidth>
-    Action::ItrType veiHelper(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType veiHelper(pegasus::PegasusState* state, Action::ItrType action_it)
     {
         using ElemsType = Elements<Element<elemWidth>, false>;
 
-        const AtlasInstPtr inst = state->getCurrentInst();
+        const PegasusInstPtr inst = state->getCurrentInst();
         ElemsType elems_vd{state, state->getVectorConfig(), inst->getRd()};
-        MaskElements elems_v0{state, state->getVectorConfig(), atlas::V0};
+        MaskElements elems_v0{state, state->getVectorConfig(), pegasus::V0};
 
         auto execute = [&](auto iter, const auto & iter_end)
         {
@@ -348,7 +355,7 @@ namespace atlas
         return ++action_it;
     }
 
-    Action::ItrType RvvMaskInsts::veiHandler_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvMaskInsts::veiHandler_(PegasusState* state, Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
         switch (vector_config->getSEW())
@@ -372,4 +379,4 @@ namespace atlas
         return ++action_it;
     }
 
-} // namespace atlas
+} // namespace pegasus

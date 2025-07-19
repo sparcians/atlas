@@ -6,9 +6,9 @@
 #include <string>
 #include <stdint.h>
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
 
     class RvaInsts
     {
@@ -22,15 +22,15 @@ namespace atlas
 
       private:
         template <typename T>
-        Action::ItrType computeAddressHandler_(AtlasState* state, Action::ItrType action_it);
+        Action::ItrType computeAddressHandler_(PegasusState* state, Action::ItrType action_it);
 
         template <typename RV, typename SIZE, typename OP, bool U = true>
-        Action::ItrType amoHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType amoHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
 
         template <typename XLEN, typename SIZE>
-        Action::ItrType lr_handler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType lr_handler_(pegasus::PegasusState* state, Action::ItrType action_it);
 
         template <typename XLEN, typename SIZE>
-        Action::ItrType sc_handler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType sc_handler_(pegasus::PegasusState* state, Action::ItrType action_it);
     };
-} // namespace atlas
+} // namespace pegasus

@@ -1,4 +1,4 @@
-#include "core/AtlasState.hpp"
+#include "core/PegasusState.hpp"
 #include "core/Fetch.hpp"
 #include "core/Execute.hpp"
 #include "core/translate/Translate.hpp"
@@ -8,15 +8,15 @@
 #include "sparta/simulation/ResourceTreeNode.hpp"
 #include "sparta/utils/SpartaTester.hpp"
 
-class AtlasStateTester
+class PegasusStateTester
 {
   public:
-    AtlasStateTester()
+    PegasusStateTester()
     {
         root_tn_.setClock(&clk_);
 
         // top.allocators
-        allocators_tn_.reset(new atlas::AtlasAllocators(&root_tn_));
+        allocators_tn_.reset(new pegasus::PegasusAllocators(&root_tn_));
 
         // top.core
         tns_to_delete_.emplace_back(new sparta::ResourceTreeNode(&root_tn_, "core0", "cores", 0,
@@ -46,10 +46,10 @@ class AtlasStateTester
         root_tn_.validatePreRun();
 
         // top.core.fetch
-        state_.reset(core_tn->getResourceAs<atlas::AtlasState*>());
+        state_.reset(core_tn->getResourceAs<pegasus::PegasusState*>());
     }
 
-    ~AtlasStateTester() { root_tn_.enterTeardown(); }
+    ~PegasusStateTester() { root_tn_.enterTeardown(); }
 
     void testRegisterSet()
     {
@@ -61,19 +61,19 @@ class AtlasStateTester
     sparta::Scheduler scheduler_;
     sparta::Clock clk_{"clock", &scheduler_};
     sparta::RootTreeNode root_tn_;
-    sparta::ResourceFactory<atlas::AtlasState, atlas::AtlasState::AtlasStateParameters>
+    sparta::ResourceFactory<pegasus::PegasusState, pegasus::PegasusState::PegasusStateParameters>
         state_factory_;
-    sparta::ResourceFactory<atlas::Fetch, atlas::Fetch::FetchParameters> fetch_factory_;
-    sparta::ResourceFactory<atlas::Execute, atlas::Execute::ExecuteParameters> execute_factory_;
-    sparta::ResourceFactory<atlas::Translate, atlas::Translate::TranslateParameters>
+    sparta::ResourceFactory<pegasus::Fetch, pegasus::Fetch::FetchParameters> fetch_factory_;
+    sparta::ResourceFactory<pegasus::Execute, pegasus::Execute::ExecuteParameters> execute_factory_;
+    sparta::ResourceFactory<pegasus::Translate, pegasus::Translate::TranslateParameters>
         translate_factory_;
-    sparta::ResourceFactory<atlas::Exception, atlas::Exception::ExceptionParameters>
+    sparta::ResourceFactory<pegasus::Exception, pegasus::Exception::ExceptionParameters>
         exception_factory_;
-    std::unique_ptr<atlas::AtlasAllocators> allocators_tn_;
+    std::unique_ptr<pegasus::PegasusAllocators> allocators_tn_;
     std::vector<std::unique_ptr<sparta::ResourceTreeNode>> tns_to_delete_;
 
-    // AtlasState
-    std::unique_ptr<atlas::AtlasState> state_;
+    // PegasusState
+    std::unique_ptr<pegasus::PegasusState> state_;
 };
 
 int main(int argc, char** argv)
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
     (void)argc;
     (void)argv;
 
-    AtlasStateTester tester;
+    PegasusStateTester tester;
     tester.testRegisterSet();
 
     REPORT_ERROR;

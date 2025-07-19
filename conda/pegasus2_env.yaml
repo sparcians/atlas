@@ -1,4 +1,4 @@
-name: atlas2
+name: pegasus2
 channels:
   - conda-forge
   - defaults

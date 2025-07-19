@@ -2,9 +2,9 @@
 
 #include "core/Execute.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
 
     class RvzicondInsts
     {
@@ -15,6 +15,6 @@ namespace atlas
 
       private:
         template <typename XLEN, typename OPERATOR>
-        Action::ItrType czeroHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType czeroHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
     };
-} // namespace atlas
+} // namespace pegasus

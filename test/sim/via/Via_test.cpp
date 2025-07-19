@@ -3,7 +3,7 @@
 #include "sparta/utils/SpartaTester.hpp"
 #include "mavis/Mavis.h"
 
-class ViaInstructionTester : public AtlasInstructionTester
+class ViaInstructionTester : public PegasusInstructionTester
 {
 
   public:
@@ -14,8 +14,8 @@ class ViaInstructionTester : public AtlasInstructionTester
 
     void testVaddvv1()
     {
-        atlas::AtlasState* state = getAtlasState();
-        const atlas::Addr pc = 0x1000;
+        pegasus::PegasusState* state = getPegasusState();
+        const pegasus::Addr pc = 0x1000;
         const uint32_t vd = 3, vs1 = 1, vs2 = 2;
         uint32_t opcode;
 
@@ -37,15 +37,15 @@ class ViaInstructionTester : public AtlasInstructionTester
         {
             EXPECT_EQUAL(vd_val[i], vs3_val[i]);
         }
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 1);
     }
 
     void testVaddvv2()
     {
-        atlas::AtlasState* state = getAtlasState();
-        const atlas::Addr pc = 0x1000;
+        pegasus::PegasusState* state = getPegasusState();
+        const pegasus::Addr pc = 0x1000;
         uint32_t opcode;
 
         state->getVectorConfig()->setVSTART(0);
@@ -76,15 +76,15 @@ class ViaInstructionTester : public AtlasInstructionTester
         {
             EXPECT_EQUAL(vd_val2[i], vs6_val[i]);
         }
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 2);
     }
 
     void testVaddvv3()
     {
-        atlas::AtlasState* state = getAtlasState();
-        const atlas::Addr pc = 0x1000;
+        pegasus::PegasusState* state = getPegasusState();
+        const pegasus::Addr pc = 0x1000;
         uint32_t opcode;
 
         state->getVectorConfig()->setVSTART(2); // vstart = 2
@@ -128,15 +128,15 @@ class ViaInstructionTester : public AtlasInstructionTester
         {
             EXPECT_EQUAL(vd_val2[i], 0);
         }
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 3);
     }
 
     void testVaddvv4()
     {
-        atlas::AtlasState* state = getAtlasState();
-        const atlas::Addr pc = 0x1000;
+        pegasus::PegasusState* state = getPegasusState();
+        const pegasus::Addr pc = 0x1000;
         uint32_t opcode;
 
         state->getVectorConfig()->setVSTART(2); // vstart = 2
@@ -182,7 +182,7 @@ class ViaInstructionTester : public AtlasInstructionTester
         {
             EXPECT_EQUAL(vd_val2[i], 0);
         }
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 4);
     }
@@ -210,7 +210,7 @@ class ViaInstructionTester : public AtlasInstructionTester
     }
 
   private:
-    atlas::AtlasInst::PtrType instPtr_ = nullptr;
+    pegasus::PegasusInst::PtrType instPtr_ = nullptr;
 };
 
 int main()

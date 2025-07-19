@@ -2,12 +2,12 @@
 
 #include <stdint.h>
 
-#include "core/AtlasState.hpp"
+#include "core/PegasusState.hpp"
 #include "core/VecConfig.hpp"
 #include "core/VecNums.hpp"
-#include "include/AtlasUtils.hpp"
+#include "include/PegasusUtils.hpp"
 
-namespace atlas
+namespace pegasus
 {
     /**
      * @class Element
@@ -118,11 +118,11 @@ namespace atlas
         /**
          * @brief Constructor.
          *
-         * @param state Poninter of *AtlasState* object.
+         * @param state Poninter of *PegasusState* object.
          * @param reg_id vector register ID.
          * @param idx Index offset in the Register
          */
-        Element(AtlasState* state, uint32_t reg_id, uint32_t idx) :
+        Element(PegasusState* state, uint32_t reg_id, uint32_t idx) :
             state_(state),
             reg_id_(reg_id),
             idx_(idx)
@@ -132,7 +132,7 @@ namespace atlas
         /**
          * @brief Set *state_*.
          */
-        void setState(AtlasState* state) { state_ = state; }
+        void setState(PegasusState* state) { state_ = state; }
 
         /**
          * @brief Set *reg_id_*.
@@ -261,7 +261,7 @@ namespace atlas
 
       private:
         /**< Needed for vector register access. */
-        AtlasState* state_ = nullptr;
+        PegasusState* state_ = nullptr;
         /**< vector register ID. */
         uint32_t reg_id_ = 0;
         /**< Index offset for vector register. */
@@ -402,6 +402,7 @@ namespace atlas
          */
         template <bool M = isMaskElems>
         requires EnableIf<M>
+
         class MaskBitIterator
         {
           public:
@@ -495,13 +496,12 @@ namespace atlas
         /**
          * @brief Constructor for vector register group *Elements*.
          *
-         * @param state Poninter to *AtlasState* object.
+         * @param state Poninter to *PegasusState* object.
          * @param config Poninter to *VectorConfig* object.
          * @param reg_id vector register ID.
          */
-        Elements(AtlasState* state, VectorConfig* config, uint32_t reg_id)
-        requires EnableIf<!isMaskElems>
-            :
+        Elements(PegasusState* state, VectorConfig* config,
+                 uint32_t reg_id) requires EnableIf<!isMaskElems> :
             state_(state),
             config_(config),
             start_pos_(config_->getVSTART()),
@@ -513,13 +513,12 @@ namespace atlas
         /**
          * @brief Constructor for vector mask *Elements*.
          *
-         * @param state Poninter to *AtlasState* object.
+         * @param state Poninter to *PegasusState* object.
          * @param config Poninter to *VectorConfig* object.
          * @param reg_id vector register ID.
          */
-        Elements(AtlasState* state, VectorConfig* config, uint32_t reg_id)
-        requires EnableIf<isMaskElems>
-            :
+        Elements(PegasusState* state, VectorConfig* config,
+                 uint32_t reg_id) requires EnableIf<isMaskElems> :
             state_(state),
             config_(config),
             start_pos_(config_->getVSTART() / ElemType::elem_width),
@@ -544,8 +543,7 @@ namespace atlas
          * @brief Return *begin* *MaskBitIterator* object.
          * @return *MaskBitIterator* object pointitng to the starting bit.
          */
-        auto maskBitIterBegin() const
-        requires EnableIf<isMaskElems>
+        auto maskBitIterBegin() const requires EnableIf<isMaskElems>
         {
             return MaskBitIterator<>(this, config_->getVSTART());
         }
@@ -554,8 +552,7 @@ namespace atlas
          * @brief Return *end* *MaskBitIterator* object.
          * @return *MaskBitIterator* object pointitng to the ending bit.
          */
-        auto maskBitIterEnd() const
-        requires EnableIf<isMaskElems>
+        auto maskBitIterEnd() const requires EnableIf<isMaskElems>
         {
             return MaskBitIterator<>(this, config_->getVL());
         }
@@ -611,8 +608,7 @@ namespace atlas
          * @param index The index of requested bit.
          * @return Bit value at *index*.
          */
-        typename ElemType::ValueType getBit(size_t index) const
-        requires EnableIf<isMaskElems>
+        typename ElemType::ValueType getBit(size_t index) const requires EnableIf<isMaskElems>
         {
             auto elem = getElement(index / ElemType::elem_width);
             return elem.getBit(index % ElemType::elem_width);
@@ -622,8 +618,7 @@ namespace atlas
          * @brief Update bit of *MaskElements* at *index* in vector register to 1.
          * @param index The index of requested bit.
          */
-        void setBit(size_t index) const
-        requires EnableIf<isMaskElems>
+        void setBit(size_t index) const requires EnableIf<isMaskElems>
         {
             auto elem = getElement(index / ElemType::elem_width);
             return elem.setBit(index % ElemType::elem_width);
@@ -633,16 +628,15 @@ namespace atlas
          * @brief Update bit of *MaskElements* at *index* in vector register to 0.
          * @param index The index of requested bit.
          */
-        void clearBit(size_t index) const
-        requires EnableIf<isMaskElems>
+        void clearBit(size_t index) const requires EnableIf<isMaskElems>
         {
             auto elem = getElement(index / ElemType::elem_width);
             return elem.clearBit(index % ElemType::elem_width);
         }
 
       private:
-        /**< Pointer to *AtlasState* object. */
-        AtlasState* state_ = nullptr;
+        /**< Pointer to *PegasusState* object. */
+        PegasusState* state_ = nullptr;
         /**< Pointer to *VectorConfig* object. */
         const VectorConfig* config_ = nullptr;
         /**< Starting *Element* position. */
@@ -656,4 +650,4 @@ namespace atlas
     using MaskElement = Element<VLEN_MIN>;
     using MaskElements = Elements<MaskElement, true>;
     using MaskBitIterator = MaskElements::MaskBitIterator<>;
-} // namespace atlas
+} // namespace pegasus

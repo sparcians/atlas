@@ -2,7 +2,7 @@
 
 #include <cinttypes>
 
-namespace atlas
+namespace pegasus
 {
     static constexpr uint64_t V0 = 0;
     static constexpr uint64_t V1 = 1;
@@ -36,4 +36,4 @@ namespace atlas
     static constexpr uint64_t V29 = 29;
     static constexpr uint64_t V30 = 30;
     static constexpr uint64_t V31 = 31;
-} // namespace atlas
+} // namespace pegasus

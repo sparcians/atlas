@@ -79,14 +79,14 @@ def run_test(testname, wkld, output_dir, passing_tests, failing_tests, timeout_t
     instlogname = output_dir + testname + ".instlog"
     error_dump = output_dir + testname + ".error"
     isa_string = "rv32gcbv_zicsr_zifencei_zicond" if rv32_test else "rv64gcbv_zicsr_zifencei_zicond"
-    atlas_cmd = ["./atlas",
+    pegasus_cmd = ["./pegasus",
                  "--debug-dump-filename", error_dump,
                  "-p", "top.core0.params.isa_string", isa_string, wkld]
 
     test_passed = False
     try:
         with open(logname, "w") as f:
-            result = subprocess.run(atlas_cmd, stdout=f, stderr=f, timeout=10)
+            result = subprocess.run(pegasus_cmd, stdout=f, stderr=f, timeout=10)
             if result.returncode == 0:
                 test_passed = True
 
@@ -128,7 +128,7 @@ def run_tests_in_parallel(tests, passing_tests, failing_tests, timeout_tests, ou
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Script to run the Tenstorrent architecture tests on Atlas")
+    parser = argparse.ArgumentParser(description="Script to run the Tenstorrent architecture tests on Pegasus")
     parser.add_argument("--extensions", type=str, nargs="+", help="The extensions to test (e.g. i, m, a, f, d)")
     parser.add_argument("--output", type=str, help="Where logs and error files should go")
     xlen_group = parser.add_mutually_exclusive_group()
@@ -173,9 +173,9 @@ def main():
     be_noisy = args.verbose
 
     ###########################################################################
-    # Make sure we're in the correct sim directory for atlas
-    if not os.path.isfile('./atlas'):
-        print("ERROR: ./atlas command not found.  Run inside sim directory")
+    # Make sure we're in the correct sim directory for pegasus
+    if not os.path.isfile('./pegasus'):
+        print("ERROR: ./pegasus command not found.  Run inside sim directory")
         sys.exit(1)
 
     ###########################################################################
@@ -187,7 +187,7 @@ def main():
         tests.extend(get_tenstorrent_tests(SUPPORTED_EXTENSIONS, SUPPORTED_XLEN, args.tenstorrent))
 
     skip_tests = [
-        "rv64mi-p-breakpoint", # Atlas does not support external debug support
+        "rv64mi-p-breakpoint", # Pegasus does not support external debug support
         "rv64mi-v-breakpoint",
         "rv32mi-p-breakpoint",
         "rv32mi-v-breakpoint",

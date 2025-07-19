@@ -1,6 +1,6 @@
 from backend.observers import Observer
 from backend.sim_api import *
-from backend.atlas_dtypes import *
+from backend.pegasus_dtypes import *
 import json, re
 
 class StateSerializer(Observer):
@@ -30,10 +30,10 @@ class StateSerializer(Observer):
             self.tracked_reg_values = {'resv_priv': priv}
 
         def AddChangable(self, endpoint, reg_name):
-            self.tracked_reg_values[reg_name] = atlas_reg_value(endpoint, reg_name)
+            self.tracked_reg_values[reg_name] = pegasus_reg_value(endpoint, reg_name)
 
         def Finalize(self, endpoint, state_db):
-            uid = atlas_current_uid(endpoint)
+            uid = pegasus_current_uid(endpoint)
             state_db.AppendInstruction(self.pc, self.opcode, self.dasm, uid)
 
             # {'pc': 0xPC', 'priv': 3, 'reg_changes': [RegChange, RegChange, ...]}
@@ -48,9 +48,9 @@ class StateSerializer(Observer):
 
             for reg_name, prev_val in self.tracked_reg_values.items():
                 if reg_name == 'resv_priv':
-                    cur_val = atlas_inst_priv(endpoint)
+                    cur_val = pegasus_inst_priv(endpoint)
                 else:
-                    cur_val = atlas_reg_value(endpoint, reg_name)
+                    cur_val = pegasus_reg_value(endpoint, reg_name)
 
                 if cur_val != prev_val:
                     expected_val = None
@@ -61,48 +61,48 @@ class StateSerializer(Observer):
 
                     state_db.AppendRegChange(uid, reg_name, cur_val, expected_val)
 
-            mem_reads = atlas_mem_reads(endpoint)
-            mem_writes = atlas_mem_writes(endpoint)
+            mem_reads = pegasus_mem_reads(endpoint)
+            mem_writes = pegasus_mem_writes(endpoint)
             if mem_reads or mem_writes:
                 state_db.AppendMemAccesses(uid, mem_reads, mem_writes)
 
     def OnPreSimulation(self, endpoint):
-        for reg_id in range(atlas_num_regs_in_group(endpoint, 0)):
+        for reg_id in range(pegasus_num_regs_in_group(endpoint, 0)):
             reg_name = 'x' + str(reg_id)
-            reg_val = atlas_reg_value(endpoint, reg_name)
+            reg_val = pegasus_reg_value(endpoint, reg_name)
             if isinstance(reg_val, str):
                 self.state_db.SetInitRegValue(reg_name, reg_val)
 
-        for reg_id in range(atlas_num_regs_in_group(endpoint, 1)):
+        for reg_id in range(pegasus_num_regs_in_group(endpoint, 1)):
             reg_name = 'f' + str(reg_id)
-            reg_val = atlas_reg_value(endpoint, reg_name)
+            reg_val = pegasus_reg_value(endpoint, reg_name)
             if isinstance(reg_val, str):
                 self.state_db.SetInitRegValue(reg_name, reg_val)
 
-        for reg_id in range(atlas_num_regs_in_group(endpoint, 3)):
-            reg_name = atlas_csr_name(endpoint, reg_id)
+        for reg_id in range(pegasus_num_regs_in_group(endpoint, 3)):
+            reg_name = pegasus_csr_name(endpoint, reg_id)
             if reg_name:
-                reg_val = atlas_reg_value(endpoint, reg_name)
+                reg_val = pegasus_reg_value(endpoint, reg_name)
                 if isinstance(reg_val, str):
                     self.state_db.SetInitRegValue(reg_name, reg_val)
 
-        init_priv = atlas_inst_priv(endpoint)
+        init_priv = pegasus_inst_priv(endpoint)
         self.state_db.SetInitRegValue('resv_priv', init_priv)
 
     def OnPreExecute(self, endpoint):
         # Note that there are cases where the current instruction is None,
         # due to hitting exceptions during fetch/translate/decode. In those
         # cases, we will enter OnPreException() first.
-        inst = atlas_current_inst(endpoint)
+        inst = pegasus_current_inst(endpoint)
         assert inst is not None
 
-        pc = atlas_pc(endpoint)
+        pc = pegasus_pc(endpoint)
         mnemonic = inst.getMnemonic()
         opcode = inst.getOpcode()
         priv = inst.getPrivMode()
         dasm = inst.dasmString()
         rd = inst.getRd()
-        uid = atlas_current_uid(endpoint)
+        uid = pegasus_current_uid(endpoint)
 
         # Use regex to look for "CSR=<csr_hex>" in the dasm
         csr_match = re.search(r'CSR=0x([0-9a-fA-F]+)', dasm)
@@ -124,7 +124,7 @@ class StateSerializer(Observer):
 
         # Add fcsr, frm, and fflags to the list of tracked registers
         # if the instruction is a floating-point instruction.
-        inst_type = atlas_inst_type(endpoint)
+        inst_type = pegasus_inst_type(endpoint)
         is_fp = isinstance(inst_type, int) and inst_type == 1 << 1
         if is_fp:
             inst.AddChangable(endpoint, 'fcsr')
@@ -138,12 +138,12 @@ class StateSerializer(Observer):
         #     auto info = inst->getMavisOpcodeInfo()
         #     auto csr = info->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
         #     auto csr_name = state->getCsrRegister(csr)->getName();
-        csr_name = atlas_inst_csr(endpoint)
+        csr_name = pegasus_inst_csr(endpoint)
         if csr_name:
             inst.AddChangable(endpoint, csr_name)
 
     def OnPreException(self, endpoint):
-        inst = atlas_current_inst(endpoint)
+        inst = pegasus_current_inst(endpoint)
         if inst is None:
             # This can occur when mavis::UnknownOpcode is thrown during
             # fetch/translate/decode. We don't have a current instruction.
@@ -153,7 +153,7 @@ class StateSerializer(Observer):
             # the PC, opcode, etc. right now. We will try to fill in that data
             # in OnPostExecute().
             inst = self.Instruction(None, None, None, None, self.reg_info_query)
-            uid = atlas_current_uid(endpoint)
+            uid = pegasus_current_uid(endpoint)
             self.insts_by_uid[uid] = inst
         else:
             uid = inst.getUid()
@@ -171,7 +171,7 @@ class StateSerializer(Observer):
         self.__AddCsrChangables(endpoint, inst)
 
     def OnPostExecute(self, endpoint):
-        uid = atlas_current_uid(endpoint)
+        uid = pegasus_current_uid(endpoint)
         if uid not in self.insts_by_uid:
             return
 
@@ -183,13 +183,13 @@ class StateSerializer(Observer):
             # The reason we have to take the previous PC and not the current PC
             # is due to the fact that incrementPc_() is called before the observers'
             # postExecute_() method is called.
-            inst.pc = atlas_prev_pc(endpoint)
+            inst.pc = pegasus_prev_pc(endpoint)
 
         inst.Finalize(endpoint, self.state_db)
         del self.insts_by_uid[uid]
 
     def OnSimulationStuck(self, endpoint):
-        self.infinite_loop_pc = atlas_pc(endpoint)
+        self.infinite_loop_pc = pegasus_pc(endpoint)
         self.msg_queue.put('SIM_STUCK:{}'.format(self.infinite_loop_pc))
 
     def OnSimFinished(self, endpoint):
@@ -208,8 +208,8 @@ class StateSerializer(Observer):
             return self.csr_names
 
         self.csr_names = []
-        for reg_id in range(atlas_num_regs_in_group(endpoint, 3)):
-            reg_name = atlas_csr_name(endpoint, reg_id)
+        for reg_id in range(pegasus_num_regs_in_group(endpoint, 3)):
+            reg_name = pegasus_csr_name(endpoint, reg_id)
             if reg_name:
                 self.csr_names.append(reg_name)
 

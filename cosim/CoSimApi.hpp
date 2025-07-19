@@ -7,12 +7,12 @@
 #include <memory>
 
 /**
- * \mainpage Atlas CoSim API Proposal
+ * \mainpage Pegasus CoSim API Proposal
  *
  * TODO
  *
  */
-namespace atlas::cosim
+namespace pegasus::cosim
 {
     using EventList = std::list<Event>;
 
@@ -204,4 +204,4 @@ namespace atlas::cosim
      * \todo Need to define extension for cosim params so we can sue yamls as config files
      */
     std::unique_ptr<CoSim> createCoSimInstance(const std::string & config_yaml);
-} // namespace atlas::cosim
+} // namespace pegasus::cosim

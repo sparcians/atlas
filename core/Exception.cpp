@@ -1,28 +1,28 @@
 #include "core/Exception.hpp"
 #include "core/Fetch.hpp"
-#include "core/AtlasState.hpp"
+#include "core/PegasusState.hpp"
 #include "include/ActionTags.hpp"
 #include "sparta/simulation/ResourceTreeNode.hpp"
 #include "sparta/utils/LogUtils.hpp"
 #include "include/CSRFieldIdxs64.hpp"
 #include "core/inst_handlers/inst_helpers.hpp"
 
-namespace atlas
+namespace pegasus
 {
 
     Exception::Exception(sparta::TreeNode* exception_node, const ExceptionParameters*) :
         sparta::Unit(exception_node)
     {
-        rv32_exception_action_ = atlas::Action::createAction<&Exception::handleException_<RV32>>(
+        rv32_exception_action_ = pegasus::Action::createAction<&Exception::handleException_<RV32>>(
             this, "exception", ActionTags::EXCEPTION_TAG);
-        rv64_exception_action_ = atlas::Action::createAction<&Exception::handleException_<RV64>>(
+        rv64_exception_action_ = pegasus::Action::createAction<&Exception::handleException_<RV64>>(
             this, "exception", ActionTags::EXCEPTION_TAG);
     }
 
     void Exception::onBindTreeEarly_()
     {
         auto core_tn = getContainer()->getParentAs<sparta::ResourceTreeNode>();
-        AtlasState* state = core_tn->getResourceAs<AtlasState>();
+        PegasusState* state = core_tn->getResourceAs<PegasusState>();
 
         const auto xlen = state->getXlen();
         if (xlen == 64)
@@ -39,7 +39,8 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType Exception::handleException_(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType Exception::handleException_(pegasus::PegasusState* state,
+                                                Action::ItrType action_it)
     {
         sparta_assert(fault_cause_.isValid() || interrupt_cause_.isValid(),
                       "Exception cause is not valid!");
@@ -141,7 +142,7 @@ namespace atlas
         return ++action_it;
     }
 
-    uint64_t Exception::determineTrapValue_(const FaultCause & cause, AtlasState* state)
+    uint64_t Exception::determineTrapValue_(const FaultCause & cause, PegasusState* state)
     {
         switch (cause)
         {
@@ -232,7 +233,7 @@ namespace atlas
         return os;
     }
 
-    uint64_t Exception::determineTrapValue_(const InterruptCause & cause, AtlasState*)
+    uint64_t Exception::determineTrapValue_(const InterruptCause & cause, PegasusState*)
     {
         switch (cause)
         {
@@ -247,4 +248,4 @@ namespace atlas
         }
         return 0;
     }
-} // namespace atlas
+} // namespace pegasus

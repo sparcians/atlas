@@ -1,13 +1,13 @@
 #include "core/observers/Observer.hpp"
-#include "include/AtlasUtils.hpp"
-#include "core/AtlasState.hpp"
-#include "core/AtlasInst.hpp"
+#include "include/PegasusUtils.hpp"
+#include "core/PegasusState.hpp"
+#include "core/PegasusInst.hpp"
 
 #include "sparta/utils/LogUtils.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    void Observer::preExecute(AtlasState* state)
+    void Observer::preExecute(PegasusState* state)
     {
         reset_();
         inspectInitialState_(state);
@@ -16,7 +16,7 @@ namespace atlas
         preExecute_(state);
     }
 
-    void Observer::preException(AtlasState* state)
+    void Observer::preException(PegasusState* state)
     {
         // We want to reuse the preExecute() code but we do not want to
         // call the subclass' preExecute_() method twice (once normally
@@ -35,10 +35,10 @@ namespace atlas
         preException_(state);
     }
 
-    void Observer::postExecute(AtlasState* state)
+    void Observer::postExecute(PegasusState* state)
     {
         // Get final value of destination registers
-        AtlasInstPtr inst = state->getCurrentInst();
+        PegasusInstPtr inst = state->getCurrentInst();
 
         if (fault_cause_.isValid() == false)
         {
@@ -76,10 +76,10 @@ namespace atlas
         postExecute_(state);
     }
 
-    void Observer::inspectInitialState_(AtlasState* state)
+    void Observer::inspectInitialState_(PegasusState* state)
     {
         pc_ = state->getPc();
-        AtlasInstPtr inst = state->getCurrentInst();
+        PegasusInstPtr inst = state->getCurrentInst();
 
         if (inst)
         {
@@ -209,7 +209,8 @@ namespace atlas
 
     std::ostream & operator<<(std::ostream & os, const Observer::RegValue & reg_value)
     {
-        os << "0x" << sparta::utils::bin_to_hexstr(reg_value.getByteVector().data(), reg_value.size(), "");
+        os << "0x"
+           << sparta::utils::bin_to_hexstr(reg_value.getByteVector().data(), reg_value.size(), "");
         return os;
     }
-} // namespace atlas
+} // namespace pegasus

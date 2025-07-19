@@ -1,4 +1,4 @@
-# Atlas
+# Pegasus
 RISC-V Functional Model
 
 ![riscv-arch](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/kathlenemagnus/257907f4095b77a22da35df05f543a4a/raw/riscv-arch.json)
@@ -16,10 +16,10 @@ Install the following packages (tested with Ubuntu 24.04):
 - (apt-get install libsqlite3-dev) SQLite3 3.37.2
 - (apt-get install libhdf5-dev) HDF5 1.10.7
 
-An Atlas Conda environment is also available:
+An Pegasus Conda environment is also available:
 ```
-conda env create -f conda/atlas_env.yaml
-conda activate atlas
+conda env create -f conda/pegasus_env.yaml
+conda activate pegasus
 ```
 
 ## Install Sparta
@@ -33,33 +33,33 @@ CC=$COMPILER CXX=$CXX_COMPILER cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTA
 sudo make -j$(nproc --all) install
 ```
 
-If using Conda, you must install Sparta in the Atlas Conda environment:
+If using Conda, you must install Sparta in the Pegasus Conda environment:
 ```
 cmake --install . --prefix $CONDA_PREFIX
 ```
 
 
-## Clone Atlas and Build/Regress
+## Clone Pegasus and Build/Regress
 ```
-git clone --recursive git@github.com:sparcians/atlas.git
-cd atlas
+git clone --recursive git@github.com:sparcians/pegasus.git
+cd pegasus
 mkdir release
 cd release
 cmake .. -DCMAKE_BUILD_TYPE=Release -DSPARTA_SEARCH_DIR=/usr/local
 make
-make atlas_regress
+make pegasus_regress
 ```
-Alternatively, you can build Atlas without an install of Sparta by providing a path
-to your Sparta repo and Atlas will build the Sparta library for
-you. Since Sparta already has a make target named `regress`, the Atlas
-regression make target is renamed to `atlas_regress`.
+Alternatively, you can build Pegasus without an install of Sparta by providing a path
+to your Sparta repo and Pegasus will build the Sparta library for
+you. Since Sparta already has a make target named `regress`, the Pegasus
+regression make target is renamed to `pegasus_regress`.
 
 ```
 mkdir release
 cd release
 cmake .. -CMAKE_BUILD_TYPE=Release -DSPARTA_SEARCH_DIR=<full path to map/sparta>
 make
-make atlas_regress
+make pegasus_regress
 ```
 
 ## Validate
@@ -69,7 +69,7 @@ are a set of self-checking unit tests provided by the RISC-V Foundation. Follow 
 the [README](https://github.com/riscv-software-src/riscv-tests#readme) to build the tests.
 
 ```
-cd atlas/<build>/sim
+cd pegasus/<build>/sim
 python ../../scripts/RunArchTest.py --riscv-arch $RISCV_TESTS_PATH/isa/
 ```
 
@@ -79,13 +79,13 @@ are a set of self-checking architectural tests provided by Tenstorrent. Follow t
 [README](https://github.com/riscv-software-src/riscv-tests?tab=readme-ov-file#building-from-repository)
 to build the tests. Alternatively, pre-built tests can be downloaded here: [Releases/v0.2.0+aligned-access](https://github.com/tenstorrent/riscv_arch_tests/releases/tag/v0.2.0%2Baligned-access)
 ```
-cd atlas/<build>/sim
+cd pegasus/<build>/sim
 python ../../scripts/RunArchTest.py --tenstorrent $TENSTORRENT_TESTS_PATH/bare_metal/user/
 ```
 
 ## Debug
 
-To build Atlas for debugging, Debug and FastDebug build types are available.
+To build Pegasus for debugging, Debug and FastDebug build types are available.
 ```
 CC=clang CXX=clang++ cmake .. -DCMAKE_BUILD_TYPE=FastDebug
 ```
@@ -94,7 +94,7 @@ CC=clang CXX=clang++ cmake .. -DCMAKE_BUILD_TYPE=Debug
 ```
 
 ## Python IDE
-See [Python IDE for Atlas](IDE/README.md)
+See [Python IDE for Pegasus](IDE/README.md)
 
 ## RISC-V Profile Support
 | RVA23U64 Mandatory Extensions | Status |

@@ -2,7 +2,7 @@ from backend.observers import *
 import argparse
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Atlas IDE')
+    parser = argparse.ArgumentParser(description='Pegasus IDE')
     parser.add_argument('--riscv-tests-dir', required=True, help='Path to the RISC-V tests directory')
     parser.add_argument('--sim-exe-path', required=True, help='Path to the RISC-V simulator executable')
     parser.add_argument('--test-name', required=True, help='Name of the test to run')

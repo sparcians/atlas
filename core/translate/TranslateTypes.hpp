@@ -4,7 +4,7 @@
 #include <array>
 #include <map>
 
-namespace atlas::translate_types
+namespace pegasus::translate_types
 {
     struct FieldDef
     {
@@ -308,4 +308,4 @@ namespace atlas::translate_types
 
         return get_page_offset_mask(level);
     }
-} // namespace atlas::translate_types
+} // namespace pegasus::translate_types

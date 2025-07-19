@@ -6,9 +6,9 @@
 
 #include "core/Action.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
     class Action;
     class ActionGroup;
 
@@ -29,15 +29,15 @@ namespace atlas
 
       private:
         template <auto func>
-        Action::ItrType vmlHandler_(atlas::AtlasState* state_ptr, Action::ItrType action_it);
+        Action::ItrType vmlHandler_(pegasus::PegasusState* state_ptr, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType vcpHandler_(atlas::AtlasState* state_ptr, Action::ItrType action_it);
+        Action::ItrType vcpHandler_(pegasus::PegasusState* state_ptr, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType vfirstHandler_(atlas::AtlasState* state_ptr, Action::ItrType action_it);
+        Action::ItrType vfirstHandler_(pegasus::PegasusState* state_ptr, Action::ItrType action_it);
         template <SetFirstMode sfMode>
-        Action::ItrType vsxfHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType vsxfHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
 
-        Action::ItrType viotaHandler_(atlas::AtlasState* state, Action::ItrType action_it);
-        Action::ItrType veiHandler_(AtlasState* state, Action::ItrType action_it);
+        Action::ItrType viotaHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
+        Action::ItrType veiHandler_(PegasusState* state, Action::ItrType action_it);
     };
-} // namespace atlas
+} // namespace pegasus

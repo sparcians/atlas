@@ -2,122 +2,122 @@ from backend.sim_api import *
 from backend.c_dtypes import uint64_t
 import os, json
 
-# Create a wrapper around a running AtlasState C++ object.
-def atlas_state(endpoint):
-    return AtlasState(endpoint)
+# Create a wrapper around a running PegasusState C++ object.
+def pegasus_state(endpoint):
+    return PegasusState(endpoint)
 
-# Create a wrapper around a running AtlasInst C++ object.
-# C++: "AtlasInstPtr AtlasState::getCurrentInst()"
-def atlas_current_inst(endpoint):
-    inst = AtlasInst(endpoint)
+# Create a wrapper around a running PegasusInst C++ object.
+# C++: "PegasusInstPtr PegasusState::getCurrentInst()"
+def pegasus_current_inst(endpoint):
+    inst = PegasusInst(endpoint)
     return inst if isinstance(inst.getUid(), int) else None
 
-# Wrap an AtlasState C++ object.
-class AtlasState:
+# Wrap an PegasusState C++ object.
+class PegasusState:
     def __init__(self, endpoint):
         self.endpoint = endpoint
 
     def getXlen(self):
-        return atlas_xlen(self.endpoint)
+        return pegasus_xlen(self.endpoint)
 
     def getPc(self):
-        return atlas_pc(self.endpoint)
+        return pegasus_pc(self.endpoint)
 
     def getPrevPc(self):
-        return atlas_prev_pc(self.endpoint)
+        return pegasus_prev_pc(self.endpoint)
 
     def getPrivMode(self):
-        return atlas_inst_priv(self.endpoint)
+        return pegasus_inst_priv(self.endpoint)
 
     def getTrapCause(self):
-        return atlas_inst_active_exception(self.endpoint)
+        return pegasus_inst_active_exception(self.endpoint)
 
     def getSimState(self):
-        return AtlasState.SimState(self.endpoint)
+        return PegasusState.SimState(self.endpoint)
 
     def getCurrentInst(self):
-        return AtlasState.AtlasInst(self.endpoint)
+        return PegasusState.PegasusInst(self.endpoint)
 
     def getIntRegisterSet(self):
-        return AtlasIntRegisterSet(self.endpoint)
+        return PegasusIntRegisterSet(self.endpoint)
 
     def getFpRegisterSet(self):
-        return AtlasFpRegisterSet(self.endpoint)
+        return PegasusFpRegisterSet(self.endpoint)
     
     def getVectorRegisterSet(self):
-        return AtlasVecRegisterSet(self.endpoint)
+        return PegasusVecRegisterSet(self.endpoint)
     
     def getCsrRegisterSet(self):
-        return AtlasCsrRegisterSet(self.endpoint)
+        return PegasusCsrRegisterSet(self.endpoint)
 
-    # Wrap an AtlasState::SimState C++ object.
+    # Wrap an PegasusState::SimState C++ object.
     class SimState:
         def __init__(self, endpoint):
             self.endpoint = endpoint
 
         @property
         def current_uid(self):
-            return atlas_inst_uid(self.endpoint)
+            return pegasus_inst_uid(self.endpoint)
 
         @property
         def inst_count(self):
-            return atlas_inst_count(self.endpoint)
+            return pegasus_inst_count(self.endpoint)
 
         @property
         def sim_stopped(self):
-            return atlas_sim_stopped(self.endpoint)
+            return pegasus_sim_stopped(self.endpoint)
 
         @property
         def test_passed(self):
-            return atlas_test_passed(self.endpoint)
+            return pegasus_test_passed(self.endpoint)
 
         @property
         def workload_exit_code(self):
-            return atlas_exit_code(self.endpoint)
+            return pegasus_exit_code(self.endpoint)
 
-# Wrap an AtlasInst C++ object.
-class AtlasInst:
+# Wrap an PegasusInst C++ object.
+class PegasusInst:
     def __init__(self, endpoint):
         self.endpoint = endpoint
 
-    def getAtlasState(self):
-        return AtlasState(self.endpoint)
+    def getPegasusState(self):
+        return PegasusState(self.endpoint)
 
     def getUid(self):
-        return atlas_inst_uid(self.endpoint)
+        return pegasus_inst_uid(self.endpoint)
 
     def getMnemonic(self):
-        return atlas_inst_mnemonic(self.endpoint)
+        return pegasus_inst_mnemonic(self.endpoint)
 
     def dasmString(self):
-        return atlas_inst_dasm_string(self.endpoint)
+        return pegasus_inst_dasm_string(self.endpoint)
 
     def getOpcode(self):
-        return atlas_inst_opcode(self.endpoint)
+        return pegasus_inst_opcode(self.endpoint)
 
     def getPrivMode(self):
-        return atlas_inst_priv(self.endpoint)
+        return pegasus_inst_priv(self.endpoint)
 
     def getRs1(self):
-        rs1_name = atlas_inst_rs1_name(self.endpoint)
-        return AtlasRS1(self.endpoint, rs1_name) if rs1_name else None
+        rs1_name = pegasus_inst_rs1_name(self.endpoint)
+        return PegasusRS1(self.endpoint, rs1_name) if rs1_name else None
 
     def getRs2(self):
-        rs2_name = atlas_inst_rs2_name(self.endpoint)
-        return AtlasRS2(self.endpoint, rs2_name) if rs2_name else None
+        rs2_name = pegasus_inst_rs2_name(self.endpoint)
+        return PegasusRS2(self.endpoint, rs2_name) if rs2_name else None
 
     def getRd(self):
-        rd_name = atlas_inst_rd_name(self.endpoint)
-        return AtlasRD(self.endpoint, rd_name) if rd_name else None
+        rd_name = pegasus_inst_rd_name(self.endpoint)
+        return PegasusRD(self.endpoint, rd_name) if rd_name else None
 
     def getImmediate(self):
-        has_imm = atlas_inst_has_immediate(self.endpoint)
-        return atlas_inst_immediate(self.endpoint) if has_imm else None
+        has_imm = pegasus_inst_has_immediate(self.endpoint)
+        return pegasus_inst_immediate(self.endpoint) if has_imm else None
 
     def deepCopy(self):
-        return AtlasInstDeepCopy(self)
+        return PegasusInstDeepCopy(self)
 
-class AtlasInstDeepCopy:
+class PegasusInstDeepCopy:
     def __init__(self, orig_inst):
         self.uid = orig_inst.getUid()
         self.mnemonic = orig_inst.getMnemonic()
@@ -135,7 +135,7 @@ class AtlasInstDeepCopy:
         self.rd = rd.deepCopy() if rd else None
         self.imm = imm
 
-    def getAtlasState(self):
+    def getPegasusState(self):
         return None
 
     def getUid(self):
@@ -175,26 +175,26 @@ class SpartaRegister:
         return self.reg_name
 
     def getGroupNum(self):
-        return atlas_reg_group_num(self.endpoint, self.reg_name)
+        return pegasus_reg_group_num(self.endpoint, self.reg_name)
 
     def getID(self):
-        return atlas_reg_id(self.endpoint, self.reg_name)
+        return pegasus_reg_id(self.endpoint, self.reg_name)
 
     def read(self):
-        return atlas_reg_value(self.endpoint, self.reg_name)
+        return pegasus_reg_value(self.endpoint, self.reg_name)
 
     def write(self, value):
-        atlas_reg_write(self.endpoint, self.reg_name, value)
+        pegasus_reg_write(self.endpoint, self.reg_name, value)
 
     def dmiWrite(self, value):
-        atlas_reg_dmiwrite(self.endpoint, self.reg_name, value)
+        pegasus_reg_dmiwrite(self.endpoint, self.reg_name, value)
 
     def deepCopy(self):
         return SpartaRegisterDeepCopy(self)
 
-class AtlasRD(SpartaRegister):  pass
-class AtlasRS1(SpartaRegister): pass
-class AtlasRS2(SpartaRegister): pass
+class PegasusRD(SpartaRegister):  pass
+class PegasusRS1(SpartaRegister): pass
+class PegasusRS2(SpartaRegister): pass
 
 # Provide read-only register access after the simulation is
 # over. This may be useful to some python observers for post-
@@ -223,8 +223,8 @@ class SpartaRegisterDeepCopy:
     def deepCopy(self):
         return SpartaRegisterDeepCopy(self)
 
-# Wrap an atlas::RegisterSet C++ object.
-class AtlasRegisterSet:
+# Wrap an pegasus::RegisterSet C++ object.
+class PegasusRegisterSet:
     def __init__(self, endpoint, group_num):
         self.endpoint = endpoint
         self.group_num = group_num
@@ -238,18 +238,18 @@ class AtlasRegisterSet:
         return SpartaRegister(self.endpoint, reg_name)
 
     def getNumRegisters(self):
-        return atlas_num_regs_in_group(self.endpoint, self.group_num)
+        return pegasus_num_regs_in_group(self.endpoint, self.group_num)
 
-class AtlasIntRegisterSet(AtlasRegisterSet): pass
-class AtlasFpRegisterSet(AtlasRegisterSet):  pass
-class AtlasVecRegisterSet(AtlasRegisterSet): pass
+class PegasusIntRegisterSet(PegasusRegisterSet): pass
+class PegasusFpRegisterSet(PegasusRegisterSet):  pass
+class PegasusVecRegisterSet(PegasusRegisterSet): pass
 
-class AtlasCsrRegisterSet(AtlasRegisterSet):
+class PegasusCsrRegisterSet(PegasusRegisterSet):
     def __init__(self, endpoint):
-        AtlasRegisterSet.__init__(self, endpoint, 3)
+        PegasusRegisterSet.__init__(self, endpoint, 3)
 
     def getRegister(self, reg_id):
-        csr_name = atlas_csr_name(self.endpoint, reg_id)
+        csr_name = pegasus_csr_name(self.endpoint, reg_id)
         if isinstance(csr_name, str) and csr_name != '':
             return SpartaRegister(self.endpoint, csr_name)
 
@@ -262,8 +262,8 @@ class CSR:
 
         assert isinstance(self.csr_value, uint64_t), f"Invalid type for CSR value: {type(csr_val)}"
 
-        atlas_root = os.path.join(os.path.dirname(__file__), '..', '..')
-        csr_json = os.path.join(atlas_root, 'arch', 'rv'+str(xlen), 'reg_csr.json')
+        pegasus_root = os.path.join(os.path.dirname(__file__), '..', '..')
+        csr_json = os.path.join(pegasus_root, 'arch', 'rv'+str(xlen), 'reg_csr.json')
 
         csr_defn = None
         with open(csr_json, 'r') as fin:

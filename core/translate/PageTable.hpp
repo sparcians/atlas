@@ -1,12 +1,12 @@
 #pragma once
 
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 #include "core/translate/PageTableEntry.hpp"
 
 #include <map>
 #include <iostream>
 
-namespace atlas
+namespace pegasus
 {
 
     uint32_t determineMaxNumPteEntries(MMUMode mode)
@@ -122,4 +122,4 @@ namespace atlas
         return os;
     }
 
-} // namespace atlas
+} // namespace pegasus

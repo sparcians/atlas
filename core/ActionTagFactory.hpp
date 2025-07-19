@@ -1,11 +1,11 @@
 #pragma once
 
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 
 #include <cassert>
 #include <vector>
 
-namespace atlas
+namespace pegasus
 {
     /**
      * @brief A factory for creating unique Tags.
@@ -61,4 +61,4 @@ namespace atlas
 
         friend class Action;
     };
-} // namespace atlas
+} // namespace pegasus

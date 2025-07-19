@@ -6,7 +6,7 @@
 #include "sparta/simulation/ParameterSet.hpp"
 #include "sparta/memory/BlockingMemoryIFNode.hpp"
 
-namespace atlas
+namespace pegasus
 {
     class SimpleUART : public sparta::Unit, public sparta::memory::BlockingMemoryIF
     {
@@ -44,4 +44,4 @@ namespace atlas
         bool tryPoke_(sparta::memory::addr_t addr, sparta::memory::addr_t size,
                       const uint8_t* buf) override final;
     };
-} // namespace atlas
+} // namespace pegasus

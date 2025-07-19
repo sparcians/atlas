@@ -3,10 +3,10 @@
 #include "core/observers/Observer.hpp"
 #include <memory>
 
-namespace atlas
+namespace pegasus
 {
 
-    class AtlasState;
+    class PegasusState;
 
     class SimController : public Observer
     {
@@ -15,16 +15,16 @@ namespace atlas
 
         SimController();
 
-        void postInit(AtlasState*);
-        void onSimulationFinished(AtlasState* state);
+        void postInit(PegasusState*);
+        void onSimulationFinished(PegasusState* state);
 
       private:
-        void preExecute_(AtlasState*) override;
-        void postExecute_(AtlasState*) override;
-        void preException_(AtlasState*) override;
+        void preExecute_(PegasusState*) override;
+        void postExecute_(PegasusState*) override;
+        void preException_(PegasusState*) override;
 
         class SimEndpoint;
         std::shared_ptr<SimEndpoint> endpoint_;
     };
 
-} // namespace atlas
+} // namespace pegasus

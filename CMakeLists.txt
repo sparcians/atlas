@@ -14,7 +14,7 @@ endif()
 message(STATUS "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 message(STATUS "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
 
-project(Atlas CXX)
+project(Pegasus CXX)
 set (SIM_BASE ${PROJECT_SOURCE_DIR})
 
 # Profile build flags
@@ -61,7 +61,7 @@ set(SPARTA_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}")
 #   cd /my/path/to/map/sparta/build
 #   cmake --install . --prefix .
 #
-#   cd atlas/build
+#   cd pegasus/build
 #   SPARTA_SEARCH_DIR=/my/path/to/map/sparta/build cmake ....args
 #
 if(BUILD_SPARTA_FROM_SOURCE)
@@ -124,9 +124,9 @@ add_subdirectory(stf_lib)
 add_compile_definitions(REG32_JSON_DIR="${SIM_BASE}/arch/rv32")
 add_compile_definitions(REG64_JSON_DIR="${SIM_BASE}/arch/rv64")
 
-# Atlas dependencies
+# Pegasus dependencies
 find_package (Boost REQUIRED COMPONENTS json)
-set (ATLAS_LIBS ${SPARTA_LIBS} ${STF_LINK_LIBS} mavis Boost::json)
+set (PEGASUS_LIBS ${SPARTA_LIBS} ${STF_LINK_LIBS} mavis Boost::json)
 
 add_subdirectory(arch)
 add_subdirectory(core)
@@ -188,7 +188,7 @@ add_custom_target(clangformat
   WORKING_DIRECTORY
      ${CMAKE_SOURCE_DIR}
   COMMENT
-     "Formatting Atlas with ${CLANGFORMAT_EXECUTABLE} ..."
+     "Formatting Pegasus with ${CLANGFORMAT_EXECUTABLE} ..."
   )
 
 add_custom_target(clangformat-check
@@ -197,5 +197,5 @@ add_custom_target(clangformat-check
   WORKING_DIRECTORY
      ${CMAKE_SOURCE_DIR}
   COMMENT
-     "Formatting Atlas with ${CLANGFORMAT_EXECUTABLE} ..."
+     "Formatting Pegasus with ${CLANGFORMAT_EXECUTABLE} ..."
   )

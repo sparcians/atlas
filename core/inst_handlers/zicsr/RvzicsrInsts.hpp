@@ -2,9 +2,9 @@
 
 #include "core/Execute.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
 
     class RvzicsrInsts
     {
@@ -26,35 +26,38 @@ namespace atlas
         bool isAccessLegal_(const uint32_t csr_num, const PrivMode priv_mode);
 
         template <typename XLEN>
-        Action::ItrType csrrcHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType csrrcHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType csrrciHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType csrrciHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType csrrsHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType csrrsHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType csrrsiHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType csrrsiHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType csrrwHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType csrrwHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType csrrwiHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType csrrwiHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
 
         // CSR update Actions for executing write side effects
         template <typename XLEN>
-        Action::ItrType fcsrUpdateHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcsrUpdateHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fflagsUpdateHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fflagsUpdateHandler_(pegasus::PegasusState* state,
+                                             Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType frmUpdateHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType frmUpdateHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
 
         template <typename XLEN>
-        Action::ItrType sstatusUpdateHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType sstatusUpdateHandler_(pegasus::PegasusState* state,
+                                              Action::ItrType action_it);
 
         template <typename XLEN>
-        Action::ItrType satpUpdateHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType satpUpdateHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
 
         template <typename XLEN>
-        Action::ItrType mstatusUpdateHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType mstatusUpdateHandler_(pegasus::PegasusState* state,
+                                              Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType misaUpdateHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType misaUpdateHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
     };
-} // namespace atlas
+} // namespace pegasus

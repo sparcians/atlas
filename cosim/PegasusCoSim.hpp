@@ -1,7 +1,7 @@
-#include "sim/AtlasSim.hpp"
+#include "sim/PegasusSim.hpp"
 #include "cosim/CoSimApi.hpp"
 
-namespace atlas
+namespace pegasus
 {
     class CoSimMemoryInterface : public cosim::MemoryInterface
     {
@@ -24,11 +24,11 @@ namespace atlas
     class Fetch;
     class CoSimObserver;
 
-    class AtlasCoSim : public AtlasSim, public atlas::cosim::CoSim
+    class PegasusCoSim : public PegasusSim, public pegasus::cosim::CoSim
     {
       public:
-        AtlasCoSim(sparta::Scheduler* scheduler, uint64_t ilimit);
-        ~AtlasCoSim();
+        PegasusCoSim(sparta::Scheduler* scheduler, uint64_t ilimit);
+        ~PegasusCoSim();
 
         void enableLogger(const std::string & filename = "")
         {
@@ -101,4 +101,4 @@ namespace atlas
         // CoSim Observer for capturing Events from each hart
         std::vector<CoSimObserver*> cosim_observer_;
     };
-} // namespace atlas
+} // namespace pegasus

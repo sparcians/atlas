@@ -1,22 +1,23 @@
-#include "AtlasSim.hpp"
+#include "PegasusSim.hpp"
 #include "include/ActionTags.hpp"
 #include "include/CSRFieldIdxs64.hpp"
 #include <filesystem>
 
 #include "sparta/utils/LogUtils.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    AtlasSim::AtlasSim(sparta::Scheduler* scheduler, const WorkloadAndArguments & workload_and_args,
-                       const RegValueOverridePairs & reg_value_overrides, uint64_t ilimit) :
-        sparta::app::Simulation("AtlasSim", scheduler),
+    PegasusSim::PegasusSim(sparta::Scheduler* scheduler,
+                           const WorkloadAndArguments & workload_and_args,
+                           const RegValueOverridePairs & reg_value_overrides, uint64_t ilimit) :
+        sparta::app::Simulation("PegasusSim", scheduler),
         workload_and_args_(workload_and_args),
         reg_value_overrides_(reg_value_overrides),
         ilimit_(ilimit)
     {
     }
 
-    AtlasSim::~AtlasSim()
+    PegasusSim::~PegasusSim()
     {
         for (auto state : state_)
         {
@@ -26,7 +27,7 @@ namespace atlas
         getRoot()->enterTeardown();
     }
 
-    void AtlasSim::run(uint64_t run_time)
+    void PegasusSim::run(uint64_t run_time)
     {
         for (auto state : state_)
         {
@@ -41,7 +42,7 @@ namespace atlas
         auto sim_time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
         const HartId hart_id = 0;
-        const AtlasState* state = state_.at(hart_id);
+        const PegasusState* state = state_.at(hart_id);
         const uint64_t inst_count = state->getSimState()->inst_count;
         std::locale::global(std::locale(""));
         std::cout.imbue(std::locale());
@@ -53,7 +54,7 @@ namespace atlas
         // TODO: mem usage, workload exit code
     }
 
-    void AtlasSim::setEOTMode(const std::string & eot_mode)
+    void PegasusSim::setEOTMode(const std::string & eot_mode)
     {
         if (eot_mode == "pass_fail")
         {
@@ -65,7 +66,7 @@ namespace atlas
         }
     }
 
-    void AtlasSim::enableInteractiveMode()
+    void PegasusSim::enableInteractiveMode()
     {
         sparta_assert(!state_.empty(), "Must call after bindTree_()");
         for (auto state : state_)
@@ -74,7 +75,7 @@ namespace atlas
         }
     }
 
-    void AtlasSim::useSpikeFormatting()
+    void PegasusSim::useSpikeFormatting()
     {
         sparta_assert(!state_.empty(), "Must call after bindTree_()");
         for (auto state : state_)
@@ -83,16 +84,16 @@ namespace atlas
         }
     }
 
-    void AtlasSim::buildTree_()
+    void PegasusSim::buildTree_()
     {
         auto root_tn = getRoot();
 
         // top.allocators
-        allocators_tn_.reset(new AtlasAllocators(getRoot()));
+        allocators_tn_.reset(new PegasusAllocators(getRoot()));
 
         // top.system
         tns_to_delete_.emplace_back(
-            new sparta::ResourceTreeNode(root_tn, "system", "Atlas System", &system_factory_));
+            new sparta::ResourceTreeNode(root_tn, "system", "Pegasus System", &system_factory_));
 
         // top.system_call_emulator
         tns_to_delete_.emplace_back(new sparta::ResourceTreeNode(
@@ -127,33 +128,35 @@ namespace atlas
             sparta::TreeNode::GROUP_IDX_NONE, "Exception Unit", &exception_factory_));
     }
 
-    void AtlasSim::configureTree_()
+    void PegasusSim::configureTree_()
     {
-        // Set AtlasSystem workload parameter
+        // Set PegasusSystem workload parameter
         auto system_workload_and_args =
             getRoot()->getChildAs<sparta::ParameterBase>("system.params.workload_and_args");
         system_workload_and_args->setValueFromStringVector(workload_and_args_);
     }
 
-    void AtlasSim::bindTree_()
+    void PegasusSim::bindTree_()
     {
-        // Atlas System (shared by all harts)
-        system_ = getRoot()->getChild("system")->getResourceAs<atlas::AtlasSystem>();
+        // Pegasus System (shared by all harts)
+        system_ = getRoot()->getChild("system")->getResourceAs<pegasus::PegasusSystem>();
         SystemCallEmulator* system_call_emulator =
-            getRoot()->getChild("system_call_emulator")->getResourceAs<atlas::SystemCallEmulator>();
+            getRoot()
+                ->getChild("system_call_emulator")
+                ->getResourceAs<pegasus::SystemCallEmulator>();
 
         bool system_call_emulator_enabled = false;
         const uint32_t num_harts = 1;
         for (uint32_t hart_id = 0; hart_id < num_harts; ++hart_id)
         {
-            // Get AtlasState and Fetch for each hart
+            // Get PegasusState and Fetch for each hart
             const std::string core_name = "core" + std::to_string(hart_id);
             const auto core = getRoot()->getChild(core_name);
-            state_.emplace_back(core->getResourceAs<AtlasState*>());
+            state_.emplace_back(core->getResourceAs<PegasusState*>());
 
-            // Give AtlasState a pointer to AtlasSystem for accessing memory
-            AtlasState* state = state_.back();
-            state->setAtlasSystem(system_);
+            // Give PegasusState a pointer to PegasusSystem for accessing memory
+            PegasusState* state = state_.back();
+            state->setPegasusSystem(system_);
             state->setPc(system_->getStartingPc());
 
             if (core->getChildAs<sparta::ResourceTreeNode>("execute")
@@ -251,7 +254,7 @@ namespace atlas
         }
     }
 
-    void AtlasSim::endSimulation(int64_t exit_code)
+    void PegasusSim::endSimulation(int64_t exit_code)
     {
         for (auto state : state_)
         {
@@ -259,4 +262,4 @@ namespace atlas
         }
     }
 
-} // namespace atlas
+} // namespace pegasus

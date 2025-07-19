@@ -9,7 +9,7 @@ from RV64_CSR import CSR64_DEFS
 from RV32_CSR import CSR32_DEFS
 
 from REG_CONSTS import CSR_CONSTS
-from REG_CONSTS import ATLAS_INTERNAL_REGISTERS
+from REG_CONSTS import PEGASUS_INTERNAL_REGISTERS
 
 CSR_BF_HEADER_FILE_NAME = "CSRBitMasks{reg_size}.hpp"
 CSR_FI_HEADER_FILE_NAME = "CSRFieldIdxs{reg_size}.hpp"
@@ -30,7 +30,7 @@ def GetCsrNumFileHeader(reg_size):
     header += '// DO NOT MODIFY THIS FILE BY HAND\n'
     header += '//\n'
     header += '\n'
-    header += 'namespace atlas\n'
+    header += 'namespace pegasus\n'
     header += '{\n'
     return header
 
@@ -180,12 +180,12 @@ def gen_csr_helpers_header():
 #include <utility>
 #include <vector>
 
-namespace atlas
+namespace pegasus
 {{
 {bit_masks_init_code}
 
 {bit_ranges_init_code}
-}} // namespace atlas
+}} // namespace pegasus
 
 """
 
@@ -233,7 +233,7 @@ def gen_csr_num_header():
                               "\n")
 
     csr_header_file.write(CSR_NUM_FILE_INTERNAL_REGS_COMMENT)
-    for k, v in ATLAS_INTERNAL_REGISTERS.items():
+    for k, v in PEGASUS_INTERNAL_REGISTERS.items():
         csr_header_file.write("    static constexpr uint64_t "+
                               k.upper()+
                               " = "+

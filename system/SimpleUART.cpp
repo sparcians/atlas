@@ -1,12 +1,12 @@
 
 #include "system/SimpleUART.hpp"
-#include "system/AtlasSystem.hpp"
+#include "system/PegasusSystem.hpp"
 
-namespace atlas
+namespace pegasus
 {
     SimpleUART::SimpleUART(sparta::TreeNode* node, const SimpleUARTParameters* params) :
         sparta::Unit(node),
-        sparta::memory::BlockingMemoryIF("Simple UART", AtlasSystem::ATLAS_SYSTEM_BLOCK_SIZE,
+        sparta::memory::BlockingMemoryIF("Simple UART", PegasusSystem::PEGASUS_SYSTEM_BLOCK_SIZE,
                                          {0, params->size, "uart_window"}, nullptr),
         base_addr_(params->base_addr),
         size_(params->size)
@@ -38,4 +38,4 @@ namespace atlas
         sparta_assert(false, "Simple UART pokes are not implemented");
         return false;
     }
-} // namespace atlas
+} // namespace pegasus

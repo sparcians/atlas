@@ -1,17 +1,17 @@
 #pragma once
 
 #include "core/ActionGroup.hpp"
-#include "core/AtlasAllocatorWrapper.hpp"
-#include "core/AtlasInst.hpp"
+#include "core/PegasusAllocatorWrapper.hpp"
+#include "core/PegasusInst.hpp"
 #include "core/observers/Observer.hpp"
 #include "core/CoSimQuery.hpp"
 
 #include "arch/RegisterSet.hpp"
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 #include "include/CSRBitMasks64.hpp"
 #include "include/CSRHelpers.hpp"
 
-#include "sim/AtlasAllocators.hpp"
+#include "sim/PegasusAllocators.hpp"
 
 #include "mavis/mavis/extension_managers/RISCVExtensionManager.hpp"
 
@@ -29,11 +29,11 @@
 
 template <class InstT, class ExtenT, class InstTypeAllocator, class ExtTypeAllocator> class Mavis;
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasInst;
-    using AtlasInstPtr = sparta::SpartaSharedPointer<AtlasInst>;
-    class AtlasSystem;
+    class PegasusInst;
+    using PegasusInstPtr = sparta::SpartaSharedPointer<PegasusInst>;
+    class PegasusSystem;
     class Fetch;
     class Execute;
     class Translate;
@@ -45,22 +45,22 @@ namespace atlas
     class VectorConfig;
 
     using MavisType =
-        Mavis<AtlasInst, AtlasExtractor, AtlasInstAllocatorWrapper<AtlasInstAllocator>,
-              AtlasExtractorAllocatorWrapper<AtlasExtractorAllocator>>;
+        Mavis<PegasusInst, PegasusExtractor, PegasusInstAllocatorWrapper<PegasusInstAllocator>,
+              PegasusExtractorAllocatorWrapper<PegasusExtractorAllocator>>;
 
-    class AtlasState : public sparta::Unit
+    class PegasusState : public sparta::Unit
     {
       public:
         // Name of this resource, required by sparta::UnitFactory
-        static constexpr char name[] = "AtlasState";
-        using base_type = AtlasState;
+        static constexpr char name[] = "PegasusState";
+        using base_type = PegasusState;
 
-        class AtlasStateParameters : public sparta::ParameterSet
+        class PegasusStateParameters : public sparta::ParameterSet
         {
           public:
-            AtlasStateParameters(sparta::TreeNode* node) : sparta::ParameterSet(node)
+            PegasusStateParameters(sparta::TreeNode* node) : sparta::ParameterSet(node)
             {
-                vlen.addDependentValidationCallback(&AtlasStateParameters::validateVlen_,
+                vlen.addDependentValidationCallback(&PegasusStateParameters::validateVlen_,
                                                     "VLEN constraint");
             }
 
@@ -68,7 +68,7 @@ namespace atlas
             PARAMETER(std::string, isa_string, "rv64gcbv_zicsr_zifencei_zicond_zcb", "ISA string")
             PARAMETER(uint32_t, vlen, 128, "Vector register size in bits")
             PARAMETER(std::string, isa_file_path, "mavis_json", "Where are the Mavis isa files?")
-            PARAMETER(std::string, uarch_file_path, "arch", "Where are the Atlas uarch files?")
+            PARAMETER(std::string, uarch_file_path, "arch", "Where are the Pegasus uarch files?")
             PARAMETER(std::string, csr_values, "arch/default_csr_values.json",
                       "Provides initial values of CSRs")
             PARAMETER(bool, stop_sim_on_wfi, false, "Executing a WFI instruction stops simulation")
@@ -84,10 +84,10 @@ namespace atlas
             }
         };
 
-        AtlasState(sparta::TreeNode* core_node, const AtlasStateParameters* p);
+        PegasusState(sparta::TreeNode* core_node, const PegasusStateParameters* p);
 
         // Not default -- defined in source file to reduce massive inlining
-        virtual ~AtlasState();
+        virtual ~PegasusState();
 
         HartId getHartId() const { return hart_id_; }
 
@@ -154,7 +154,7 @@ namespace atlas
         {
             uint32_t current_opcode = 0;
             uint64_t current_uid = 0;
-            AtlasInstPtr current_inst = nullptr;
+            PegasusInstPtr current_inst = nullptr;
             uint64_t inst_count = 0;
             bool sim_stopped = false;
             bool test_passed = true;
@@ -175,9 +175,9 @@ namespace atlas
 
         VectorConfig* getVectorConfig() { return vector_config_.get(); }
 
-        const AtlasInstPtr & getCurrentInst() { return sim_state_.current_inst; }
+        const PegasusInstPtr & getCurrentInst() { return sim_state_.current_inst; }
 
-        void setCurrentInst(AtlasInstPtr inst)
+        void setCurrentInst(PegasusInstPtr inst)
         {
             inst->setUid(sim_state_.current_uid);
             sim_state_.current_inst = inst;
@@ -186,11 +186,11 @@ namespace atlas
         // Is the "H" extension enabled?
         bool hasHypervisor() const { return hypervisor_enabled_; }
 
-        AtlasTranslationState* getFetchTranslationState() { return &fetch_translation_state_; }
+        PegasusTranslationState* getFetchTranslationState() { return &fetch_translation_state_; }
 
-        AtlasSystem* getAtlasSystem() const { return atlas_system_; }
+        PegasusSystem* getPegasusSystem() const { return pegasus_system_; }
 
-        void setAtlasSystem(AtlasSystem* atlas_system) { atlas_system_ = atlas_system; }
+        void setPegasusSystem(PegasusSystem* pegasus_system) { pegasus_system_ = pegasus_system; }
 
         void enableInteractiveMode();
 
@@ -212,13 +212,13 @@ namespace atlas
 
         Translate* getTranslateUnit() const { return translate_unit_; }
 
-        atlas::RegisterSet* getIntRegisterSet() { return int_rset_.get(); }
+        pegasus::RegisterSet* getIntRegisterSet() { return int_rset_.get(); }
 
-        atlas::RegisterSet* getFpRegisterSet() { return fp_rset_.get(); }
+        pegasus::RegisterSet* getFpRegisterSet() { return fp_rset_.get(); }
 
-        atlas::RegisterSet* getVecRegisterSet() { return vec_rset_.get(); }
+        pegasus::RegisterSet* getVecRegisterSet() { return vec_rset_.get(); }
 
-        atlas::RegisterSet* getCsrRegisterSet() { return csr_rset_.get(); }
+        pegasus::RegisterSet* getCsrRegisterSet() { return csr_rset_.get(); }
 
         sparta::Register* getIntRegister(uint32_t reg_num)
         {
@@ -265,8 +265,8 @@ namespace atlas
         // Initialze a program stack (argc, argv, envp, auxv, etc)
         void setupProgramStack(const std::vector<std::string> & program_arguments);
 
-        // For standalone Atlas simulations, this method will be
-        // called at the top of AtlasSim::run()
+        // For standalone Pegasus simulations, this method will be
+        // called at the top of PegasusSim::run()
         void boot();
 
         // One-time cleanup phase after simulation end.
@@ -276,15 +276,15 @@ namespace atlas
         void onBindTreeEarly_() override;
         void onBindTreeLate_() override;
 
-        Action::ItrType preExecute_(AtlasState* state, Action::ItrType action_it);
-        Action::ItrType postExecute_(AtlasState* state, Action::ItrType action_it);
-        Action::ItrType preException_(AtlasState* state, Action::ItrType action_it);
+        Action::ItrType preExecute_(PegasusState* state, Action::ItrType action_it);
+        Action::ItrType postExecute_(PegasusState* state, Action::ItrType action_it);
+        Action::ItrType preException_(PegasusState* state, Action::ItrType action_it);
 
         Action pre_execute_action_;
         Action post_execute_action_;
         Action pre_exception_action_;
 
-        Action::ItrType stopSim_(AtlasState*, Action::ItrType action_it)
+        Action::ItrType stopSim_(PegasusState*, Action::ItrType action_it)
         {
             for (auto & obs : observers_)
             {
@@ -314,10 +314,10 @@ namespace atlas
         // Path to Mavis
         const std::string isa_file_path_;
 
-        // Path to Atlas
+        // Path to Pegasus
         const std::string uarch_file_path_;
 
-        // Get Atlas arch JSONs for Mavis
+        // Get Pegasus arch JSONs for Mavis
         mavis::FileNameListType getUArchFiles_() const;
 
         // CSR Initial Values JSON
@@ -388,14 +388,14 @@ namespace atlas
         std::unique_ptr<VectorConfig> vector_config_;
 
         // Increment PC Action
-        Action::ItrType incrementPc_(AtlasState* state, Action::ItrType action_it);
-        atlas::Action increment_pc_action_;
+        Action::ItrType incrementPc_(PegasusState* state, Action::ItrType action_it);
+        pegasus::Action increment_pc_action_;
 
         // Translation/MMU state
-        AtlasTranslationState fetch_translation_state_;
+        PegasusTranslationState fetch_translation_state_;
 
-        //! AtlasSystem for accessing memory
-        AtlasSystem* atlas_system_ = nullptr;
+        //! PegasusSystem for accessing memory
+        PegasusSystem* pegasus_system_ = nullptr;
 
         //! System Call Emulator for ecall emulation
         SystemCallEmulator* system_call_emulator_ = nullptr;
@@ -440,14 +440,15 @@ namespace atlas
         SimController* sim_controller_ = nullptr;
     };
 
-    template <typename XLEN> static inline XLEN READ_INT_REG(AtlasState* state, uint32_t reg_ident)
+    template <typename XLEN>
+    static inline XLEN READ_INT_REG(PegasusState* state, uint32_t reg_ident)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
         return (reg_ident == 0) ? 0 : state->getIntRegister(reg_ident)->dmiRead<XLEN>();
     }
 
     template <typename XLEN>
-    static inline void WRITE_INT_REG(AtlasState* state, uint32_t reg_ident, uint64_t reg_value)
+    static inline void WRITE_INT_REG(PegasusState* state, uint32_t reg_ident, uint64_t reg_value)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
         if (reg_ident != 0)
@@ -456,54 +457,56 @@ namespace atlas
         }
     }
 
-    template <typename XLEN> static inline XLEN READ_FP_REG(AtlasState* state, uint32_t reg_ident)
+    template <typename XLEN> static inline XLEN READ_FP_REG(PegasusState* state, uint32_t reg_ident)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
         return state->getFpRegister(reg_ident)->dmiRead<XLEN>();
     }
 
     template <typename XLEN>
-    static inline void WRITE_FP_REG(AtlasState* state, uint32_t reg_ident, uint64_t reg_value)
+    static inline void WRITE_FP_REG(PegasusState* state, uint32_t reg_ident, uint64_t reg_value)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
         state->getFpRegister(reg_ident)->dmiWrite<XLEN>(reg_value);
     }
 
-    template <typename VLEN> static inline VLEN READ_VEC_REG(AtlasState* state, uint32_t reg_ident)
+    template <typename VLEN>
+    static inline VLEN READ_VEC_REG(PegasusState* state, uint32_t reg_ident)
     {
         return state->getVecRegister(reg_ident)->dmiRead<VLEN>();
     }
 
     template <typename VLEN>
-    static inline void WRITE_VEC_REG(AtlasState* state, uint32_t reg_ident, VLEN reg_value)
+    static inline void WRITE_VEC_REG(PegasusState* state, uint32_t reg_ident, VLEN reg_value)
     {
         state->getVecRegister(reg_ident)->dmiWrite<VLEN>(reg_value);
     }
 
     template <typename Elem>
-    static inline Elem READ_VEC_ELEM(AtlasState* state, uint32_t reg_ident, uint32_t idx)
+    static inline Elem READ_VEC_ELEM(PegasusState* state, uint32_t reg_ident, uint32_t idx)
     {
         return state->getVecRegister(reg_ident)->dmiRead<Elem>(idx);
     }
 
     template <typename Elem>
-    static inline void WRITE_VEC_ELEM(AtlasState* state, uint32_t reg_ident, Elem value,
+    static inline void WRITE_VEC_ELEM(PegasusState* state, uint32_t reg_ident, Elem value,
                                       uint32_t idx)
     {
         state->getVecRegister(reg_ident)->dmiWrite<Elem>(value, idx);
     }
 
-    template <typename XLEN> static inline XLEN READ_CSR_REG(AtlasState* state, uint32_t reg_ident)
+    template <typename XLEN>
+    static inline XLEN READ_CSR_REG(PegasusState* state, uint32_t reg_ident)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
         return state->getCsrRegister(reg_ident)->read<XLEN>();
     }
 
     template <typename XLEN>
-    static inline void WRITE_CSR_REG(AtlasState* state, uint32_t reg_ident, uint64_t reg_value)
+    static inline void WRITE_CSR_REG(PegasusState* state, uint32_t reg_ident, uint64_t reg_value)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
-        if (const auto mask = atlas::getCsrBitMask<XLEN>(reg_ident);
+        if (const auto mask = pegasus::getCsrBitMask<XLEN>(reg_ident);
             mask != std::numeric_limits<XLEN>::max())
         {
             auto reg = state->getCsrRegister(reg_ident);
@@ -517,24 +520,26 @@ namespace atlas
         }
     }
 
-    template <typename XLEN> static inline XLEN PEEK_CSR_REG(AtlasState* state, uint32_t reg_ident)
+    template <typename XLEN>
+    static inline XLEN PEEK_CSR_REG(PegasusState* state, uint32_t reg_ident)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
         return state->getCsrRegister(reg_ident)->dmiRead<XLEN>();
     }
 
     template <typename XLEN>
-    static inline void POKE_CSR_REG(AtlasState* state, uint32_t reg_ident, uint64_t reg_value)
+    static inline void POKE_CSR_REG(PegasusState* state, uint32_t reg_ident, uint64_t reg_value)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
         state->getCsrRegister(reg_ident)->dmiWrite<XLEN>(reg_value);
     }
 
     template <typename XLEN>
-    static inline XLEN READ_CSR_FIELD(AtlasState* state, uint32_t reg_ident, const char* field_name)
+    static inline XLEN READ_CSR_FIELD(PegasusState* state, uint32_t reg_ident,
+                                      const char* field_name)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
-        const auto & csr_bit_range = atlas::getCsrBitRange<XLEN>(reg_ident, field_name);
+        const auto & csr_bit_range = pegasus::getCsrBitRange<XLEN>(reg_ident, field_name);
         const XLEN field_lsb = csr_bit_range.first;
         const XLEN field_msb = csr_bit_range.second;
         const XLEN max_msb = std::is_same_v<XLEN, RV64> ? 63 : 31;
@@ -551,13 +556,13 @@ namespace atlas
     }
 
     template <typename XLEN>
-    static inline void WRITE_CSR_FIELD(AtlasState* state, uint32_t reg_ident,
+    static inline void WRITE_CSR_FIELD(PegasusState* state, uint32_t reg_ident,
                                        const char* field_name, uint64_t field_value)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
         XLEN csr_value = READ_CSR_REG<XLEN>(state, reg_ident);
 
-        const auto & csr_bit_range = atlas::getCsrBitRange<XLEN>(reg_ident, field_name);
+        const auto & csr_bit_range = pegasus::getCsrBitRange<XLEN>(reg_ident, field_name);
         const XLEN field_lsb = csr_bit_range.first;
         const XLEN field_msb = csr_bit_range.second;
         const XLEN max_msb = std::is_same_v<XLEN, RV64> ? 63 : 31;
@@ -579,13 +584,13 @@ namespace atlas
     }
 
     template <typename XLEN>
-    static inline void POKE_CSR_FIELD(AtlasState* state, uint32_t reg_ident, const char* field_name,
-                                      uint64_t field_value)
+    static inline void POKE_CSR_FIELD(PegasusState* state, uint32_t reg_ident,
+                                      const char* field_name, uint64_t field_value)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
         XLEN csr_value = READ_CSR_REG<XLEN>(state, reg_ident);
 
-        const auto & csr_bit_range = atlas::getCsrBitRange<XLEN>(reg_ident, field_name);
+        const auto & csr_bit_range = pegasus::getCsrBitRange<XLEN>(reg_ident, field_name);
         const XLEN field_lsb = csr_bit_range.first;
         const XLEN field_msb = csr_bit_range.second;
         const XLEN max_msb = std::is_same_v<XLEN, RV64> ? 63 : 31;
@@ -605,4 +610,4 @@ namespace atlas
             POKE_CSR_REG<XLEN>(state, reg_ident, csr_value);
         }
     }
-} // namespace atlas
+} // namespace pegasus

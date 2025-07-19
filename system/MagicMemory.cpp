@@ -1,26 +1,26 @@
 #include "system/MagicMemory.hpp"
-#include "system/AtlasSystem.hpp"
-#include "core/AtlasState.hpp"
+#include "system/PegasusSystem.hpp"
+#include "core/PegasusState.hpp"
 #include "sparta/utils/LogUtils.hpp"
 
-namespace atlas
+namespace pegasus
 {
     MagicMemory::MagicMemory(sparta::TreeNode* node, const MagicMemoryParameters* params) :
         sparta::Unit(node),
-        sparta::memory::BlockingMemoryIF("Magic Memory", AtlasSystem::ATLAS_SYSTEM_BLOCK_SIZE,
+        sparta::memory::BlockingMemoryIF("Magic Memory", PegasusSystem::PEGASUS_SYSTEM_BLOCK_SIZE,
                                          {0, params->size, "magic_memory"}, nullptr),
         base_addr_(params->base_addr),
         tohost_addr_(params->tohost_addr),
         fromhost_addr_(params->fromhost_addr),
         size_(params->size),
-        memory_(node, AtlasSystem::ATLAS_SYSTEM_BLOCK_SIZE, size_, 0)
+        memory_(node, PegasusSystem::PEGASUS_SYSTEM_BLOCK_SIZE, size_, 0)
     {
     }
 
     void MagicMemory::onBindTreeEarly_()
     {
         auto core_tn = getContainer()->getRoot()->getChildAs<sparta::ResourceTreeNode>("core0");
-        state_ = core_tn->getResourceAs<AtlasState>();
+        state_ = core_tn->getResourceAs<PegasusState>();
     }
 
     bool MagicMemory::tryRead_(sparta::memory::addr_t addr, sparta::memory::addr_t size,
@@ -114,4 +114,4 @@ namespace atlas
         }
     }
 
-} // namespace atlas
+} // namespace pegasus

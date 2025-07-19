@@ -1,19 +1,19 @@
 #pragma once
 
-#include "include/AtlasTypes.hpp"
-#include "include/AtlasUtils.hpp"
+#include "include/PegasusTypes.hpp"
+#include "include/PegasusUtils.hpp"
 #include "mavis/OpcodeInfo.h"
 
 #include <vector>
 #include <algorithm>
 #include <iomanip>
 
-namespace atlas
+namespace pegasus
 {
     class CoSimObserver;
 }
 
-namespace atlas::cosim
+namespace pegasus::cosim
 {
     /*!
      * \class Event
@@ -24,7 +24,7 @@ namespace atlas::cosim
      * instruction execution, interrupts, injected behaviors and register/memory writes.
      *
      * The Event class supports copy construction and assignment, and it provides friend access
-     * to the atlas::CoSimObserver class for detailed observation of events.
+     * to the pegasus::CoSimObserver class for detailed observation of events.
      */
     class Event
     {
@@ -244,7 +244,7 @@ namespace atlas::cosim
         OpcodeSize opcode_size_ =
             std::numeric_limits<OpcodeSize>::max(); //!< Opcode size for instruction Events
 
-        // Atlas instruction type
+        // Pegasus instruction type
         InstType inst_type_ = InstType::INVALID; //!< Instruction type for instruction Events
 
         // PC
@@ -299,32 +299,32 @@ namespace atlas::cosim
         //! @}
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        friend class atlas::CoSimObserver;
+        friend class pegasus::CoSimObserver;
     };
 
     inline std::ostream & operator<<(std::ostream & os, const Event::Type & type)
     {
         switch (type)
         {
-            case atlas::cosim::Event::Type::INSTRUCTION:
+            case pegasus::cosim::Event::Type::INSTRUCTION:
                 os << "INSTRUCTION";
                 break;
-            case atlas::cosim::Event::Type::INTERRUPT:
+            case pegasus::cosim::Event::Type::INTERRUPT:
                 os << "INTERRUPT";
                 break;
-            case atlas::cosim::Event::Type::INJECTED_INSTRUCTION:
+            case pegasus::cosim::Event::Type::INJECTED_INSTRUCTION:
                 os << "INJECTED_INSTRUCTION";
                 break;
-            case atlas::cosim::Event::Type::INJECTED_INTERRUPT:
+            case pegasus::cosim::Event::Type::INJECTED_INTERRUPT:
                 os << "INJECTED_INTERRUPT";
                 break;
-            case atlas::cosim::Event::Type::REGISTER_WRITE:
+            case pegasus::cosim::Event::Type::REGISTER_WRITE:
                 os << "REGISTER_WRITE";
                 break;
-            case atlas::cosim::Event::Type::MEMORY_WRITE:
+            case pegasus::cosim::Event::Type::MEMORY_WRITE:
                 os << "MEMORY_WRITE";
                 break;
-            case atlas::cosim::Event::Type::INVALID:
+            case pegasus::cosim::Event::Type::INVALID:
                 os << "INVALID";
                 break;
             default:
@@ -416,4 +416,4 @@ namespace atlas::cosim
         }
         return os;
     }
-} // namespace atlas::cosim
+} // namespace pegasus::cosim

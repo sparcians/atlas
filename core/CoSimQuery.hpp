@@ -1,15 +1,15 @@
 #pragma once
 
-namespace atlas
+namespace pegasus
 {
 
     // This base class is used to query the expected register values from the
     // attached co-simulation e.g. Imperas, Spike, etc.
     //
     // It is used to optionally add expected input/output values to each instruction
-    // for Python implementations' quick evaluation in the Atlas IDE.
+    // for Python implementations' quick evaluation in the Pegasus IDE.
     //
-    // Subclasses could be found external to the core Atlas codebase, such as
+    // Subclasses could be found external to the core Pegasus codebase, such as
     // a separate repo of yours that has a license to Imperas.
     class CoSimQuery
     {
@@ -31,4 +31,4 @@ namespace atlas
         virtual uint64_t getExpectedPC(uint64_t hart) const = 0;
     };
 
-} // namespace atlas
+} // namespace pegasus

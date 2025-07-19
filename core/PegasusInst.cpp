@@ -1,7 +1,7 @@
-#include "core/AtlasInst.hpp"
-#include "core/AtlasState.hpp"
+#include "core/PegasusInst.hpp"
+#include "core/PegasusState.hpp"
 
-namespace atlas
+namespace pegasus
 {
 
     template <mavis::InstMetaData::OperandFieldID OperandFieldId>
@@ -23,7 +23,7 @@ namespace atlas
         }
     }
 
-    sparta::Register* getSpartaReg(AtlasState* state, const mavis::OperandInfo::Element* operand)
+    sparta::Register* getSpartaReg(PegasusState* state, const mavis::OperandInfo::Element* operand)
     {
         if (operand)
         {
@@ -53,8 +53,8 @@ namespace atlas
                    : opcode_info->getImmediate();
     }
 
-    AtlasInst::AtlasInst(const mavis::OpcodeInfo::PtrType & opcode_info,
-                         const AtlasExtractorPtr & extractor_info, AtlasState* state) :
+    PegasusInst::PegasusInst(const mavis::OpcodeInfo::PtrType & opcode_info,
+                             const PegasusExtractorPtr & extractor_info, PegasusState* state) :
         opcode_info_(opcode_info),
         extractor_info_(extractor_info),
         opcode_size_(((getOpcode() & 0x3) != 0x3) ? 2 : 4),
@@ -79,21 +79,21 @@ namespace atlas
     {
     }
 
-    bool AtlasInst::writesCsr() const
+    bool PegasusInst::writesCsr() const
     {
         switch (getMavisUid())
         {
             // csrrw/csrrwi always writes
-            case AtlasState::MavisUIDs::MAVIS_UID_CSRRW:
-            case AtlasState::MavisUIDs::MAVIS_UID_CSRRWI:
+            case PegasusState::MavisUIDs::MAVIS_UID_CSRRW:
+            case PegasusState::MavisUIDs::MAVIS_UID_CSRRWI:
                 return true;
             // csrrs/csrrc write if rs1 != 0
-            case AtlasState::MavisUIDs::MAVIS_UID_CSRRS:
-            case AtlasState::MavisUIDs::MAVIS_UID_CSRRC:
+            case PegasusState::MavisUIDs::MAVIS_UID_CSRRS:
+            case PegasusState::MavisUIDs::MAVIS_UID_CSRRC:
                 return rs1_info_ && (rs1_info_->field_value != 0);
             // csrrsi/csrrci writes if imm != 0
-            case AtlasState::MavisUIDs::MAVIS_UID_CSRRSI:
-            case AtlasState::MavisUIDs::MAVIS_UID_CSRRCI:
+            case PegasusState::MavisUIDs::MAVIS_UID_CSRRSI:
+            case PegasusState::MavisUIDs::MAVIS_UID_CSRRCI:
                 return getImmediate() != 0;
             default:
                 sparta_assert(hasCsr() == false, "Unknown instruction with CSR: " << *this);
@@ -101,16 +101,16 @@ namespace atlas
         }
     }
 
-    std::ostream & operator<<(std::ostream & os, const AtlasInst & inst)
+    std::ostream & operator<<(std::ostream & os, const PegasusInst & inst)
     {
         os << "uid: " << std::dec << inst.uid_ << " " << inst.dasmString() << " "
            << inst.inst_action_group_;
         return os;
     }
 
-    std::ostream & operator<<(std::ostream & os, const AtlasInstPtr & inst)
+    std::ostream & operator<<(std::ostream & os, const PegasusInstPtr & inst)
     {
         os << *inst;
         return os;
     }
-} // namespace atlas
+} // namespace pegasus

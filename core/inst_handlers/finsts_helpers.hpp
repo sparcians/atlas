@@ -3,7 +3,7 @@
 #include <utility>
 #include <tuple>
 
-#include "core/AtlasState.hpp"
+#include "core/PegasusState.hpp"
 
 extern "C"
 {
@@ -11,9 +11,9 @@ extern "C"
 #include "source/include/internals.h"
 }
 
-namespace atlas
+namespace pegasus
 {
-    template <typename XLEN> void updateFloatCsrs(AtlasState* state)
+    template <typename XLEN> void updateFloatCsrs(PegasusState* state)
     {
         XLEN mask = 0;
         XLEN value = 0;
@@ -292,4 +292,4 @@ namespace atlas
             return r.v;
         }
     };
-} // namespace atlas
+} // namespace pegasus

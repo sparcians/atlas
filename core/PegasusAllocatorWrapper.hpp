@@ -2,18 +2,18 @@
 
 #include "sparta/utils/SpartaSharedPointerAllocator.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    template <typename AllocatorT> class AtlasInstAllocatorWrapper
+    template <typename AllocatorT> class PegasusInstAllocatorWrapper
     {
       public:
-        ~AtlasInstAllocatorWrapper()
+        ~PegasusInstAllocatorWrapper()
         {
-            std::cout << "AtlasInstAllocatorWrapper: " << allocator_.getNumAllocated()
+            std::cout << "PegasusInstAllocatorWrapper: " << allocator_.getNumAllocated()
                       << " objects allocated/created" << std::endl;
         }
 
-        explicit AtlasInstAllocatorWrapper(AllocatorT & allocator) : allocator_(allocator) {}
+        explicit PegasusInstAllocatorWrapper(AllocatorT & allocator) : allocator_(allocator) {}
 
         // Used by Mavis for the type allocated
         using InstTypePtr = sparta::SpartaSharedPointer<typename AllocatorT::element_type>;
@@ -29,16 +29,16 @@ namespace atlas
         AllocatorT & allocator_;
     };
 
-    template <typename AllocatorT> class AtlasExtractorAllocatorWrapper
+    template <typename AllocatorT> class PegasusExtractorAllocatorWrapper
     {
       public:
-        ~AtlasExtractorAllocatorWrapper()
+        ~PegasusExtractorAllocatorWrapper()
         {
-            std::cout << "AtlasExtractorAllocatorWrapper: " << allocator_.getNumAllocated()
+            std::cout << "PegasusExtractorAllocatorWrapper: " << allocator_.getNumAllocated()
                       << " objects allocated/created" << std::endl;
         }
 
-        AtlasExtractorAllocatorWrapper(AllocatorT & allocator, AtlasState* state) :
+        PegasusExtractorAllocatorWrapper(AllocatorT & allocator, PegasusState* state) :
             allocator_(allocator),
             state_(state)
         {
@@ -56,6 +56,6 @@ namespace atlas
 
       private:
         AllocatorT & allocator_;
-        AtlasState* state_ = nullptr;
+        PegasusState* state_ = nullptr;
     };
-} // namespace atlas
+} // namespace pegasus

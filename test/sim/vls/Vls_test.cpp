@@ -3,7 +3,7 @@
 #include "sparta/utils/SpartaTester.hpp"
 #include "mavis/Mavis.h"
 
-class VlsInstructionTester : public AtlasInstructionTester
+class VlsInstructionTester : public PegasusInstructionTester
 {
 
   public:
@@ -14,9 +14,9 @@ class VlsInstructionTester : public AtlasInstructionTester
 
     void testVle8()
     {
-        atlas::AtlasState* state = getAtlasState();
+        pegasus::PegasusState* state = getPegasusState();
         const uint64_t pc = 0x1000;
-        const atlas::Addr addr = 0x2000;
+        const pegasus::Addr addr = 0x2000;
         const uint64_t v1_val = 0x0807060504030201;
         const uint32_t vd = 1, rs1 = 1;
 
@@ -33,17 +33,17 @@ class VlsInstructionTester : public AtlasInstructionTester
         {
             EXPECT_EQUAL(vd_val[i], reinterpret_cast<const uint8_t*>(&v1_val)[i]);
         }
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 1);
     }
 
     void testVlse8()
     {
-        atlas::AtlasState* state = getAtlasState();
+        pegasus::PegasusState* state = getPegasusState();
         const uint64_t pc = 0x1000;
-        const atlas::Addr addr = 0x2000;
-        const atlas::Addr stride = 0x10; // 16-byte stride
+        const pegasus::Addr addr = 0x2000;
+        const pegasus::Addr stride = 0x10; // 16-byte stride
         const uint32_t vd = 1, rs1 = 1, rs2 = 2;
         VLEN vd_val;
 
@@ -64,16 +64,16 @@ class VlsInstructionTester : public AtlasInstructionTester
         {
             EXPECT_EQUAL(vd_val[i], i);
         }
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 2);
     }
 
     void testVloxei8()
     {
-        atlas::AtlasState* state = getAtlasState();
+        pegasus::PegasusState* state = getPegasusState();
         const uint64_t pc = 0x1000;
-        const atlas::Addr addr = 0x2000;
+        const pegasus::Addr addr = 0x2000;
         const uint32_t vd = 1, rs1 = 1, vs2 = 3;
         const VLEN vs2_val = {0, 2, 4, 6, 8, 10, 12, 14};
         VLEN vd_val1, vd_val2;
@@ -102,7 +102,7 @@ class VlsInstructionTester : public AtlasInstructionTester
         {
             EXPECT_EQUAL(reinterpret_cast<uint16_t*>(&vd_val2)[i], i + 4);
         }
-        const atlas::AtlasState::SimState* sim_state = state->getSimState();
+        const pegasus::PegasusState::SimState* sim_state = state->getSimState();
         std::cout << sim_state->current_inst << std::endl;
         EXPECT_EQUAL(sim_state->inst_count, 3);
     }
@@ -180,7 +180,7 @@ class VlsInstructionTester : public AtlasInstructionTester
     }
 
   private:
-    atlas::AtlasInst::PtrType instPtr_ = nullptr;
+    pegasus::PegasusInst::PtrType instPtr_ = nullptr;
 };
 
 int main()

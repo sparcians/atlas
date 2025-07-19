@@ -5,7 +5,7 @@
 
 #include "sparta/utils/SpartaAssert.hpp"
 
-namespace atlas
+namespace pegasus
 {
     class CoSimObserver : public Observer
     {
@@ -27,10 +27,10 @@ namespace atlas
         }
 
       private:
-        void preExecute_(AtlasState*) override;
-        void postExecute_(AtlasState*) override;
+        void preExecute_(PegasusState*) override;
+        void postExecute_(PegasusState*) override;
 
         uint64_t event_uid_ = 0;
         cosim::Event last_event_ = cosim::Event(event_uid_, cosim::Event::Type::INSTRUCTION);
     };
-} // namespace atlas
+} // namespace pegasus

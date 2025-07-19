@@ -37,16 +37,16 @@ fi
 rm install.log
 
 cd ${GITHUB_WORKSPACE}
-mkdir $ATLAS_BUILD_TYPE
-cd $ATLAS_BUILD_TYPE
-CC=$COMPILER CXX=$CXX_COMPILER cmake .. -DCMAKE_BUILD_TYPE=$ATLAS_BUILD_TYPE
+mkdir $PEGASUS_BUILD_TYPE
+cd $PEGASUS_BUILD_TYPE
+CC=$COMPILER CXX=$CXX_COMPILER cmake .. -DCMAKE_BUILD_TYPE=$PEGASUS_BUILD_TYPE
 if [ $? -ne 0 ]; then
-    echo "ERROR: CMake for atlas failed"
+    echo "ERROR: CMake for pegasus failed"
     exit 1
 fi
 make clangformat-check
-BUILD_ATLAS=$?
-if [ ${BUILD_ATLAS} -ne 0 ]; then
-    echo "ERROR: clangformat check of Atlas FAILED!!!"
+BUILD_PEGASUS=$?
+if [ ${BUILD_PEGASUS} -ne 0 ]; then
+    echo "ERROR: clangformat check of Pegasus FAILED!!!"
     exit 1
 fi

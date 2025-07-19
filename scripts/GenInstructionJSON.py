@@ -96,7 +96,7 @@ class InstJSONGenerator():
             os.makedirs(self.xlen_str)
 
         for ext in self.extensions:
-            filename = self.xlen_str + "/atlas_uarch_" + self.xlen_str + ext.lower() + ".json"
+            filename = self.xlen_str + "/pegasus_uarch_" + self.xlen_str + ext.lower() + ".json"
             with open(filename,"w") as fh:
                 json.dump(self.isa_map[ext], fh, indent=4)
 
@@ -108,8 +108,8 @@ def main():
         print(USAGE_STR)
         return
 
-    atlas_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    arch_root = os.path.join(atlas_root, 'arch')
+    pegasus_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    arch_root = os.path.join(pegasus_root, 'arch')
 
     os.chdir(arch_root)
 

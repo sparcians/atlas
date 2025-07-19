@@ -2,10 +2,10 @@
 
 #include "sparta/functional/RegisterSet.hpp"
 #include "arch/RegisterDefnsJSON.hpp"
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 #include "include/CSRBitMasks64.hpp"
 
-namespace atlas
+namespace pegasus
 {
     inline RegId getRegId(const sparta::Register* reg)
     {
@@ -141,4 +141,4 @@ namespace atlas
         std::unordered_map<std::string, sparta::Register*> registers_by_name_;
     };
 
-} // namespace atlas
+} // namespace pegasus

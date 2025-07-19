@@ -1,39 +1,39 @@
-#include "sim/AtlasSim.hpp"
+#include "sim/PegasusSim.hpp"
 
-#include "core/AtlasState.hpp"
+#include "core/PegasusState.hpp"
 #include "core/translate/PageTable.hpp"
 
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 #include "include/CSRNums.hpp"
 
 #include <bitset>
 #include "sparta/utils/SpartaTester.hpp"
 
-class AtlasTranslateTester
+class PegasusTranslateTester
 {
 
   public:
-    AtlasTranslateTester()
+    PegasusTranslateTester()
     {
         // Create the simulator
         const uint64_t ilimit = 0;
-        atlas_sim_.reset(new atlas::AtlasSim(&scheduler_, {}, {}, ilimit));
+        pegasus_sim_.reset(new pegasus::PegasusSim(&scheduler_, {}, {}, ilimit));
 
-        atlas_sim_->buildTree();
-        atlas_sim_->configureTree();
-        atlas_sim_->finalizeTree();
+        pegasus_sim_->buildTree();
+        pegasus_sim_->configureTree();
+        pegasus_sim_->finalizeTree();
 
-        state_ = atlas_sim_->getAtlasState();
+        state_ = pegasus_sim_->getPegasusState();
         translate_unit_ = state_->getTranslateUnit();
     }
 
-    void testAtlasTranslationStateBasic()
+    void testPegasusTranslationStateBasic()
     {
-        std::cout << "Testing AtlasTranslationState class -- basic" << std::endl;
-        const atlas::Addr vaddr = 0x1000;
+        std::cout << "Testing PegasusTranslationState class -- basic" << std::endl;
+        const pegasus::Addr vaddr = 0x1000;
         const size_t access_size = 4;
 
-        atlas::AtlasTranslationState* translation_state = state_->getFetchTranslationState();
+        pegasus::PegasusTranslationState* translation_state = state_->getFetchTranslationState();
 
         // Requests and results should be invalid and throw an exception
         EXPECT_THROW(translation_state->getRequest());
@@ -70,7 +70,7 @@ class AtlasTranslateTester
         EXPECT_EQUAL(translation_state->getNumResults(), 1);
 
         // Get result
-        const atlas::AtlasTranslationState::TranslationResult & result =
+        const pegasus::PegasusTranslationState::TranslationResult & result =
             translation_state->getResult();
         EXPECT_TRUE(result.isValid());
         EXPECT_EQUAL(result.getPAddr(), vaddr | 0x80000000);
@@ -91,16 +91,16 @@ class AtlasTranslateTester
         EXPECT_THROW(translation_state->popResult());
     }
 
-    void testAtlasTranslationStateMisaligned()
+    void testPegasusTranslationStateMisaligned()
     {
-        std::cout << "Testing AtlasTranslationState class -- misaligned" << std::endl;
-        atlas::AtlasTranslationState* translation_state = state_->getFetchTranslationState();
+        std::cout << "Testing PegasusTranslationState class -- misaligned" << std::endl;
+        pegasus::PegasusTranslationState* translation_state = state_->getFetchTranslationState();
 
         // Make a request and mark it as misaligned
-        const atlas::Addr vaddr = 0xffe;
+        const pegasus::Addr vaddr = 0xffe;
         const size_t access_size = 4;
         translation_state->makeRequest(vaddr, access_size);
-        atlas::AtlasTranslationState::TranslationRequest & request =
+        pegasus::PegasusTranslationState::TranslationRequest & request =
             translation_state->getRequest();
         request.setMisaligned(2);
 
@@ -123,10 +123,10 @@ class AtlasTranslateTester
         translation_state->popResult();
     }
 
-    void testAtlasTranslationStateMultiple()
+    void testPegasusTranslationStateMultiple()
     {
-        std::cout << "Testing AtlasTranslationState class -- multiple" << std::endl;
-        atlas::AtlasTranslationState* translation_state = state_->getFetchTranslationState();
+        std::cout << "Testing PegasusTranslationState class -- multiple" << std::endl;
+        pegasus::PegasusTranslationState* translation_state = state_->getFetchTranslationState();
 
         // Make multiple requests
         const uint64_t base_vaddr = 0x1000;
@@ -145,7 +145,7 @@ class AtlasTranslateTester
         // Handle requests
         for (uint64_t num = 0; num < num_requests; num++)
         {
-            const atlas::AtlasTranslationState::TranslationRequest & request =
+            const pegasus::PegasusTranslationState::TranslationRequest & request =
                 translation_state->getRequest();
             const uint64_t paddr = request.getVAddr() | 0x80000000;
             translation_state->setResult(request.getVAddr(), paddr, request.getSize());
@@ -161,7 +161,7 @@ class AtlasTranslateTester
         // Get Results
         for (uint64_t num = 0; num < num_requests; num++)
         {
-            const atlas::AtlasTranslationState::TranslationResult & result =
+            const pegasus::PegasusTranslationState::TranslationResult & result =
                 translation_state->getResult();
             std::cout << "Getting result: 0x" << std::hex << result.getPAddr() << std::endl;
             translation_state->popResult();
@@ -187,20 +187,20 @@ class AtlasTranslateTester
             const uint32_t rsw = 2;
             const uint32_t ppn0 = 123;
             const uint32_t ppn1 = 456;
-            const uint32_t pte_val = (ppn1 << atlas::translate_types::Sv32::PteFields::ppn1.lsb)
-                                     | (ppn0 << atlas::translate_types::Sv32::PteFields::ppn0.lsb)
-                                     | (rsw << atlas::translate_types::Sv32::PteFields::rsw.lsb)
-                                     | (d << atlas::translate_types::Sv32::PteFields::dirty.lsb)
-                                     | (a << atlas::translate_types::Sv32::PteFields::accessed.lsb)
-                                     | (g << atlas::translate_types::Sv32::PteFields::global.lsb)
-                                     | (u << atlas::translate_types::Sv32::PteFields::user.lsb)
-                                     | (x << atlas::translate_types::Sv32::PteFields::execute.lsb)
-                                     | (w << atlas::translate_types::Sv32::PteFields::write.lsb)
-                                     | (r << atlas::translate_types::Sv32::PteFields::read.lsb)
-                                     | (v);
+            const uint32_t pte_val =
+                (ppn1 << pegasus::translate_types::Sv32::PteFields::ppn1.lsb)
+                | (ppn0 << pegasus::translate_types::Sv32::PteFields::ppn0.lsb)
+                | (rsw << pegasus::translate_types::Sv32::PteFields::rsw.lsb)
+                | (d << pegasus::translate_types::Sv32::PteFields::dirty.lsb)
+                | (a << pegasus::translate_types::Sv32::PteFields::accessed.lsb)
+                | (g << pegasus::translate_types::Sv32::PteFields::global.lsb)
+                | (u << pegasus::translate_types::Sv32::PteFields::user.lsb)
+                | (x << pegasus::translate_types::Sv32::PteFields::execute.lsb)
+                | (w << pegasus::translate_types::Sv32::PteFields::write.lsb)
+                | (r << pegasus::translate_types::Sv32::PteFields::read.lsb) | (v);
 
             std::cout << "Creating sv32 PTE: " << HEX8(pte_val) << std::endl;
-            atlas::PageTableEntry<atlas::RV32, atlas::MMUMode::SV32> sv32_pte(pte_val);
+            pegasus::PageTableEntry<pegasus::RV32, pegasus::MMUMode::SV32> sv32_pte(pte_val);
 
             EXPECT_TRUE(sv32_pte.isValid());
             EXPECT_TRUE(sv32_pte.canRead());
@@ -228,21 +228,21 @@ class AtlasTranslateTester
             const uint64_t ppn0 = 123;
             const uint64_t ppn1 = 456;
             const uint64_t ppn2 = 789;
-            const uint64_t pte_val = (ppn2 << atlas::translate_types::Sv39::PteFields::ppn2.lsb)
-                                     | (ppn1 << atlas::translate_types::Sv39::PteFields::ppn1.lsb)
-                                     | (ppn0 << atlas::translate_types::Sv39::PteFields::ppn0.lsb)
-                                     | (rsw << atlas::translate_types::Sv39::PteFields::rsw.lsb)
-                                     | (d << atlas::translate_types::Sv39::PteFields::dirty.lsb)
-                                     | (a << atlas::translate_types::Sv39::PteFields::accessed.lsb)
-                                     | (g << atlas::translate_types::Sv39::PteFields::global.lsb)
-                                     | (u << atlas::translate_types::Sv39::PteFields::user.lsb)
-                                     | (x << atlas::translate_types::Sv39::PteFields::execute.lsb)
-                                     | (w << atlas::translate_types::Sv39::PteFields::write.lsb)
-                                     | (r << atlas::translate_types::Sv39::PteFields::read.lsb)
-                                     | (v);
+            const uint64_t pte_val =
+                (ppn2 << pegasus::translate_types::Sv39::PteFields::ppn2.lsb)
+                | (ppn1 << pegasus::translate_types::Sv39::PteFields::ppn1.lsb)
+                | (ppn0 << pegasus::translate_types::Sv39::PteFields::ppn0.lsb)
+                | (rsw << pegasus::translate_types::Sv39::PteFields::rsw.lsb)
+                | (d << pegasus::translate_types::Sv39::PteFields::dirty.lsb)
+                | (a << pegasus::translate_types::Sv39::PteFields::accessed.lsb)
+                | (g << pegasus::translate_types::Sv39::PteFields::global.lsb)
+                | (u << pegasus::translate_types::Sv39::PteFields::user.lsb)
+                | (x << pegasus::translate_types::Sv39::PteFields::execute.lsb)
+                | (w << pegasus::translate_types::Sv39::PteFields::write.lsb)
+                | (r << pegasus::translate_types::Sv39::PteFields::read.lsb) | (v);
 
             std::cout << "Creating sv64 PTE: " << HEX16(pte_val) << std::endl;
-            atlas::PageTableEntry<atlas::RV64, atlas::MMUMode::SV39> sv39_pte(pte_val);
+            pegasus::PageTableEntry<pegasus::RV64, pegasus::MMUMode::SV39> sv39_pte(pte_val);
 
             EXPECT_TRUE(sv39_pte.isValid());
             EXPECT_TRUE(sv39_pte.canRead());
@@ -262,18 +262,18 @@ class AtlasTranslateTester
     void testPageTable() // unit test for PageTable.cpp
     {
         std::cout << "\nTesting PageTable class" << std::endl;
-        constexpr uint32_t PTE_SIZE = sizeof(atlas::RV32);
+        constexpr uint32_t PTE_SIZE = sizeof(pegasus::RV32);
         const uint32_t base_addr = 0x1000;
-        atlas::PageTable<atlas::RV32, atlas::MMUMode::SV32> pt(base_addr);
+        pegasus::PageTable<pegasus::RV32, pegasus::MMUMode::SV32> pt(base_addr);
 
         // Valid, Readable, Writable, and Executable (0000 1010 1011 1100 0001 0010 1111 0000 1111)
-        atlas::PageTableEntry<atlas::RV32, atlas::MMUMode::SV32> sv32_pte1(0x7B1EEFF);
+        pegasus::PageTableEntry<pegasus::RV32, pegasus::MMUMode::SV32> sv32_pte1(0x7B1EEFF);
         // Valid, Readable, Writable, and Executable (0000 1010 1011 1100 0001 0010 1111 0000 1111)
-        atlas::PageTableEntry<atlas::RV32, atlas::MMUMode::SV32> sv32_pte2(0xABC12FF);
+        pegasus::PageTableEntry<pegasus::RV32, pegasus::MMUMode::SV32> sv32_pte2(0xABC12FF);
         // Valid, Read-only (0111 1111 0000 0011 1101 0100 1100 0011)
-        atlas::PageTableEntry<atlas::RV32, atlas::MMUMode::SV32> sv32_pte3(0x7F03D4C3);
+        pegasus::PageTableEntry<pegasus::RV32, pegasus::MMUMode::SV32> sv32_pte3(0x7F03D4C3);
         // Valid,
-        atlas::PageTableEntry<atlas::RV32, atlas::MMUMode::SV32> sv32_pte4(0xABC12FF);
+        pegasus::PageTableEntry<pegasus::RV32, pegasus::MMUMode::SV32> sv32_pte4(0xABC12FF);
 
         std::cout << "Creating page table with 4 PTEs:" << std::endl;
         std::cout << "    PTE1: " << sv32_pte1 << std::endl;
@@ -332,8 +332,8 @@ class AtlasTranslateTester
         std::cout << "Testing baremetal translation\n" << std::endl;
 
         // Make translation request
-        atlas::AtlasTranslationState* translation_state = state_->getFetchTranslationState();
-        const atlas::Addr vaddr = 0x1000;
+        pegasus::PegasusTranslationState* translation_state = state_->getFetchTranslationState();
+        const pegasus::Addr vaddr = 0x1000;
         const uint32_t access_size = 4;
         std::cout << "Translation request:" << std::endl;
         std::cout << "    VA: 0x" << std::hex << vaddr;
@@ -341,13 +341,13 @@ class AtlasTranslateTester
         translation_state->makeRequest(vaddr, access_size);
 
         // Execute translation
-        atlas::Action::ItrType dummy_action_it;
-        dummy_action_it = translate_unit_->translate_<atlas::RV64, atlas::MMUMode::BAREMETAL,
-                                                      atlas::Translate::AccessType::INSTRUCTION>(
+        pegasus::Action::ItrType dummy_action_it;
+        dummy_action_it = translate_unit_->translate_<pegasus::RV64, pegasus::MMUMode::BAREMETAL,
+                                                      pegasus::Translate::AccessType::INSTRUCTION>(
             state_, dummy_action_it);
 
         // Get translation result
-        const atlas::AtlasTranslationState::TranslationResult & result =
+        const pegasus::PegasusTranslationState::TranslationResult & result =
             translation_state->getResult();
         std::cout << "Translation result:" << std::endl;
         std::cout << "    PA: 0x" << std::hex << result.getPAddr();
@@ -364,7 +364,7 @@ class AtlasTranslateTester
     {
         std::cout << "Testing sv32 translation\n" << std::endl;
 
-        state_->setPrivMode(atlas::PrivMode::SUPERVISOR, true);
+        state_->setPrivMode(pegasus::PrivMode::SUPERVISOR, true);
 
         const uint32_t vaddr = 0x143FFABC;
         const uint32_t page_offset = vaddr & 0xFFF;
@@ -373,8 +373,8 @@ class AtlasTranslateTester
         // First-level page table
         uint32_t satp_ppn = 0x10;
         const uint32_t lvl1_base_paddr = satp_ppn << 12; // 0x10000
-        atlas::PageTable<atlas::RV32, atlas::MMUMode::SV32> lvl1_pagetable(lvl1_base_paddr);
-        atlas::PageTableEntry<atlas::RV32, atlas::MMUMode::SV32> lvl1_pte{0x8031};
+        pegasus::PageTable<pegasus::RV32, pegasus::MMUMode::SV32> lvl1_pagetable(lvl1_base_paddr);
+        pegasus::PageTableEntry<pegasus::RV32, pegasus::MMUMode::SV32> lvl1_pte{0x8031};
         const uint32_t lvl1_index = (vaddr & 0xFFC00000) >> 22;
         const uint32_t lvl1_paddr = lvl1_pagetable.getAddrOfIndex(lvl1_index);
         std::cout << "Loading Level 1 PTE at address 0x" << std::hex << lvl1_paddr
@@ -384,8 +384,8 @@ class AtlasTranslateTester
 
         // Second-level page table
         const uint32_t lvl2_base_paddr = 0x20000;
-        atlas::PageTable<atlas::RV32, atlas::MMUMode::SV32> lvl2_pagetable(lvl2_base_paddr);
-        atlas::PageTableEntry<atlas::RV32, atlas::MMUMode::SV32> lvl2_pte{0x8000002f};
+        pegasus::PageTable<pegasus::RV32, pegasus::MMUMode::SV32> lvl2_pagetable(lvl2_base_paddr);
+        pegasus::PageTableEntry<pegasus::RV32, pegasus::MMUMode::SV32> lvl2_pte{0x8000002f};
         lvl2_pte.setAccessed();
         const uint32_t lvl2_index = (vaddr & 0x3FF000) >> 12;
         const uint32_t lvl2_paddr = lvl2_pagetable.getAddrOfIndex(lvl2_index);
@@ -396,14 +396,14 @@ class AtlasTranslateTester
         std::cout << std::endl;
 
         // Set SATP value
-        state_->getCsrRegister(atlas::CSR::SATP::reg_num)->dmiWrite<uint64_t>(satp_ppn);
+        state_->getCsrRegister(pegasus::CSR::SATP::reg_num)->dmiWrite<uint64_t>(satp_ppn);
 
         // Write PTEs to memory
         state_->writeMemory<uint32_t>(lvl1_paddr, lvl1_pte.getPte());
         state_->writeMemory<uint32_t>(lvl2_paddr, lvl2_pte.getPte());
 
         // Make translation request
-        atlas::AtlasTranslationState* translation_state = state_->getFetchTranslationState();
+        pegasus::PegasusTranslationState* translation_state = state_->getFetchTranslationState();
         const size_t access_size = 4;
         translation_state->makeRequest(vaddr, access_size);
         std::cout << "Translation request:" << std::endl;
@@ -411,13 +411,13 @@ class AtlasTranslateTester
         std::cout << ", Access size: " << std::dec << access_size << std::endl;
 
         // Translate!
-        atlas::Action::ItrType dummy_action_it;
-        dummy_action_it = translate_unit_->translate_<atlas::RV32, atlas::MMUMode::SV32,
-                                                      atlas::Translate::AccessType::INSTRUCTION>(
+        pegasus::Action::ItrType dummy_action_it;
+        dummy_action_it = translate_unit_->translate_<pegasus::RV32, pegasus::MMUMode::SV32,
+                                                      pegasus::Translate::AccessType::INSTRUCTION>(
             state_, dummy_action_it);
 
         // Get translation result
-        const atlas::AtlasTranslationState::TranslationResult & result =
+        const pegasus::PegasusTranslationState::TranslationResult & result =
             translation_state->getResult();
         std::cout << "Translation result:" << std::endl;
         std::cout << "    PA: 0x" << std::hex << result.getPAddr();
@@ -432,10 +432,10 @@ class AtlasTranslateTester
 
   private:
     sparta::Scheduler scheduler_;
-    std::unique_ptr<atlas::AtlasSim> atlas_sim_;
+    std::unique_ptr<pegasus::PegasusSim> pegasus_sim_;
 
-    atlas::AtlasState* state_ = nullptr;
-    atlas::Translate* translate_unit_ = nullptr;
+    pegasus::PegasusState* state_ = nullptr;
+    pegasus::Translate* translate_unit_ = nullptr;
 };
 
 int main(int argc, char** argv)
@@ -443,11 +443,11 @@ int main(int argc, char** argv)
     (void)argc;
     (void)argv;
 
-    AtlasTranslateTester translate_tester;
+    PegasusTranslateTester translate_tester;
 
-    translate_tester.testAtlasTranslationStateBasic();
-    translate_tester.testAtlasTranslationStateMisaligned();
-    translate_tester.testAtlasTranslationStateMultiple();
+    translate_tester.testPegasusTranslationStateBasic();
+    translate_tester.testPegasusTranslationStateMisaligned();
+    translate_tester.testPegasusTranslationStateMultiple();
     // translate_tester.testPageTableEntry();
     // translate_tester.testPageTable();
 

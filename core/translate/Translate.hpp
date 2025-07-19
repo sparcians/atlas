@@ -2,18 +2,18 @@
 
 #include "core/ActionGroup.hpp"
 #include "core/translate/TranslateTypes.hpp"
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 
 #include "sparta/simulation/ParameterSet.hpp"
 #include "sparta/simulation/TreeNode.hpp"
 #include "sparta/simulation/Unit.hpp"
 
-class AtlasTranslateTester;
+class PegasusTranslateTester;
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
-    class AtlasTranslationState;
+    class PegasusState;
+    class PegasusTranslationState;
 
     class Translate : public sparta::Unit
     {
@@ -58,10 +58,10 @@ namespace atlas
         std::array<Action, N_MMU_MODES> rv32_store_translation_actions_;
 
         template <typename XLEN, MMUMode MODE, AccessType TYPE>
-        Action::ItrType translate_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType translate_(pegasus::PegasusState* state, Action::ItrType action_it);
 
         template <typename XLEN, MMUMode MODE, AccessType TYPE>
-        Action::ItrType setResult_(AtlasTranslationState* translation_state,
+        Action::ItrType setResult_(PegasusTranslationState* translation_state,
                                    Action::ItrType action_it, const Addr paddr,
                                    const uint32_t level = 1);
 
@@ -70,11 +70,11 @@ namespace atlas
                              std::array<Action, N_MMU_MODES> & xlation_actions)
         {
             Action action =
-                Action::createAction<&atlas::Translate::translate_<XLEN, MODE, TYPE>>(this, desc);
+                Action::createAction<&pegasus::Translate::translate_<XLEN, MODE, TYPE>>(this, desc);
             action.addTag(tags);
             xlation_actions[static_cast<uint32_t>(MODE)] = action;
         }
 
-        friend class ::AtlasTranslateTester;
+        friend class ::PegasusTranslateTester;
     };
-} // namespace atlas
+} // namespace pegasus

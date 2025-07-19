@@ -10,7 +10,7 @@
 #include "arch/RegisterSet.hpp"
 #include "sparta/utils/SpartaTester.hpp"
 #include "sparta/utils/Utils.hpp"
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 
 /* sparta::RegisterSet::getArchData() has been removed. Until the functionality
  * it provides have been replaced by other means, tests relying on it are not
@@ -518,8 +518,8 @@ void testFieldRegisterWrite()
 {
     RootTreeNode root;
     DummyDevice good_dummy(&root);
-    std::unique_ptr<atlas::RegisterSet> regs =
-        atlas::RegisterSet::create(&good_dummy, "fp_reg.json");
+    std::unique_ptr<pegasus::RegisterSet> regs =
+        pegasus::RegisterSet::create(&good_dummy, "fp_reg.json");
 
     regs->getRegister("fp_reg")->getField("sp")->write(1);
     regs->getRegister("fp_reg")->getField("dp")->write(1);
@@ -541,8 +541,8 @@ void testGoodRegs()
 {
     RootTreeNode root;
     DummyDevice good_dummy(&root);
-    std::unique_ptr<atlas::RegisterSet> good_regs =
-        atlas::RegisterSet::create(&good_dummy, "int_reg.json");
+    std::unique_ptr<pegasus::RegisterSet> good_regs =
+        pegasus::RegisterSet::create(&good_dummy, "int_reg.json");
     root.enterTeardown();
 }
 
@@ -575,28 +575,28 @@ void testBadRegs()
         RootTreeNode root;
         DummyDevice bad_dummy(&root);
         std::cout << sz << ", ";
-        EXPECT_THROW(atlas::RegisterSet::create(&bad_dummy, fname));
+        EXPECT_THROW(pegasus::RegisterSet::create(&bad_dummy, fname));
         root.enterTeardown();
     }
 
     {
         RootTreeNode root;
         DummyDevice bad_dummy(&root);
-        EXPECT_THROW(atlas::RegisterSet::create(&bad_dummy, "bad_group_reg1.json"));
+        EXPECT_THROW(pegasus::RegisterSet::create(&bad_dummy, "bad_group_reg1.json"));
         root.enterTeardown();
     }
 
     {
         RootTreeNode root;
         DummyDevice bad_dummy(&root);
-        EXPECT_THROW(atlas::RegisterSet::create(&bad_dummy, "bad_group_reg2.json"));
+        EXPECT_THROW(pegasus::RegisterSet::create(&bad_dummy, "bad_group_reg2.json"));
         root.enterTeardown();
     }
 
     {
         RootTreeNode root;
         DummyDevice bad_dummy(&root);
-        EXPECT_THROW(atlas::RegisterSet::create(&bad_dummy, "bad_group_reg3.json"));
+        EXPECT_THROW(pegasus::RegisterSet::create(&bad_dummy, "bad_group_reg3.json"));
         root.enterTeardown();
     }
 
@@ -607,7 +607,7 @@ void testRegFileNoThrow(const std::string & filename)
 {
     RootTreeNode root;
     DummyDevice dummy(&root);
-    EXPECT_NOTHROW(atlas::RegisterSet::create(&dummy, filename));
+    EXPECT_NOTHROW(pegasus::RegisterSet::create(&dummy, filename));
     root.enterTeardown();
 }
 

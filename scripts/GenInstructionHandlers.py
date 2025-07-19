@@ -34,10 +34,10 @@ from insts.RVZIFENCEI_INST import RV32ZIFENCEI_INST
 from insts.RVZIFENCEI_INST import RV64ZIFENCEI_INST
 
 class InstHandlerGenerator():
-    """Helper script for adding a new extension to Atlas.
+    """Helper script for adding a new extension to Pegasus.
 
     This script generates the extension class and instruction handler methods
-    required to support a new extension in Atlas. If a path to Spike is
+    required to support a new extension in Pegasus. If a path to Spike is
     provided, the script will also insert Spike's instruction handler code as
     comments into the instruction handler methods for reference.
 
@@ -73,9 +73,9 @@ class InstHandlerGenerator():
 #include <map>
 #include <string>
 
-namespace atlas
+namespace pegasus
 {{
-    class AtlasState;
+    class PegasusState;
     class Action;
     class ActionGroup;
 
@@ -93,8 +93,8 @@ namespace atlas
         for inst in self.insts:
             handler_name = inst["mnemonic"].replace('.', '_') + "_" + str(self.xlen)
             if inst["memory"]:
-                header_string += f"        ActionGroup * {handler_name}_compute_address_handler(atlas::AtlasState* state);\n"
-            header_string += f"        ActionGroup * {handler_name}_handler(atlas::AtlasState* state);\n"
+                header_string += f"        ActionGroup * {handler_name}_compute_address_handler(pegasus::PegasusState* state);\n"
+            header_string += f"        ActionGroup * {handler_name}_handler(pegasus::PegasusState* state);\n"
 
         header_string += """    };
 }
@@ -113,7 +113,7 @@ namespace atlas
 #include "include/ActionTags.hpp"
 #include "core/inst_handlers/inst_helpers.hpp"
 
-namespace atlas
+namespace pegasus
 {{"""
 
         if any(inst["memory"] for inst in self.insts):
@@ -127,7 +127,7 @@ namespace atlas
                 mnemonic = inst["mnemonic"]
                 inst_name = mnemonic.replace('.', '_')
                 handler_name = inst_name + "_" + str(self.xlen)
-                source_string += f"""        inst_handlers.emplace(\"{mnemonic}\", atlas::Action::createAction<&{class_name}::{handler_name}_compute_address_handler, {class_name}>(nullptr, \"{inst_name}\", ActionTags::COMPUTE_ADDR_TAG));
+                source_string += f"""        inst_handlers.emplace(\"{mnemonic}\", pegasus::Action::createAction<&{class_name}::{handler_name}_compute_address_handler, {class_name}>(nullptr, \"{inst_name}\", ActionTags::COMPUTE_ADDR_TAG));
 """
 
             source_string += f"""    }}
@@ -142,7 +142,7 @@ namespace atlas
             mnemonic = inst["mnemonic"]
             inst_name = mnemonic.replace('.', '_')
             handler_name = inst_name + "_" + str(self.xlen)
-            source_string += f"        inst_handlers.emplace(\"{mnemonic}\", atlas::Action::createAction<&{class_name}::{handler_name}_handler, {class_name}>(nullptr, \"{inst_name}\", ActionTags::EXECUTE_TAG));\n"
+            source_string += f"        inst_handlers.emplace(\"{mnemonic}\", pegasus::Action::createAction<&{class_name}::{handler_name}_handler, {class_name}>(nullptr, \"{inst_name}\", ActionTags::EXECUTE_TAG));\n"
 
         source_string += """    }
 };
@@ -161,17 +161,17 @@ namespace atlas
 
         inst_handler_string = f"""#include \"core/inst_handlers/{self.isa_string}/{ext_str}/{class_name}.hpp\"
 //#include \"core/ActionGroup.hpp\"
-//#include \"core/AtlasState.hpp\"
-//#include \"core/AtlasInst.hpp\"
+//#include \"core/PegasusState.hpp\"
+//#include \"core/PegasusInst.hpp\"
 
-namespace atlas
+namespace pegasus
 {{"""
 
-        inst_handler_string += "\n    class AtlasState;\n\n"
+        inst_handler_string += "\n    class PegasusState;\n\n"
 
         if inst["memory"]:
             inst_handler_string += f"""
-    ActionGroup* {class_name}::{handler_name}_compute_address_handler(atlas::AtlasState* state)
+    ActionGroup* {class_name}::{handler_name}_compute_address_handler(pegasus::PegasusState* state)
     {{
         (void)state;
         return nullptr;
@@ -179,7 +179,7 @@ namespace atlas
 """
 
         inst_handler_string += f"""
-    ActionGroup* {class_name}::{handler_name}_handler(atlas::AtlasState* state)
+    ActionGroup* {class_name}::{handler_name}_handler(pegasus::PegasusState* state)
     {{
         (void)state;
 """
@@ -214,8 +214,8 @@ namespace atlas
     }
 }"""
 
-        atlas_fname = inst_name + ".cpp"
-        with open(atlas_fname, "w") as fh:
+        pegasus_fname = inst_name + ".cpp"
+        with open(pegasus_fname, "w") as fh:
             fh.write(inst_handler_string)
 
 

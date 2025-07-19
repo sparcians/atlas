@@ -33,16 +33,16 @@ if [ ${BUILD_SPARTA} -ne 0 ]; then
 fi
 
 cd ${GITHUB_WORKSPACE}
-mkdir $ATLAS_BUILD_TYPE
-cd $ATLAS_BUILD_TYPE
-cmake .. -DSPARTA_SEARCH_DIR=/usr/local -DCMAKE_C_COMPILER=$COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_BUILD_TYPE=$ATLAS_BUILD_TYPE
+mkdir $PEGASUS_BUILD_TYPE
+cd $PEGASUS_BUILD_TYPE
+cmake .. -DSPARTA_SEARCH_DIR=/usr/local -DCMAKE_C_COMPILER=$COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_BUILD_TYPE=$PEGASUS_BUILD_TYPE
 if [ $? -ne 0 ]; then
-    echo "ERROR: CMake for atlas failed"
+    echo "ERROR: CMake for pegasus failed"
     exit 1
 fi
-make -j$(nproc --all) atlas
-BUILD_ATLAS=$?
-if [ ${BUILD_ATLAS} -ne 0 ]; then
-    echo "ERROR: build of Atlas FAILED!!!"
+make -j$(nproc --all) pegasus
+BUILD_PEGASUS=$?
+if [ ${BUILD_PEGASUS} -ne 0 ]; then
+    echo "ERROR: build of Pegasus FAILED!!!"
     exit 1
 fi

@@ -2,7 +2,7 @@
 #include "RegisterDefnsJSON.hpp"
 #include "mavis/JSONUtils.hpp"
 
-namespace atlas
+namespace pegasus
 {
     void RegisterDefnsFromJSON::parse_(const std::string & register_defns_json_filename)
     {
@@ -94,4 +94,4 @@ namespace atlas
             register_defns_.push_back(defn);
         }
     }
-} // namespace atlas
+} // namespace pegasus

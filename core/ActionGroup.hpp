@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-namespace atlas
+namespace pegasus
 {
     class ActionException : public std::exception
     {
@@ -67,7 +67,7 @@ namespace atlas
 
         const std::vector<Action> & getActions() const { return actions_; };
 
-        ActionGroup* execute(AtlasState* state)
+        ActionGroup* execute(PegasusState* state)
         {
             Action::ItrType action_it = actions_.begin();
             const Action::ItrType end_it = actions_.end();
@@ -189,4 +189,4 @@ namespace atlas
         os << *action_group;
         return os;
     }
-} // namespace atlas
+} // namespace pegasus

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "core/AtlasState.hpp"
-#include "core/AtlasInst.hpp"
-#include "include/AtlasUtils.hpp"
+#include "core/PegasusState.hpp"
+#include "core/PegasusInst.hpp"
+#include "include/PegasusUtils.hpp"
 #include "include/CSRBitMasks64.hpp"
 #include "mavis/OpcodeInfo.h"
 #include "core/inst_handlers/finsts_helpers.hpp"
@@ -13,7 +13,7 @@ extern "C"
 #include "source/include/internals.h"
 }
 
-namespace atlas
+namespace pegasus
 {
     class RvfInstsBase
     {
@@ -21,7 +21,7 @@ namespace atlas
         using base_type = RvfInstsBase;
 
       protected:
-        template <typename XLEN> inline uint_fast8_t getRM(AtlasState* state)
+        template <typename XLEN> inline uint_fast8_t getRM(PegasusState* state)
         {
             auto inst = state->getCurrentInst();
             uint64_t static_rm = inst->getRM();
@@ -67,7 +67,7 @@ namespace atlas
             }
         }
 
-        template <typename XLEN> static void updateCsr(AtlasState* state)
+        template <typename XLEN> static void updateCsr(PegasusState* state)
         {
             // TODO: it would be nice to have field shift, then a single combined CSR write will
             // suffice.
@@ -108,11 +108,11 @@ namespace atlas
         }
 
         template <typename XLEN>
-        Action::ItrType computeAddressHandler(AtlasState* state, Action::ItrType action_it)
+        Action::ItrType computeAddressHandler(PegasusState* state, Action::ItrType action_it)
         {
             static_assert(std::is_same<XLEN, RV64>::value || std::is_same<XLEN, RV32>::value);
 
-            const AtlasInstPtr & inst = state->getCurrentInst();
+            const PegasusInstPtr & inst = state->getCurrentInst();
             const XLEN rs1_val = READ_INT_REG<XLEN>(state, inst->getRs1());
             const XLEN imm = inst->getImmediate();
             const XLEN vaddr = rs1_val + imm;
@@ -150,11 +150,11 @@ namespace atlas
         }
 
         template <typename SIZE, bool LOAD>
-        Action::ItrType floatLsHandler(AtlasState* state, Action::ItrType action_it)
+        Action::ItrType floatLsHandler(PegasusState* state, Action::ItrType action_it)
         {
             static_assert(std::is_same<SIZE, SP>::value || std::is_same<SIZE, DP>::value);
 
-            const AtlasInstPtr & inst = state->getCurrentInst();
+            const PegasusInstPtr & inst = state->getCurrentInst();
             const Addr paddr = inst->getTranslationState()->getResult().getPAddr();
             inst->getTranslationState()->popResult();
 
@@ -207,4 +207,4 @@ namespace atlas
 
     }; // class RvfInstsBase
 
-} // namespace atlas
+} // namespace pegasus

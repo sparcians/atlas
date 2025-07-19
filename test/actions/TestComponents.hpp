@@ -1,4 +1,4 @@
-#include "core/AtlasState.hpp"
+#include "core/PegasusState.hpp"
 
 #include <algorithm>
 
@@ -14,11 +14,11 @@ class Unit
 
     const std::string & getName() const { return name_; }
 
-    atlas::ActionGroup* getActionGroup() { return &action_group_; }
+    pegasus::ActionGroup* getActionGroup() { return &action_group_; }
 
   protected:
     const std::string name_;
-    atlas::ActionGroup action_group_;
+    pegasus::ActionGroup action_group_;
 };
 
 class FetchUnit : public Unit
@@ -26,10 +26,11 @@ class FetchUnit : public Unit
   public:
     FetchUnit() : Unit("Fetch") { loadWorkload(); }
 
-    atlas::Action::ItrType fetch_inst(atlas::AtlasState* state, atlas::Action::ItrType action_it)
+    pegasus::Action::ItrType fetch_inst(pegasus::PegasusState* state,
+                                        pegasus::Action::ItrType action_it)
     {
         // Set the current inst, using the PC as an index
-        const atlas::Addr pc = state->getPc();
+        const pegasus::Addr pc = state->getPc();
         std::cout << "Fetching PC 0x" << std::hex << pc << std::endl;
 
         // Read the "opcode" from the "workload"
@@ -48,7 +49,7 @@ class FetchUnit : public Unit
         workload_.clear();
         // Initialize a fake workload
         const uint64_t opcode = (vector) ? vadd_opcode : add_opcode;
-        atlas::Addr pc = 01000;
+        pegasus::Addr pc = 01000;
         while (pc < 0x1012)
         {
             workload_[pc] = opcode;
@@ -58,8 +59,8 @@ class FetchUnit : public Unit
     }
 
   private:
-    std::map<atlas::Addr, uint64_t> workload_;
-    std::vector<atlas::AtlasInstPtr> fetched_insts_;
+    std::map<pegasus::Addr, uint64_t> workload_;
+    std::vector<pegasus::PegasusInstPtr> fetched_insts_;
     const uint64_t add_opcode = 0x00000033;  // add x0, x0, x0
     const uint64_t vadd_opcode = 0x02000057; // vadd.vv v0, v0, v0
     const uint64_t wfi_opcode = 0x10500073;  // wfi
@@ -70,7 +71,8 @@ class TranslateUnit : public Unit
   public:
     TranslateUnit() : Unit("Translate") {}
 
-    atlas::Action::ItrType translate_addr(atlas::AtlasState*, atlas::Action::ItrType action_it)
+    pegasus::Action::ItrType translate_addr(pegasus::PegasusState*,
+                                            pegasus::Action::ItrType action_it)
     {
         std::cout << "Translating" << std::endl;
 
@@ -84,7 +86,7 @@ class DecodeUnit : public Unit
   public:
     DecodeUnit() : Unit("Decode") {}
 
-    atlas::Action::ItrType decode_inst(atlas::AtlasState*, atlas::Action::ItrType action_it)
+    pegasus::Action::ItrType decode_inst(pegasus::PegasusState*, pegasus::Action::ItrType action_it)
     {
         std::cout << "Decoding" << std::endl;
 
@@ -96,16 +98,17 @@ class DecodeUnit : public Unit
 class ExecuteUnit : public Unit
 {
   public:
-    ExecuteUnit(atlas::ActionGroup* fetch_action_group) :
+    ExecuteUnit(pegasus::ActionGroup* fetch_action_group) :
         Unit("Execute"),
         fetch_action_group_(fetch_action_group)
     {
     }
 
-    atlas::Action::ItrType execute_inst(atlas::AtlasState* state, atlas::Action::ItrType action_it)
+    pegasus::Action::ItrType execute_inst(pegasus::PegasusState* state,
+                                          pegasus::Action::ItrType action_it)
     {
         // Get current inst
-        const atlas::AtlasInstPtr inst = state->getCurrentInst();
+        const pegasus::PegasusInstPtr inst = state->getCurrentInst();
 
         auto inst_action_group_it = inst_action_groups_.find(inst->getMnemonic());
         if (inst_action_group_it == inst_action_groups_.end())
@@ -116,8 +119,8 @@ class ExecuteUnit : public Unit
 
             // Create an ActionGroup for the current instruction
             inst_action_group_it = ret.first;
-            atlas::ActionGroup & inst_action_group = inst_action_group_it->second;
-            inst_action_group.addAction(atlas::Action::createAction<&ExecuteUnit::inst_handler>(
+            pegasus::ActionGroup & inst_action_group = inst_action_group_it->second;
+            inst_action_group.addAction(pegasus::Action::createAction<&ExecuteUnit::inst_handler>(
                 this, inst->getMnemonic().c_str()));
 
             if (inst->getMnemonic() == "wfi")
@@ -136,9 +139,10 @@ class ExecuteUnit : public Unit
         return ++action_it;
     }
 
-    atlas::Action::ItrType inst_handler(atlas::AtlasState* state, atlas::Action::ItrType action_it)
+    pegasus::Action::ItrType inst_handler(pegasus::PegasusState* state,
+                                          pegasus::Action::ItrType action_it)
     {
-        const atlas::AtlasInstPtr & inst = state->getCurrentInst();
+        const pegasus::PegasusInstPtr & inst = state->getCurrentInst();
         std::cout << "Executing "
                   << "uid: " << std::dec << inst->getUid() << " " << inst->dasmString()
                   << std::endl;
@@ -165,6 +169,6 @@ class ExecuteUnit : public Unit
     }
 
   private:
-    atlas::ActionGroup* fetch_action_group_;
-    std::map<std::string, atlas::ActionGroup> inst_action_groups_;
+    pegasus::ActionGroup* fetch_action_group_;
+    std::map<std::string, pegasus::ActionGroup> inst_action_groups_;
 };

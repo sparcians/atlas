@@ -2,8 +2,8 @@
 #include "core/inst_handlers/zicsr/RvzicsrInsts.hpp"
 #include "include/ActionTags.hpp"
 #include "core/ActionGroup.hpp"
-#include "core/AtlasState.hpp"
-#include "core/AtlasInst.hpp"
+#include "core/PegasusState.hpp"
+#include "core/PegasusInst.hpp"
 #include "core/Exception.hpp"
 #include "core/Trap.hpp"
 
@@ -12,32 +12,35 @@ extern "C"
 #include "source/include/softfloat.h"
 }
 
-namespace atlas
+namespace pegasus
 {
     template <typename XLEN>
     void RvzicsrInsts::getInstHandlers(Execute::InstHandlersMap & inst_handlers)
     {
         static_assert(std::is_same_v<XLEN, RV64> || std::is_same_v<XLEN, RV32>);
         inst_handlers.emplace(
-            "csrrc", atlas::Action::createAction<&RvzicsrInsts::csrrcHandler_<XLEN>, RvzicsrInsts>(
-                         nullptr, "csrrc", ActionTags::EXECUTE_TAG));
+            "csrrc",
+            pegasus::Action::createAction<&RvzicsrInsts::csrrcHandler_<XLEN>, RvzicsrInsts>(
+                nullptr, "csrrc", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "csrrci",
-            atlas::Action::createAction<&RvzicsrInsts::csrrciHandler_<XLEN>, RvzicsrInsts>(
+            pegasus::Action::createAction<&RvzicsrInsts::csrrciHandler_<XLEN>, RvzicsrInsts>(
                 nullptr, "csrrci", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
-            "csrrs", atlas::Action::createAction<&RvzicsrInsts::csrrsHandler_<XLEN>, RvzicsrInsts>(
-                         nullptr, "csrrs", ActionTags::EXECUTE_TAG));
+            "csrrs",
+            pegasus::Action::createAction<&RvzicsrInsts::csrrsHandler_<XLEN>, RvzicsrInsts>(
+                nullptr, "csrrs", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "csrrsi",
-            atlas::Action::createAction<&RvzicsrInsts::csrrsiHandler_<XLEN>, RvzicsrInsts>(
+            pegasus::Action::createAction<&RvzicsrInsts::csrrsiHandler_<XLEN>, RvzicsrInsts>(
                 nullptr, "csrrsi", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
-            "csrrw", atlas::Action::createAction<&RvzicsrInsts::csrrwHandler_<XLEN>, RvzicsrInsts>(
-                         nullptr, "csrrw", ActionTags::EXECUTE_TAG));
+            "csrrw",
+            pegasus::Action::createAction<&RvzicsrInsts::csrrwHandler_<XLEN>, RvzicsrInsts>(
+                nullptr, "csrrw", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "csrrwi",
-            atlas::Action::createAction<&RvzicsrInsts::csrrwiHandler_<XLEN>, RvzicsrInsts>(
+            pegasus::Action::createAction<&RvzicsrInsts::csrrwiHandler_<XLEN>, RvzicsrInsts>(
                 nullptr, "csrrwi", ActionTags::EXECUTE_TAG));
     }
 
@@ -52,36 +55,37 @@ namespace atlas
         // Unprivileged Floating-Point CSRs
         csrUpdate_actions.emplace(
             FCSR,
-            atlas::Action::createAction<&RvzicsrInsts::fcsrUpdateHandler_<XLEN>, RvzicsrInsts>(
+            pegasus::Action::createAction<&RvzicsrInsts::fcsrUpdateHandler_<XLEN>, RvzicsrInsts>(
                 nullptr, "fcsrUpdate"));
         csrUpdate_actions.emplace(
             FFLAGS,
-            atlas::Action::createAction<&RvzicsrInsts::fflagsUpdateHandler_<XLEN>, RvzicsrInsts>(
+            pegasus::Action::createAction<&RvzicsrInsts::fflagsUpdateHandler_<XLEN>, RvzicsrInsts>(
                 nullptr, "fflagsUpdate"));
         csrUpdate_actions.emplace(
-            FRM, atlas::Action::createAction<&RvzicsrInsts::frmUpdateHandler_<XLEN>, RvzicsrInsts>(
-                     nullptr, "frmUpdate"));
+            FRM,
+            pegasus::Action::createAction<&RvzicsrInsts::frmUpdateHandler_<XLEN>, RvzicsrInsts>(
+                nullptr, "frmUpdate"));
 
         // Supervisor Trap Setup
         csrUpdate_actions.emplace(
             SSTATUS,
-            atlas::Action::createAction<&RvzicsrInsts::sstatusUpdateHandler_<XLEN>, RvzicsrInsts>(
+            pegasus::Action::createAction<&RvzicsrInsts::sstatusUpdateHandler_<XLEN>, RvzicsrInsts>(
                 nullptr, "sstatusUpdate"));
 
         // Supervisor Protection and Translation
         csrUpdate_actions.emplace(
             SATP,
-            atlas::Action::createAction<&RvzicsrInsts::satpUpdateHandler_<XLEN>, RvzicsrInsts>(
+            pegasus::Action::createAction<&RvzicsrInsts::satpUpdateHandler_<XLEN>, RvzicsrInsts>(
                 nullptr, "satpUpdate"));
 
         // Machine Trap Setup
         csrUpdate_actions.emplace(
             MSTATUS,
-            atlas::Action::createAction<&RvzicsrInsts::mstatusUpdateHandler_<XLEN>, RvzicsrInsts>(
+            pegasus::Action::createAction<&RvzicsrInsts::mstatusUpdateHandler_<XLEN>, RvzicsrInsts>(
                 nullptr, "mstatusUpdate"));
         csrUpdate_actions.emplace(
             MISA,
-            atlas::Action::createAction<&RvzicsrInsts::misaUpdateHandler_<XLEN>, RvzicsrInsts>(
+            pegasus::Action::createAction<&RvzicsrInsts::misaUpdateHandler_<XLEN>, RvzicsrInsts>(
                 nullptr, "misaUpdate"));
     }
 
@@ -103,9 +107,10 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::csrrcHandler_(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvzicsrInsts::csrrcHandler_(pegasus::PegasusState* state,
+                                                Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
 
         const auto rs1 = inst->getRs1();
         auto rd = inst->getRd();
@@ -135,10 +140,10 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::csrrciHandler_(atlas::AtlasState* state,
+    Action::ItrType RvzicsrInsts::csrrciHandler_(pegasus::PegasusState* state,
                                                  Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
 
         const XLEN imm = inst->getImmediate();
         const auto rd = inst->getRd();
@@ -165,9 +170,10 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::csrrsHandler_(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvzicsrInsts::csrrsHandler_(pegasus::PegasusState* state,
+                                                Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
 
         const auto rs1 = inst->getRs1();
         const auto rd = inst->getRd();
@@ -196,10 +202,10 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::csrrsiHandler_(atlas::AtlasState* state,
+    Action::ItrType RvzicsrInsts::csrrsiHandler_(pegasus::PegasusState* state,
                                                  Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
 
         const XLEN imm = inst->getImmediate();
         const auto rd = inst->getRd();
@@ -227,9 +233,10 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::csrrwHandler_(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvzicsrInsts::csrrwHandler_(pegasus::PegasusState* state,
+                                                Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
 
         const auto rs1 = inst->getRs1();
         const auto rd = inst->getRd();
@@ -259,10 +266,10 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::csrrwiHandler_(atlas::AtlasState* state,
+    Action::ItrType RvzicsrInsts::csrrwiHandler_(pegasus::PegasusState* state,
                                                  Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
 
         const XLEN imm = inst->getImmediate();
         const auto rd = inst->getRd();
@@ -289,7 +296,7 @@ namespace atlas
         return ++action_it;
     }
 
-    template <typename XLEN> void set_softfloat_excpetionFlags(atlas::AtlasState* state)
+    template <typename XLEN> void set_softfloat_excpetionFlags(pegasus::PegasusState* state)
     {
         XLEN softfloat_exceptionFlags_mask = softfloat_flag_inexact | softfloat_flag_underflow
                                              | softfloat_flag_overflow | softfloat_flag_infinite
@@ -299,7 +306,7 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::fcsrUpdateHandler_(atlas::AtlasState* state,
+    Action::ItrType RvzicsrInsts::fcsrUpdateHandler_(pegasus::PegasusState* state,
                                                      Action::ItrType action_it)
     {
         // FFLAGS
@@ -328,7 +335,8 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::fflagsUpdateHandler_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvzicsrInsts::fflagsUpdateHandler_(PegasusState* state,
+                                                       Action::ItrType action_it)
     {
         // FCSR
         const XLEN nx_val = READ_CSR_FIELD<XLEN>(state, FFLAGS, "NX");
@@ -352,7 +360,7 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::frmUpdateHandler_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvzicsrInsts::frmUpdateHandler_(PegasusState* state, Action::ItrType action_it)
     {
         // FCSR
         const XLEN frm_val = READ_CSR_REG<XLEN>(state, FRM);
@@ -362,7 +370,7 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::sstatusUpdateHandler_(atlas::AtlasState* state,
+    Action::ItrType RvzicsrInsts::sstatusUpdateHandler_(pegasus::PegasusState* state,
                                                         Action::ItrType action_it)
     {
         // Update shared fields only
@@ -406,7 +414,7 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::satpUpdateHandler_(atlas::AtlasState* state,
+    Action::ItrType RvzicsrInsts::satpUpdateHandler_(pegasus::PegasusState* state,
                                                      Action::ItrType action_it)
     {
         state->changeMMUMode<XLEN>();
@@ -414,7 +422,7 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::mstatusUpdateHandler_(atlas::AtlasState* state,
+    Action::ItrType RvzicsrInsts::mstatusUpdateHandler_(pegasus::PegasusState* state,
                                                         Action::ItrType action_it)
     {
         // Non-shared fields of SSTATUS are read-only so writing the MSTATUS value to SSTATUS will
@@ -451,7 +459,7 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvzicsrInsts::misaUpdateHandler_(atlas::AtlasState* state,
+    Action::ItrType RvzicsrInsts::misaUpdateHandler_(pegasus::PegasusState* state,
                                                      Action::ItrType action_it)
     {
         const XLEN misa_val = READ_CSR_REG<XLEN>(state, MISA);
@@ -485,4 +493,4 @@ namespace atlas
 
         return ++action_it;
     }
-} // namespace atlas
+} // namespace pegasus

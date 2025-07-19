@@ -15,8 +15,8 @@ CSR_CONSTS = {
     "PMP_MIN_GRANULARITY_SHIFT": [2, "The minimum PMP granularity (in shift values)"],
 }
 
-ATLAS_INTERNAL_REGISTERS = {
-    "ATLAS_INTERNAL_PC": [0x20, "Atlas internal register to hold the program counter"],
-    "ATLAS_INTERNAL_RESV_ADDR": [0x21, "Atlas internal register to hold the load reservation address"],
-    "ATLAS_INTERNAL_RESV_VALID": [0x22, "Atlas internal register to hold whether the load reservation is valid"],
+PEGASUS_INTERNAL_REGISTERS = {
+    "PEGASUS_INTERNAL_PC": [0x20, "Pegasus internal register to hold the program counter"],
+    "PEGASUS_INTERNAL_RESV_ADDR": [0x21, "Pegasus internal register to hold the load reservation address"],
+    "PEGASUS_INTERNAL_RESV_VALID": [0x22, "Pegasus internal register to hold whether the load reservation is valid"],
 }

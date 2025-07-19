@@ -6,7 +6,7 @@ on:
 env:
   CACHE_VERSION: v1
 
-name: Regress Atlas on Ubuntu
+name: Regress Pegasus on Ubuntu
 jobs:
   build_test_job:
     strategy:
@@ -21,12 +21,12 @@ jobs:
 
     # Set up a global environment variable for build scripts
     env:
-      ATLAS_BUILD_TYPE:   ${{ matrix.BUILD_TYPE }}
+      PEGASUS_BUILD_TYPE:   ${{ matrix.BUILD_TYPE }}
       COMPILER:           ${{ matrix.COMPILER }}
 
     steps:
-      # Get Atlas
-      - name: Clone Atlas
+      # Get Pegasus
+      - name: Clone Pegasus
         uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -49,7 +49,7 @@ jobs:
             ${{ matrix.os }}-${{ matrix.BUILD_TYPE }}-${{ matrix.COMPILER }}-ccache
 
       # Install missing packages to make everything build
-      - name: Install packages needed for sparta/atlas
+      - name: Install packages needed for sparta/pegasus
         run: |
           sudo apt-get update --fix-missing
           sudo apt-get install libboost-all-dev libyaml-cpp-dev rapidjson-dev libhdf5-dev llvm

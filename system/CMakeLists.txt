@@ -1,8 +1,8 @@
-project(Atlas)
+project(Pegasus)
 
-add_library(atlassys
+add_library(pegasussys
     STATIC
-    AtlasSystem.cpp
+    PegasusSystem.cpp
     SimpleUART.cpp
     MagicMemory.cpp
     SystemCallEmulator.cpp

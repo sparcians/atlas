@@ -5,7 +5,6 @@ file (CREATE_LINK ${PROJECT_SOURCE_DIR}/../../../mavis/json               ${CMAK
 file (CREATE_LINK ${PROJECT_SOURCE_DIR}/../../../core/inst_handlers/rv64  ${CMAKE_CURRENT_BINARY_DIR}/rv64 SYMBOLIC)
 
 add_executable(Vm_test Vm_test.cpp)
+target_link_libraries(Vm_test pegasuscore pegasusinsts softfloat pegasussys pegasussim ${PEGASUS_LIBS})
 
-target_link_libraries(Vm_test atlassim atlascore atlasinsts softfloat atlassys ${ATLAS_LIBS} mavis boost_json)
-
-atlas_named_test(Vm_test_run Vm_test)
+pegasus_named_test(Vm_test_run Vm_test)

@@ -1,15 +1,15 @@
 #pragma once
 
 #include "core/ActionGroup.hpp"
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 
 #include "sparta/simulation/ParameterSet.hpp"
 #include "sparta/simulation/TreeNode.hpp"
 #include "sparta/simulation/Unit.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
 
     class Execute : public sparta::Unit
     {
@@ -77,7 +77,7 @@ namespace atlas
       private:
         const bool enable_syscall_emulation_;
 
-        Action::ItrType execute_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType execute_(pegasus::PegasusState* state, Action::ItrType action_it);
 
         ActionGroup execute_action_group_{"Execute"};
 
@@ -93,4 +93,4 @@ namespace atlas
         CsrUpdateActionsMap rv64_csr_update_actions_;
         CsrUpdateActionsMap rv32_csr_update_actions_;
     };
-} // namespace atlas
+} // namespace pegasus

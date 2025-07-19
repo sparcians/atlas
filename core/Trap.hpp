@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <iostream>
 
-namespace atlas
+namespace pegasus
 {
     enum class FaultCause : uint64_t
     {
@@ -41,7 +41,7 @@ namespace atlas
     // Defined in Exception.cpp
     std::ostream & operator<<(std::ostream & os, const FaultCause & cause);
 
-} // namespace atlas
+} // namespace pegasus
 
 #include "core/Exception.hpp"
 

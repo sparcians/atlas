@@ -2,9 +2,9 @@ import os, wx, argparse
 from editor.test_tree import TestTreeCtrl
 from backend.workspace import Workspace
 
-class AtlasIDE(wx.Frame):
+class PegasusIDE(wx.Frame):
     def __init__(self, riscv_tests_dir, sim_exe_path):
-        wx.Frame.__init__(self, None, -1, "Atlas IDE")
+        wx.Frame.__init__(self, None, -1, "Pegasus IDE")
         self.riscv_tests_dir = riscv_tests_dir
         self.sim_exe_path = sim_exe_path
 
@@ -28,7 +28,7 @@ class AtlasIDE(wx.Frame):
         self.Layout()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Atlas IDE')
+    parser = argparse.ArgumentParser(description='Pegasus IDE')
     parser.add_argument('--riscv-tests-dir', required=True, help='Path to the RISC-V tests directory')
     parser.add_argument('--sim-exe-path', required=True, help='Path to the RISC-V simulator executable')
     parser.add_argument('--inspect-frame', action='store_true', help='Enable frame inspection (developer use only)')
@@ -48,6 +48,6 @@ if __name__ == "__main__":
         import wx.lib.inspection
         wx.lib.inspection.InspectionTool().Show()
 
-    frame = AtlasIDE(riscv_tests_dir, sim_exe_path)
+    frame = PegasusIDE(riscv_tests_dir, sim_exe_path)
     frame.Show()
     app.MainLoop()

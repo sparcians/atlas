@@ -6,7 +6,7 @@
 #include <vector>
 #include <cstring> // for memcpy
 
-namespace atlas
+namespace pegasus
 {
     template <typename T> inline std::vector<uint8_t> convertToByteVector(const T & value)
     {
@@ -47,4 +47,4 @@ namespace atlas
     }
 
     template <std::size_t N> using UintType = typename decltype(get_uint_type<N>())::type;
-} // namespace atlas
+} // namespace pegasus

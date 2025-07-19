@@ -3,7 +3,7 @@
 
 // This test is taken directly from the sparcians/stf_lib repo's unit tests.
 // It is really only here to show some example usage of the stf_lib library, which is
-// a submodule of Atlas.
+// a submodule of Pegasus.
 
 int main()
 {

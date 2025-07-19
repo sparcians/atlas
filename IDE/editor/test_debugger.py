@@ -3,7 +3,7 @@ import wx.grid
 import wx.py.shell
 import wx.lib.scrolledpanel
 from backend.c_dtypes import uint64_t, int64_t
-from backend.atlas_dtypes import CSR
+from backend.pegasus_dtypes import CSR
 from backend.sim_api import FormatHex
 
 class TestDebugger(wx.Panel):
@@ -110,18 +110,18 @@ class StateViewer(wx.Panel):
         sizer.Add(meta_panel, 0, wx.EXPAND)
         sizer.Add(wx.StaticLine(self), 0, wx.EXPAND)
 
-        atlas_root = os.path.join(os.path.dirname(__file__), '..', '..')
+        pegasus_root = os.path.join(os.path.dirname(__file__), '..', '..')
 
-        int_json = os.path.join(atlas_root, 'arch', 'rv64', 'reg_int.json')
+        int_json = os.path.join(pegasus_root, 'arch', 'rv64', 'reg_int.json')
         with open(int_json, 'r') as fin:
             int_names = [reg['name'] for reg in json.load(fin)]
             int_names = [name for name in int_names if name.startswith('x')]
 
-        fp_json = os.path.join(atlas_root, 'arch', 'rv64', 'reg_fp.json')
+        fp_json = os.path.join(pegasus_root, 'arch', 'rv64', 'reg_fp.json')
         with open(fp_json, 'r') as fin:
             fp_names = [reg['name'] for reg in json.load(fin)]
 
-        csr_json = os.path.join(atlas_root, 'arch', 'rv64', 'reg_csr.json')
+        csr_json = os.path.join(pegasus_root, 'arch', 'rv64', 'reg_csr.json')
         with open(csr_json, 'r') as fin:
             csr_names = [reg['name'] for reg in json.load(fin)]
 
@@ -138,8 +138,8 @@ class StateViewer(wx.Panel):
                 handler_subdir = tab_name
 
             if handler_subdir is not None:
-                atlas_root = os.path.join(os.path.dirname(__file__), '..', '..')
-                handler_dir = os.path.join(atlas_root, 'core', 'inst_handlers', handler_subdir)
+                pegasus_root = os.path.join(os.path.dirname(__file__), '..', '..')
+                handler_dir = os.path.join(pegasus_root, 'core', 'inst_handlers', handler_subdir)
 
                 cpp_code = None
                 for handler_file in os.listdir(handler_dir):
@@ -178,8 +178,8 @@ class StateViewer(wx.Panel):
         AddTab(cpp_notebook, 'zicsr')
         AddTab(cpp_notebook, 'zifencei')
 
-        atlas_root = os.path.join(os.path.dirname(__file__), '..', '..')
-        execute_cpp_file = os.path.join(atlas_root, 'core', 'Exception.cpp')
+        pegasus_root = os.path.join(os.path.dirname(__file__), '..', '..')
+        execute_cpp_file = os.path.join(pegasus_root, 'core', 'Exception.cpp')
         AddTab(cpp_notebook, 'trap', handler_file=execute_cpp_file)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -369,7 +369,7 @@ class RegisterGrid(wx.grid.Grid):
                 self.SetCellBackgroundColour(row, 0, (255, 191, 128))
                 self.SetCellBackgroundColour(row, 1, (255, 191, 128))
 
-            # Add a tooltip showing the expected value (Spike) if different than the actual value (Atlas).
+            # Add a tooltip showing the expected value (Spike) if different than the actual value (Pegasus).
             expected_val = snapshot.getExpectedValue(reg_name)
             if expected_val not in (None, 'NULL'):
                 if FormatHex(reg_val) != FormatHex(expected_val):

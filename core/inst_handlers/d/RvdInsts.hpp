@@ -4,9 +4,9 @@
 #include <string>
 #include "core/inst_handlers/f/RvfInstsBase.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
     class Action;
     class ActionGroup;
 
@@ -20,68 +20,68 @@ namespace atlas
 
       private:
         template <typename XLEN>
-        Action::ItrType fadd_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fadd_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fclass_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fclass_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fcvt_d_lHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcvt_d_lHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fcvt_d_luHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcvt_d_luHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fcvt_d_sHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcvt_d_sHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fcvt_d_wHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcvt_d_wHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fcvt_d_wuHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcvt_d_wuHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fcvt_l_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcvt_l_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fcvt_lu_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcvt_lu_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fcvt_s_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcvt_s_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fcvt_w_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcvt_w_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fcvt_wu_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fcvt_wu_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fdiv_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fdiv_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType feq_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType feq_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fle_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fle_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType flt_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType flt_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fmadd_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fmadd_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fmax_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fmax_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fmin_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fmin_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fmsub_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fmsub_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fmul_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fmul_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fmv_d_xHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fmv_d_xHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fmv_w_xHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fmv_w_xHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fmv_x_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fmv_x_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fmv_x_wHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fmv_x_wHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fnmadd_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fnmadd_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fnmsub_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fnmsub_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fsgnj_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fsgnj_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fsgnjn_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fsgnjn_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fsgnjx_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fsgnjx_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fsqrt_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fsqrt_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType fsub_dHandler_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType fsub_dHandler_(pegasus::PegasusState* state, Action::ItrType action_it);
     };
-} // namespace atlas
+} // namespace pegasus

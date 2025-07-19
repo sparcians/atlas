@@ -1,12 +1,12 @@
-#include "system/AtlasSystem.hpp"
+#include "system/PegasusSystem.hpp"
 
 #include "sparta/memory/SimpleMemoryMapNode.hpp"
 #include "sparta/memory/MemoryObject.hpp"
 
-namespace atlas
+namespace pegasus
 {
 
-    AtlasSystem::AtlasSystem(sparta::TreeNode* sys_node, const AtlasSystemParameters* p) :
+    PegasusSystem::PegasusSystem(sparta::TreeNode* sys_node, const PegasusSystemParameters* p) :
         sparta::Unit(sys_node),
         workload_and_args_(p->workload_and_args)
     {
@@ -27,8 +27,8 @@ namespace atlas
         // Initialize memory
         memory_map_.reset(new sparta::memory::SimpleMemoryMapNode(
             sys_node, "memory_map", sparta::TreeNode::GROUP_NAME_NONE,
-            sparta::TreeNode::GROUP_IDX_NONE, "Atlas System Memory Map", ATLAS_SYSTEM_BLOCK_SIZE,
-            ATLAS_SYSTEM_TOTAL_MEMORY));
+            sparta::TreeNode::GROUP_IDX_NONE, "Pegasus System Memory Map",
+            PEGASUS_SYSTEM_BLOCK_SIZE, PEGASUS_SYSTEM_TOTAL_MEMORY));
 
         // Create memory objects and add them to the memory map
         createMemoryMappings_(sys_node);
@@ -51,7 +51,7 @@ namespace atlas
         }
     }
 
-    void AtlasSystem::loadWorkload_(const std::string & workload)
+    void PegasusSystem::loadWorkload_(const std::string & workload)
     {
         if (elf_reader_.load(workload) == false)
         {
@@ -63,7 +63,7 @@ namespace atlas
         {
             throw sparta::SpartaException()
                 << "\nERROR: '" << workload
-                << "' is dynamically linked. Atlas can only run statically linked binaries\n";
+                << "' is dynamically linked. Pegasus can only run statically linked binaries\n";
         }
 
         std::cout << "\nLoading ELF binary: " << workload << std::endl;
@@ -126,12 +126,12 @@ namespace atlas
 
             sparta::memory::addr_t base_addr =
                 std::min(tohost_addr_.getValue(), fromhost_addr_.getValue());
-            if (base_addr % ATLAS_SYSTEM_BLOCK_SIZE != 0)
+            if (base_addr % PEGASUS_SYSTEM_BLOCK_SIZE != 0)
             {
                 // Align base address of section to the block size
-                base_addr = base_addr & ~(ATLAS_SYSTEM_BLOCK_SIZE - 1);
+                base_addr = base_addr & ~(PEGASUS_SYSTEM_BLOCK_SIZE - 1);
                 std::cout << "Warning: tohost/fromhost address doesn't align with "
-                          << ATLAS_SYSTEM_BLOCK_SIZE << " bytes" << std::endl;
+                          << PEGASUS_SYSTEM_BLOCK_SIZE << " bytes" << std::endl;
             }
             std::cout << "Automatically constructing magic memory at 0x" << std::hex << base_addr
                       << std::endl;
@@ -140,7 +140,7 @@ namespace atlas
             const sparta::memory::addr_t addr_delt = std::max(
                 tohost_addr_.getValue() - base_addr, fromhost_addr_.getValue() - base_addr);
             const sparta::memory::addr_t size_aligned =
-                ((addr_delt / ATLAS_SYSTEM_BLOCK_SIZE) + 1) * ATLAS_SYSTEM_BLOCK_SIZE;
+                ((addr_delt / PEGASUS_SYSTEM_BLOCK_SIZE) + 1) * PEGASUS_SYSTEM_BLOCK_SIZE;
 
             magic_memory_section_ = MemorySection("MAGIC_MEM", 0, size_aligned, base_addr, nullptr);
         }
@@ -166,8 +166,8 @@ namespace atlas
 
             // Round up segment size to Sparta memory block size
             const sparta::memory::addr_t size_aligned =
-                ((segment->get_memory_size() - 1) & ~(ATLAS_SYSTEM_BLOCK_SIZE - 1))
-                + ATLAS_SYSTEM_BLOCK_SIZE;
+                ((segment->get_memory_size() - 1) & ~(PEGASUS_SYSTEM_BLOCK_SIZE - 1))
+                + PEGASUS_SYSTEM_BLOCK_SIZE;
 
             MemorySection section = {(segment_name.empty() ? "?" : segment_name),
                                      segment->get_file_size(), size_aligned,
@@ -181,7 +181,7 @@ namespace atlas
         std::cout << "Starting PC: 0x" << std::hex << starting_pc_ << std::endl;
     }
 
-    void AtlasSystem::createMemoryMappings_(sparta::TreeNode* sys_node)
+    void PegasusSystem::createMemoryMappings_(sparta::TreeNode* sys_node)
     {
         using BMOIfNode = sparta::memory::BlockingMemoryObjectIFNode;
         using BMIfNode = sparta::memory::BlockingMemoryIFNode;
@@ -271,7 +271,7 @@ namespace atlas
                 // Add a memory block up to the allocated block
                 const auto block_size = alloc_block.start_address - addr_block_start;
                 memory_objects_.emplace_back(mem_obj =
-                                                 new MemObj(sys_node, ATLAS_SYSTEM_BLOCK_SIZE,
+                                                 new MemObj(sys_node, PEGASUS_SYSTEM_BLOCK_SIZE,
                                                             block_size, illop, sizeof(illop)));
                 tree_nodes_.emplace_back(memory_if = new BMOIfNode(
                                              sys_node, "mb_" + std::to_string(block_num),
@@ -284,31 +284,31 @@ namespace atlas
 
             // Determine the next large block of memory
             addr_block_start = (((alloc_block.start_address + alloc_block.size - 1)
-                                 & ~(ATLAS_SYSTEM_BLOCK_SIZE - 1))
-                                + ATLAS_SYSTEM_BLOCK_SIZE);
+                                 & ~(PEGASUS_SYSTEM_BLOCK_SIZE - 1))
+                                + PEGASUS_SYSTEM_BLOCK_SIZE);
             allocated_blocks.erase(allocated_blocks.begin());
             ++block_num;
         }
 
         // Add the rest of memory
         memory_objects_.emplace_back(mem_obj =
-                                         new MemObj(sys_node, ATLAS_SYSTEM_BLOCK_SIZE,
-                                                    ATLAS_SYSTEM_TOTAL_MEMORY - addr_block_start,
+                                         new MemObj(sys_node, PEGASUS_SYSTEM_BLOCK_SIZE,
+                                                    PEGASUS_SYSTEM_TOTAL_MEMORY - addr_block_start,
                                                     illop, sizeof(illop)));
         tree_nodes_.emplace_back(
             memory_if =
                 new BMOIfNode(sys_node, "mb_" + std::to_string(block_num),
                               sparta::TreeNode::GROUP_NAME_NONE, sparta::TreeNode::GROUP_IDX_NONE,
                               "mb_" + std::to_string(block_num), nullptr, *mem_obj));
-        memory_map_->addMapping(addr_block_start, ATLAS_SYSTEM_TOTAL_MEMORY, memory_if,
+        memory_map_->addMapping(addr_block_start, PEGASUS_SYSTEM_TOTAL_MEMORY, memory_if,
                                 0x0 /* Additional offset */);
         memory_map_->dumpMappings(std::cout);
     }
 
-    void AtlasSystem::enableEOTPassFailMode()
+    void PegasusSystem::enableEOTPassFailMode()
     {
         sparta_assert(pass_addr_.isValid() and fail_addr_.isValid(),
                       "ERROR: ELF binary does not contain pass/fail labels for EOT Pass/Fail");
     }
 
-} // namespace atlas
+} // namespace pegasus

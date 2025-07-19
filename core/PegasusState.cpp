@@ -1,13 +1,13 @@
-#include "core/AtlasState.hpp"
-#include "core/AtlasInst.hpp"
+#include "core/PegasusState.hpp"
+#include "core/PegasusInst.hpp"
 #include "core/VecElements.hpp"
 #include "core/Fetch.hpp"
 #include "core/Execute.hpp"
 #include "core/translate/Translate.hpp"
 #include "core/Exception.hpp"
 #include "include/ActionTags.hpp"
-#include "include/AtlasUtils.hpp"
-#include "system/AtlasSystem.hpp"
+#include "include/PegasusUtils.hpp"
+#include "system/PegasusSystem.hpp"
 #include "core/observers/SimController.hpp"
 #include "core/observers/InstructionLogger.hpp"
 #include "core/observers/STFLogger.hpp"
@@ -20,7 +20,7 @@
 
 #include "system/SystemCallEmulator.hpp"
 
-namespace atlas
+namespace pegasus
 {
     uint32_t getXlenFromIsaString_(const std::string & isa_string)
     {
@@ -38,7 +38,7 @@ namespace atlas
         }
     }
 
-    AtlasState::AtlasState(sparta::TreeNode* core_tn, const AtlasStateParameters* p) :
+    PegasusState::PegasusState(sparta::TreeNode* core_tn, const PegasusStateParameters* p) :
         sparta::Unit(core_tn),
         hart_id_(p->hart_id),
         isa_string_(p->isa_string),
@@ -56,7 +56,7 @@ namespace atlas
         stf_filename_(p->stf_filename),
         hypervisor_enabled_(extension_manager_.isEnabled("h")),
         vector_config_(std::make_unique<VectorConfig>()),
-        inst_logger_(core_tn, "inst", "Atlas Instruction Logger"),
+        inst_logger_(core_tn, "inst", "Pegasus Instruction Logger"),
         finish_action_group_("finish_inst"),
         stop_sim_action_group_("stop_sim")
     {
@@ -92,21 +92,21 @@ namespace atlas
 
         // Increment PC Action
         increment_pc_action_ =
-            atlas::Action::createAction<&AtlasState::incrementPc_>(this, "increment pc");
+            pegasus::Action::createAction<&PegasusState::incrementPc_>(this, "increment pc");
 
         // Add increment PC Action to finish ActionGroup
         finish_action_group_.addAction(increment_pc_action_);
 
         // Create Action to stop simulation
-        stop_action_ = atlas::Action::createAction<&AtlasState::stopSim_>(this, "stop sim");
+        stop_action_ = pegasus::Action::createAction<&PegasusState::stopSim_>(this, "stop sim");
         stop_action_.addTag(ActionTags::STOP_SIM_TAG);
         stop_sim_action_group_.addAction(stop_action_);
     }
 
     // Not default -- defined in source file to reduce massive inlining
-    AtlasState::~AtlasState() {}
+    PegasusState::~PegasusState() {}
 
-    void AtlasState::onBindTreeEarly_()
+    void PegasusState::onBindTreeEarly_()
     {
         auto core_tn = getContainer();
         fetch_unit_ = core_tn->getChild("fetch")->getResourceAs<Fetch*>();
@@ -119,15 +119,15 @@ namespace atlas
 
         mavis_ = std::make_unique<MavisType>(
             extension_manager_.constructMavis<
-                AtlasInst, AtlasExtractor, AtlasInstAllocatorWrapper<AtlasInstAllocator>,
-                AtlasExtractorAllocatorWrapper<AtlasExtractorAllocator>>(
+                PegasusInst, PegasusExtractor, PegasusInstAllocatorWrapper<PegasusInstAllocator>,
+                PegasusExtractorAllocatorWrapper<PegasusExtractorAllocator>>(
                 getUArchFiles_(), mavis_uid_list_, {}, // annotation overrides
                 {},                                    // inclusions
                 {},                                    // exclusions
-                AtlasInstAllocatorWrapper<AtlasInstAllocator>(
-                    sparta::notNull(AtlasAllocators::getAllocators(core_tn))->inst_allocator),
-                AtlasExtractorAllocatorWrapper<AtlasExtractorAllocator>(
-                    sparta::notNull(AtlasAllocators::getAllocators(core_tn))->extractor_allocator,
+                PegasusInstAllocatorWrapper<PegasusInstAllocator>(
+                    sparta::notNull(PegasusAllocators::getAllocators(core_tn))->inst_allocator),
+                PegasusExtractorAllocatorWrapper<PegasusExtractorAllocator>(
+                    sparta::notNull(PegasusAllocators::getAllocators(core_tn))->extractor_allocator,
                     this)));
 
         // FIXME: Extension manager should maintain inclusions
@@ -141,7 +141,7 @@ namespace atlas
         finish_action_group_.setNextActionGroup(fetch_unit_->getActionGroup());
     }
 
-    void AtlasState::onBindTreeLate_()
+    void PegasusState::onBindTreeLate_()
     {
         // Write initial values to CSR registers
         const boost::json::array json = mavis::parseJSON(csr_values_json_).as_array();
@@ -204,7 +204,7 @@ namespace atlas
 
         for (auto & obs : observers_)
         {
-            obs->registerReadWriteMemCallbacks(atlas_system_->getSystemMemory());
+            obs->registerReadWriteMemCallbacks(pegasus_system_->getSystemMemory());
             for (auto reg : csr_rset_->getRegisters())
             {
                 obs->registerReadWriteCsrCallbacks(reg);
@@ -212,7 +212,7 @@ namespace atlas
         }
     }
 
-    void AtlasState::changeMavisContext()
+    void PegasusState::changeMavisContext()
     {
         const mavis::MatchSet<mavis::Pattern> inclusions{inclusions_};
         const std::string context_name =
@@ -237,7 +237,7 @@ namespace atlas
         }
     }
 
-    template <typename XLEN> void AtlasState::changeMMUMode()
+    template <typename XLEN> void PegasusState::changeMMUMode()
     {
         static const std::vector<MMUMode> satp_mmu_mode_map = {
             MMUMode::BAREMETAL, // mode == 0
@@ -264,37 +264,37 @@ namespace atlas
         translate_unit_->changeMMUMode<XLEN>(mode, ls_mode);
     }
 
-    mavis::FileNameListType AtlasState::getUArchFiles_() const
+    mavis::FileNameListType PegasusState::getUArchFiles_() const
     {
         const std::string xlen_str = std::to_string(xlen_);
         const std::string xlen_uarch_file_path = uarch_file_path_ + "/rv" + xlen_str;
         const mavis::FileNameListType uarch_files = {
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "i.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "m.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "a.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "f.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "d.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zba.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zbb.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zbc.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zbs.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zve64x.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zve64d.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zve32x.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zve32f.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zicsr.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zifencei.json",
-            xlen_uarch_file_path + "/atlas_uarch_rv" + xlen_str + "zicond.json"};
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "i.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "m.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "a.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "f.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "d.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zba.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zbb.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zbc.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zbs.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zve64x.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zve64d.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zve32x.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zve32f.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zicsr.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zifencei.json",
+            xlen_uarch_file_path + "/pegasus_uarch_rv" + xlen_str + "zicond.json"};
         return uarch_files;
     }
 
-    int64_t AtlasState::emulateSystemCall(const SystemCallStack & call_stack)
+    int64_t PegasusState::emulateSystemCall(const SystemCallStack & call_stack)
     {
         return system_call_emulator_->emulateSystemCall(call_stack,
-                                                        atlas_system_->getSystemMemory());
+                                                        pegasus_system_->getSystemMemory());
     }
 
-    Action::ItrType AtlasState::preExecute_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType PegasusState::preExecute_(PegasusState* state, Action::ItrType action_it)
     {
         for (const auto & observer : observers_)
         {
@@ -304,7 +304,7 @@ namespace atlas
         return ++action_it;
     }
 
-    Action::ItrType AtlasState::postExecute_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType PegasusState::postExecute_(PegasusState* state, Action::ItrType action_it)
     {
         for (const auto & observer : observers_)
         {
@@ -314,7 +314,7 @@ namespace atlas
         return ++action_it;
     }
 
-    Action::ItrType AtlasState::preException_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType PegasusState::preException_(PegasusState* state, Action::ItrType action_it)
     {
         for (const auto & observer : observers_)
         {
@@ -324,7 +324,7 @@ namespace atlas
         return ++action_it;
     }
 
-    template <typename XLEN> uint32_t AtlasState::getMisaExtFieldValue_() const
+    template <typename XLEN> uint32_t PegasusState::getMisaExtFieldValue_() const
     {
         uint32_t ext_val = 0;
         for (char ext = 'a'; ext <= 'z'; ++ext)
@@ -343,7 +343,7 @@ namespace atlas
         return ext_val;
     }
 
-    void AtlasState::enableInteractiveMode()
+    void PegasusState::enableInteractiveMode()
     {
         sparta_assert(sim_controller_ == nullptr, "Interactive mode is already enabled");
         auto observer = std::make_unique<SimController>();
@@ -351,7 +351,7 @@ namespace atlas
         addObserver(std::move(observer));
     }
 
-    void AtlasState::useSpikeFormatting()
+    void PegasusState::useSpikeFormatting()
     {
         for (auto & obs : observers_)
         {
@@ -362,7 +362,8 @@ namespace atlas
         }
     }
 
-    sparta::Register* AtlasState::findRegister(const std::string & reg_name, bool must_exist) const
+    sparta::Register* PegasusState::findRegister(const std::string & reg_name,
+                                                 bool must_exist) const
     {
         auto iter = registers_by_name_.find(reg_name);
         auto reg = (iter != registers_by_name_.end()) ? iter->second : nullptr;
@@ -370,9 +371,9 @@ namespace atlas
         return reg;
     }
 
-    template <typename MemoryType> MemoryType AtlasState::readMemory(const Addr paddr)
+    template <typename MemoryType> MemoryType PegasusState::readMemory(const Addr paddr)
     {
-        auto* memory = atlas_system_->getSystemMemory();
+        auto* memory = pegasus_system_->getSystemMemory();
 
         static_assert(std::is_trivial<MemoryType>());
         static_assert(std::is_standard_layout<MemoryType>());
@@ -388,9 +389,9 @@ namespace atlas
     }
 
     template <typename MemoryType>
-    void AtlasState::writeMemory(const Addr paddr, const MemoryType value)
+    void PegasusState::writeMemory(const Addr paddr, const MemoryType value)
     {
-        auto* memory = atlas_system_->getSystemMemory();
+        auto* memory = pegasus_system_->getSystemMemory();
 
         static_assert(std::is_trivial<MemoryType>());
         static_assert(std::is_standard_layout<MemoryType>());
@@ -403,29 +404,29 @@ namespace atlas
                               << (uint64_t)value);
     }
 
-    template int8_t AtlasState::readMemory<int8_t>(const Addr);
-    template uint8_t AtlasState::readMemory<uint8_t>(const Addr);
-    template int16_t AtlasState::readMemory<int16_t>(const Addr);
-    template uint16_t AtlasState::readMemory<uint16_t>(const Addr);
-    template int32_t AtlasState::readMemory<int32_t>(const Addr);
-    template uint32_t AtlasState::readMemory<uint32_t>(const Addr);
-    template int64_t AtlasState::readMemory<int64_t>(const Addr);
-    template uint64_t AtlasState::readMemory<uint64_t>(const Addr);
-    template void AtlasState::writeMemory<uint8_t>(const Addr, const uint8_t);
-    template void AtlasState::writeMemory<uint16_t>(const Addr, const uint16_t);
-    template void AtlasState::writeMemory<uint32_t>(const Addr, const uint32_t);
-    template void AtlasState::writeMemory<uint64_t>(const Addr, const uint64_t);
+    template int8_t PegasusState::readMemory<int8_t>(const Addr);
+    template uint8_t PegasusState::readMemory<uint8_t>(const Addr);
+    template int16_t PegasusState::readMemory<int16_t>(const Addr);
+    template uint16_t PegasusState::readMemory<uint16_t>(const Addr);
+    template int32_t PegasusState::readMemory<int32_t>(const Addr);
+    template uint32_t PegasusState::readMemory<uint32_t>(const Addr);
+    template int64_t PegasusState::readMemory<int64_t>(const Addr);
+    template uint64_t PegasusState::readMemory<uint64_t>(const Addr);
+    template void PegasusState::writeMemory<uint8_t>(const Addr, const uint8_t);
+    template void PegasusState::writeMemory<uint16_t>(const Addr, const uint16_t);
+    template void PegasusState::writeMemory<uint32_t>(const Addr, const uint32_t);
+    template void PegasusState::writeMemory<uint64_t>(const Addr, const uint64_t);
 
-    void AtlasState::addObserver(std::unique_ptr<Observer> observer)
+    void PegasusState::addObserver(std::unique_ptr<Observer> observer)
     {
         if (observers_.empty())
         {
             pre_execute_action_ =
-                atlas::Action::createAction<&AtlasState::preExecute_>(this, "pre execute");
+                pegasus::Action::createAction<&PegasusState::preExecute_>(this, "pre execute");
             post_execute_action_ =
-                atlas::Action::createAction<&AtlasState::postExecute_>(this, "post execute");
+                pegasus::Action::createAction<&PegasusState::postExecute_>(this, "post execute");
             pre_exception_action_ =
-                atlas::Action::createAction<&AtlasState::preException_>(this, "pre exception");
+                pegasus::Action::createAction<&PegasusState::preException_>(this, "pre exception");
 
             finish_action_group_.addAction(post_execute_action_);
             exception_unit_->getActionGroup()->insertActionBefore(pre_exception_action_,
@@ -435,7 +436,7 @@ namespace atlas
         observers_.emplace_back(std::move(observer));
     }
 
-    void AtlasState::insertExecuteActions(ActionGroup* action_group)
+    void PegasusState::insertExecuteActions(ActionGroup* action_group)
     {
         if (pre_execute_action_)
         {
@@ -443,7 +444,7 @@ namespace atlas
         }
     }
 
-    Action::ItrType AtlasState::incrementPc_(AtlasState*, Action::ItrType action_it)
+    Action::ItrType PegasusState::incrementPc_(PegasusState*, Action::ItrType action_it)
     {
         // Set PC
         prev_pc_ = pc_;
@@ -459,7 +460,7 @@ namespace atlas
     // Initialze a program stack (argc, argv, envp, auxv, etc)
     // Useful info about ELF binaries: https://lwn.net/Articles/631631/
     // This is used mostly for system call emulation
-    void AtlasState::setupProgramStack(const std::vector<std::string> & program_arguments)
+    void PegasusState::setupProgramStack(const std::vector<std::string> & program_arguments)
     {
         if (false == getExecuteUnit()->getSystemCallEmulation())
         {
@@ -529,7 +530,7 @@ namespace atlas
         sparta_assert(sp != 0, "The stack pointer (sp aka x2) is set to 0.  Use --reg \"sp <val>\" "
                                "to set it to something...smarter");
 
-        auto* memory = sparta::notNull(atlas_system_)->getSystemMemory();
+        auto* memory = sparta::notNull(pegasus_system_)->getSystemMemory();
         sparta_assert(memory != nullptr, "Got no memory to preload with the argument stack");
 
         ////////////////////////////////////////////////////////////////////////////////
@@ -625,11 +626,11 @@ namespace atlas
         }
     }
 
-    void AtlasState::boot()
+    void PegasusState::boot()
     {
         std::cout << "Booting hartid " << std::dec << hart_id_ << std::endl;
         {
-            AtlasState* state = this;
+            PegasusState* state = this;
 
             if (xlen_ == 64)
             {
@@ -657,7 +658,7 @@ namespace atlas
                 POKE_CSR_FIELD<RV32>(this, MISA, "extensions", ext_val);
             }
 
-            std::cout << "AtlasState::boot()\n";
+            std::cout << "PegasusState::boot()\n";
             std::cout << std::hex;
             std::cout << "\tMHARTID: 0x" << state->getCsrRegister(MHARTID)->dmiRead<uint64_t>()
                       << std::endl;
@@ -676,7 +677,7 @@ namespace atlas
         }
     }
 
-    void AtlasState::cleanup()
+    void PegasusState::cleanup()
     {
         if (sim_controller_)
         {
@@ -684,4 +685,4 @@ namespace atlas
         }
     }
 
-} // namespace atlas
+} // namespace pegasus

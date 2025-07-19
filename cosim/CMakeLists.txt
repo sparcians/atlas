@@ -1,18 +1,17 @@
-project(AtlasCoSim)
+project(PegasusCoSim)
 
-add_library(atlascosimlib
+add_library(pegasuscosimlib
     STATIC
-    AtlasCoSim.cpp
+    PegasusCoSim.cpp
 )
 
-target_link_libraries(atlascosimlib
-    atlassim
-    atlascore
-    atlasinsts
+target_link_libraries(pegasuscosimlib
+    pegasussim
+    pegasuscore
+    pegasusinsts
     softfloat
-    ${STF_LINK_LIBS}
-    atlassys
-    ${ATLAS_LIBS}
+    pegasussys
+    ${PEGASUS_LIBS}
 )
 
 file (CREATE_LINK ${PROJECT_SOURCE_DIR}/arch          ${CMAKE_CURRENT_BINARY_DIR}/arch SYMBOLIC)

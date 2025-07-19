@@ -8,7 +8,7 @@ namespace sparta::log
     class MessageSource;
 }
 
-namespace atlas
+namespace pegasus
 {
     class InstLogWriterBase;
 
@@ -22,9 +22,9 @@ namespace atlas
         void useSpikeFormatting();
 
       private:
-        void postExecute_(AtlasState*) override;
+        void postExecute_(PegasusState*) override;
 
         sparta::log::MessageSource & inst_logger_;
         std::shared_ptr<InstLogWriterBase> inst_log_writer_;
     };
-} // namespace atlas
+} // namespace pegasus

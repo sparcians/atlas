@@ -1,12 +1,12 @@
 #pragma once
 
 #include <stdint.h>
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 #include "core/translate/TranslateTypes.hpp"
 
 #include "sparta/utils/LogUtils.hpp"
 
-namespace atlas
+namespace pegasus
 {
     template <typename XLEN, MMUMode Mode> class PageTableEntry
     {
@@ -181,4 +181,4 @@ namespace atlas
         }
         return os;
     }
-} // namespace atlas
+} // namespace pegasus

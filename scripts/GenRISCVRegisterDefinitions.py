@@ -14,10 +14,10 @@ from GenCSRHeaders import gen_csr_bitmask_header
 from GenCSRHeaders import gen_csr_field_idxs_header
 
 def main():
-    atlas_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    arch_root = os.path.join(atlas_root, 'arch')
+    pegasus_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    arch_root = os.path.join(pegasus_root, 'arch')
     rv32_root = os.path.join(arch_root, 'rv32')
-    inc_root = os.path.join(atlas_root, 'include')
+    inc_root = os.path.join(pegasus_root, 'include')
 
     os.chdir(arch_root)
 
@@ -78,7 +78,7 @@ def main():
         filename = "reg_" + name + ".json"
         regs.write_json(filename)
 
-    # Generate Atlas header files
+    # Generate Pegasus header files
     os.chdir("..")
     csr_num_hpp = gen_csr_num_header()
     csr_helpers_hpp = gen_csr_helpers_header()

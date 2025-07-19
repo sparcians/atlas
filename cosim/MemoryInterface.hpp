@@ -1,9 +1,9 @@
 #pragma once
 
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 #include <vector>
 
-namespace atlas::cosim
+namespace pegasus::cosim
 {
     /**
      * \class CoSim
@@ -23,4 +23,4 @@ namespace atlas::cosim
         virtual bool poke(HartId hart, Addr paddr, std::vector<uint8_t> & buffer) const = 0;
         virtual bool write(HartId hart, Addr paddr, std::vector<uint8_t> & buffer) const = 0;
     };
-} // namespace atlas::cosim
+} // namespace pegasus::cosim

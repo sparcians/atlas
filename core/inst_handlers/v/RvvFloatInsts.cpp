@@ -3,13 +3,13 @@
 
 #include "core/inst_handlers/v/RvvFloatInsts.hpp"
 #include "core/inst_handlers/finsts_helpers.hpp"
-#include "core/AtlasState.hpp"
+#include "core/PegasusState.hpp"
 #include "core/ActionGroup.hpp"
 #include "core/VecElements.hpp"
 #include "include/ActionTags.hpp"
-#include "include/AtlasUtils.hpp"
+#include "include/PegasusUtils.hpp"
 
-namespace atlas
+namespace pegasus
 {
     template <typename XLEN>
     void RvvFloatInsts::getInstHandlers(std::map<std::string, Action> & inst_handlers)
@@ -20,21 +20,21 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfmv.v.f",
-            atlas::Action::createAction<&RvvFloatInsts::vfmvHandler_<XLEN>, RvvFloatInsts>(
+            pegasus::Action::createAction<&RvvFloatInsts::vfmvHandler_<XLEN>, RvvFloatInsts>(
                 nullptr, "vfmv.v.f", ActionTags::EXECUTE_TAG));
 
         // merge operation
 
         inst_handlers.emplace(
             "vfmerge.vfm",
-            atlas::Action::createAction<&RvvFloatInsts::vfmergeHandler_<XLEN>, RvvFloatInsts>(
+            pegasus::Action::createAction<&RvvFloatInsts::vfmergeHandler_<XLEN>, RvvFloatInsts>(
                 nullptr, "vfmerge.vfm", ActionTags::EXECUTE_TAG));
 
         // unary operations
 
         inst_handlers.emplace(
             "vfsqrt.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfUnaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -43,7 +43,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfcvt.xu.f.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfFloatToIntHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -51,7 +51,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfcvt.xu.f.v", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfcvt.x.f.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfFloatToIntHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -59,7 +59,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfcvt.x.f.v", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfcvt.f.xu.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfUnaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -67,7 +67,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfcvt.f.xu.v", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfcvt.f.x.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfUnaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -76,7 +76,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfwcvt.xu.f.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfFloatToIntHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -84,7 +84,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwcvt.xu.f.v", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwcvt.x.f.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfFloatToIntHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -92,7 +92,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwcvt.x.f.v", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwcvt.f.xu.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfUnaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -100,7 +100,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwcvt.f.xu.v", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwcvt.f.x.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfUnaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -108,7 +108,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwcvt.f.x.v", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwcvt.f.f.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfUnaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -117,7 +117,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfncvt.xu.f.w",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfFloatToIntHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -125,7 +125,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfncvt.xu.f.w", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfncvt.x.f.w",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfFloatToIntHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -133,7 +133,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfncvt.x.f.w", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfncvt.f.xu.w",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfUnaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -141,7 +141,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfncvt.f.xu.w", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfncvt.f.x.w",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfUnaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -149,7 +149,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfncvt.f.x.w", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfclass.v",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfUnaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -158,7 +158,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfncvt.f.f.w",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfUnaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -169,7 +169,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfadd.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -177,7 +177,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfadd.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfadd.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -185,7 +185,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfadd.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfsub.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -193,7 +193,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfsub.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfsub.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -201,12 +201,12 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfsub.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfrsub.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfrBinaryHandler_<XLEN, FloatFuncs{f16_sub, f32_sub, f64_sub}>,
                 RvvFloatInsts>(nullptr, "vfrsub.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfmul.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -214,7 +214,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmul.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfmul.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -222,7 +222,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmul.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfdiv.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -230,7 +230,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfdiv.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfdiv.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -238,13 +238,13 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfdiv.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfrdiv.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfrBinaryHandler_<XLEN, FloatFuncs{f16_div, f32_div, f64_div}>,
                 RvvFloatInsts>(nullptr, "vfrdiv.vf", ActionTags::EXECUTE_TAG));
 
         inst_handlers.emplace(
             "vfwadd.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -252,7 +252,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwadd.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwadd.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -260,7 +260,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwadd.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwsub.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -268,7 +268,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwsub.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwsub.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -276,7 +276,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwsub.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwmul.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -284,7 +284,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwmul.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwmul.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -292,7 +292,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwmul.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwadd.wv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -300,7 +300,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwadd.wv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwadd.wf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::F},
@@ -308,7 +308,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwadd.wf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwsub.wv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::V},
@@ -316,7 +316,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwsub.wv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwsub.wf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::W, OperandMode::Mode::F},
@@ -325,7 +325,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfsgnj.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -333,7 +333,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfsgnj.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfsgnj.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -341,7 +341,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfsgnj.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfsgnjn.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -349,7 +349,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfsgnjn.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfsgnjn.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -357,7 +357,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfsgnjn.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfsgnjx.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -365,7 +365,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfsgnjx.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfsgnjx.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -374,7 +374,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vmfeq.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vmfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -382,7 +382,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vmfeq.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmfeq.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vmfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -390,7 +390,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vmfeq.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmfne.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vmfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -398,7 +398,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vmfne.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmfne.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vmfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -406,7 +406,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vmfne.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmflt.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vmfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -414,7 +414,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vmflt.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmflt.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vmfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -422,7 +422,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vmflt.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmfle.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vmfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -430,7 +430,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vmfle.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmfle.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vmfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -438,7 +438,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vmfle.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmfgt.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vmfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -446,7 +446,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vmfgt.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vmfge.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vmfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -456,10 +456,12 @@ namespace atlas
         // ternary operations
 
         auto maccWrapper = []<auto mulAdd>(auto src2, auto src1, auto dst)
-        { return mulAdd(src2, src1, dst).v; };
+        {
+            return mulAdd(src2, src1, dst).v;
+        };
         inst_handlers.emplace(
             "vfmacc.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -467,7 +469,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmacc.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfmacc.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -475,10 +477,12 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmacc.vf", ActionTags::EXECUTE_TAG));
 
         auto nmaccWrapper = []<auto mulAdd>(auto src2, auto src1, auto dst)
-        { return mulAdd(fnegate(src2), src1, fnegate(dst)).v; };
+        {
+            return mulAdd(fnegate(src2), src1, fnegate(dst)).v;
+        };
         inst_handlers.emplace(
             "vfnmacc.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -486,7 +490,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfnmacc.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfnmacc.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -494,10 +498,12 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfnmacc.vf", ActionTags::EXECUTE_TAG));
 
         auto msacWrapper = []<auto mulAdd>(auto src2, auto src1, auto dst)
-        { return mulAdd(src2, src1, fnegate(dst)).v; };
+        {
+            return mulAdd(src2, src1, fnegate(dst)).v;
+        };
         inst_handlers.emplace(
             "vfmsac.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -505,7 +511,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmsac.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfmsac.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -513,10 +519,12 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmsac.vf", ActionTags::EXECUTE_TAG));
 
         auto nmsacWrapper = []<auto mulAdd>(auto src2, auto src1, auto dst)
-        { return mulAdd(fnegate(src2), src1, dst).v; };
+        {
+            return mulAdd(fnegate(src2), src1, dst).v;
+        };
         inst_handlers.emplace(
             "vfnmsac.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -524,7 +532,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfnmsac.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfnmsac.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -532,10 +540,12 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfnmsac.vf", ActionTags::EXECUTE_TAG));
 
         auto maddWrapper = []<auto mulAdd>(auto src2, auto src1, auto dst)
-        { return mulAdd(src1, dst, src2).v; };
+        {
+            return mulAdd(src1, dst, src2).v;
+        };
         inst_handlers.emplace(
             "vfmadd.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -543,7 +553,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmadd.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfmadd.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -551,10 +561,12 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmadd.vf", ActionTags::EXECUTE_TAG));
 
         auto nmaddWrapper = []<auto mulAdd>(auto src2, auto src1, auto dst)
-        { return mulAdd(fnegate(src1), dst, fnegate(src2)).v; };
+        {
+            return mulAdd(fnegate(src1), dst, fnegate(src2)).v;
+        };
         inst_handlers.emplace(
             "vfnmadd.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -562,7 +574,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfnmadd.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfnmadd.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -570,10 +582,12 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfnmadd.vf", ActionTags::EXECUTE_TAG));
 
         auto msubWrapper = []<auto mulAdd>(auto src2, auto src1, auto dst)
-        { return mulAdd(src1, dst, fnegate(src2)).v; };
+        {
+            return mulAdd(src1, dst, fnegate(src2)).v;
+        };
         inst_handlers.emplace(
             "vfmsub.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -581,7 +595,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmsub.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfmsub.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -589,10 +603,12 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmsub.vf", ActionTags::EXECUTE_TAG));
 
         auto nmsubWrapper = []<auto mulAdd>(auto src2, auto src1, auto dst)
-        { return mulAdd(fnegate(src1), dst, src2).v; };
+        {
+            return mulAdd(fnegate(src1), dst, src2).v;
+        };
         inst_handlers.emplace(
             "vfnmsub.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -600,7 +616,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfnmsub.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfnmsub.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -609,7 +625,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfwmacc.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -617,7 +633,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwmacc.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwmacc.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -626,7 +642,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfwnmacc.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -634,7 +650,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwnmacc.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwnmacc.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -643,7 +659,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfwmsac.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -651,7 +667,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwmsac.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwmsac.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -660,7 +676,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfwnmsac.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -668,7 +684,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfwnmsac.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfwnmsac.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfTernaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::W, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -677,7 +693,7 @@ namespace atlas
 
         inst_handlers.emplace(
             "vfmin.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -685,7 +701,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmin.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfmin.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -693,7 +709,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmin.vf", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfmax.vv",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::V},
@@ -701,7 +717,7 @@ namespace atlas
                 RvvFloatInsts>(nullptr, "vfmax.vv", ActionTags::EXECUTE_TAG));
         inst_handlers.emplace(
             "vfmax.vf",
-            atlas::Action::createAction<
+            pegasus::Action::createAction<
                 &RvvFloatInsts::vfBinaryHandler_<
                     XLEN,
                     OperandMode{OperandMode::Mode::V, OperandMode::Mode::V, OperandMode::Mode::F},
@@ -713,9 +729,9 @@ namespace atlas
     template void RvvFloatInsts::getInstHandlers<RV64>(std::map<std::string, Action> &);
 
     template <typename XLEN, size_t elemWidth>
-    Action::ItrType vfmvHelper(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType vfmvHelper(pegasus::PegasusState* state, Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
         Elements<Element<elemWidth>, false> elems_vd{state, state->getVectorConfig(),
                                                      inst->getRd()};
 
@@ -730,7 +746,8 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvvFloatInsts::vfmvHandler_(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType RvvFloatInsts::vfmvHandler_(pegasus::PegasusState* state,
+                                                Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
         switch (vector_config->getSEW())
@@ -749,16 +766,16 @@ namespace atlas
     }
 
     template <typename XLEN, size_t elemWidth>
-    Action::ItrType vfmergeHelper(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType vfmergeHelper(pegasus::PegasusState* state, Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
         Elements<Element<elemWidth>, false> elems_vs2{state, state->getVectorConfig(),
                                                       inst->getRs2()};
         Elements<Element<elemWidth>, false> elems_vd{state, state->getVectorConfig(),
                                                      inst->getRd()};
         const UintType<elemWidth> f =
             static_cast<UintType<elemWidth>>(READ_FP_REG<XLEN>(state, inst->getRs1()));
-        const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+        const MaskElements mask_elems{state, state->getVectorConfig(), pegasus::V0};
 
         for (auto iter = elems_vd.begin(); iter != elems_vd.end(); ++iter)
         {
@@ -777,7 +794,7 @@ namespace atlas
     }
 
     template <typename XLEN>
-    Action::ItrType RvvFloatInsts::vfmergeHandler_(atlas::AtlasState* state,
+    Action::ItrType RvvFloatInsts::vfmergeHandler_(pegasus::PegasusState* state,
                                                    Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
@@ -800,9 +817,9 @@ namespace atlas
     }
 
     template <typename XLEN, size_t elemWidth, OperandMode opMode, auto func>
-    Action::ItrType vfUnaryHelper(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType vfUnaryHelper(pegasus::PegasusState* state, Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
         Elements<Element<opMode.src2 == OperandMode::Mode::W ? 2 * elemWidth : elemWidth>, false>
             elems_vs2{state, state->getVectorConfig(), inst->getRs2()};
         Elements<Element<opMode.dst == OperandMode::Mode::W ? 2 * elemWidth : elemWidth>, false>
@@ -824,7 +841,7 @@ namespace atlas
         }
         else // masked
         {
-            const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+            const MaskElements mask_elems{state, state->getVectorConfig(), pegasus::V0};
             execute(mask_elems.maskBitIterBegin(), mask_elems.maskBitIterEnd());
         }
 
@@ -834,7 +851,7 @@ namespace atlas
     }
 
     template <typename XLEN, OperandMode opMode, RvvFloatInsts::FloatFuncs funcs>
-    Action::ItrType RvvFloatInsts::vfUnaryHandler_(atlas::AtlasState* state,
+    Action::ItrType RvvFloatInsts::vfUnaryHandler_(pegasus::PegasusState* state,
                                                    Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
@@ -854,8 +871,9 @@ namespace atlas
                 }
                 break;
             case 32:
-                return vfUnaryHelper<XLEN, 32, opMode, [](auto src2)
-                                     { return func_wrapper(funcs.f32, src2); }>(state, action_it);
+                return vfUnaryHelper<XLEN, 32, opMode, [](auto src2) {
+                    return func_wrapper(funcs.f32, src2);
+                }>(state, action_it);
 
             case 64:
                 // neither narrowing to 64 bit nor widening from 64 bit
@@ -874,13 +892,13 @@ namespace atlas
     }
 
     template <typename XLEN, size_t elemWidth, OperandMode opMode, auto func>
-    Action::ItrType vfFloatToIntHelper(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType vfFloatToIntHelper(pegasus::PegasusState* state, Action::ItrType action_it)
     {
         using Traits = FuncTraits<decltype(func)>;
         using ArgType = std::tuple_element_t<0, typename Traits::ArgsTuple>;
         using IntT = decltype(std::declval<ArgType>().v);
 
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
         Elements<Element<opMode.src2 == OperandMode::Mode::W ? 2 * elemWidth : elemWidth>, false>
             elems_vs2{state, state->getVectorConfig(), inst->getRs2()};
         Elements<Element<opMode.dst == OperandMode::Mode::W ? 2 * elemWidth : elemWidth>, false>
@@ -904,7 +922,7 @@ namespace atlas
         }
         else // masked
         {
-            const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+            const MaskElements mask_elems{state, state->getVectorConfig(), pegasus::V0};
             execute(mask_elems.maskBitIterBegin(), mask_elems.maskBitIterEnd());
         }
 
@@ -914,7 +932,7 @@ namespace atlas
     }
 
     template <typename XLEN, OperandMode opMode, RvvFloatInsts::FloatFuncs funcs>
-    Action::ItrType RvvFloatInsts::vfFloatToIntHandler_(atlas::AtlasState* state,
+    Action::ItrType RvvFloatInsts::vfFloatToIntHandler_(pegasus::PegasusState* state,
                                                         Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
@@ -949,9 +967,9 @@ namespace atlas
     }
 
     template <typename XLEN, size_t elemWidth, OperandMode opMode, auto func>
-    Action::ItrType vfBinaryHelper(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType vfBinaryHelper(pegasus::PegasusState* state, Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
         Elements<Element<elemWidth>, false> elems_vs1{state, state->getVectorConfig(),
                                                       inst->getRs1()};
         Elements<Element<opMode.src2 == OperandMode::Mode::W ? 2 * elemWidth : elemWidth>, false>
@@ -987,7 +1005,7 @@ namespace atlas
         }
         else // masked
         {
-            const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+            const MaskElements mask_elems{state, state->getVectorConfig(), pegasus::V0};
             execute(mask_elems.maskBitIterBegin(), mask_elems.maskBitIterEnd());
         }
 
@@ -997,14 +1015,15 @@ namespace atlas
     }
 
     template <typename XLEN, OperandMode opMode, RvvFloatInsts::FloatFuncs funcs>
-    Action::ItrType RvvFloatInsts::vfBinaryHandler_(atlas::AtlasState* state,
+    Action::ItrType RvvFloatInsts::vfBinaryHandler_(pegasus::PegasusState* state,
                                                     Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
         switch (vector_config->getSEW())
         {
             case 16:
-                return vfBinaryHelper<XLEN, 16, opMode, [](auto src2, auto src1)
+                return vfBinaryHelper<XLEN, 16, opMode,
+                                      [](auto src2, auto src1)
                                       {
                                           if constexpr (opMode.dst == OperandMode::Mode::W)
                                           {
@@ -1017,7 +1036,8 @@ namespace atlas
                                       }>(state, action_it);
 
             case 32:
-                return vfBinaryHelper<XLEN, 32, opMode, [](auto src2, auto src1)
+                return vfBinaryHelper<XLEN, 32, opMode,
+                                      [](auto src2, auto src1)
                                       {
                                           if constexpr (opMode.dst == OperandMode::Mode::W)
                                           {
@@ -1044,7 +1064,7 @@ namespace atlas
     }
 
     template <typename XLEN, RvvFloatInsts::FloatFuncs funcs>
-    Action::ItrType RvvFloatInsts::vfrBinaryHandler_(atlas::AtlasState* state,
+    Action::ItrType RvvFloatInsts::vfrBinaryHandler_(pegasus::PegasusState* state,
                                                      Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
@@ -1082,9 +1102,9 @@ namespace atlas
     }
 
     template <typename XLEN, size_t elemWidth, OperandMode opMode, auto func>
-    Action::ItrType vmfbinaryHelper(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType vmfbinaryHelper(PegasusState* state, Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
         Elements<Element<elemWidth>, false> elems_vs1{state, state->getVectorConfig(),
                                                       inst->getRs1()};
         Elements<Element<elemWidth>, false> elems_vs2{state, state->getVectorConfig(),
@@ -1118,7 +1138,7 @@ namespace atlas
         }
         else // masked
         {
-            const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+            const MaskElements mask_elems{state, state->getVectorConfig(), pegasus::V0};
             execute(mask_elems.maskBitIterBegin(), mask_elems.maskBitIterEnd());
         }
 
@@ -1128,7 +1148,7 @@ namespace atlas
     }
 
     template <typename XLEN, OperandMode opMode, RvvFloatInsts::FloatFuncs funcs>
-    Action::ItrType RvvFloatInsts::vmfBinaryHandler_(atlas::AtlasState* state,
+    Action::ItrType RvvFloatInsts::vmfBinaryHandler_(pegasus::PegasusState* state,
                                                      Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
@@ -1157,9 +1177,9 @@ namespace atlas
     }
 
     template <typename XLEN, size_t elemWidth, OperandMode opMode, auto func>
-    Action::ItrType vfTernaryHelper(atlas::AtlasState* state, Action::ItrType action_it)
+    Action::ItrType vfTernaryHelper(pegasus::PegasusState* state, Action::ItrType action_it)
     {
-        const AtlasInstPtr & inst = state->getCurrentInst();
+        const PegasusInstPtr & inst = state->getCurrentInst();
         Elements<Element<elemWidth>, false> elems_vs1{state, state->getVectorConfig(),
                                                       inst->getRs1()};
         Elements<Element<elemWidth>, false> elems_vs2{state, state->getVectorConfig(),
@@ -1197,7 +1217,7 @@ namespace atlas
         }
         else // masked
         {
-            const MaskElements mask_elems{state, state->getVectorConfig(), atlas::V0};
+            const MaskElements mask_elems{state, state->getVectorConfig(), pegasus::V0};
             execute(mask_elems.maskBitIterBegin(), mask_elems.maskBitIterEnd());
         }
 
@@ -1207,7 +1227,7 @@ namespace atlas
     }
 
     template <typename XLEN, OperandMode opMode, auto funcWrapper>
-    Action::ItrType RvvFloatInsts::vfTernaryHandler_(atlas::AtlasState* state,
+    Action::ItrType RvvFloatInsts::vfTernaryHandler_(pegasus::PegasusState* state,
                                                      Action::ItrType action_it)
     {
         VectorConfig* vector_config = state->getVectorConfig();
@@ -1215,7 +1235,8 @@ namespace atlas
         switch (vector_config->getSEW())
         {
             case 16:
-                return vfTernaryHelper<XLEN, 16, opMode, [](auto src2, auto src1, auto dst)
+                return vfTernaryHelper<XLEN, 16, opMode,
+                                       [](auto src2, auto src1, auto dst)
                                        {
                                            if constexpr (opMode.dst == OperandMode::Mode::W)
                                            {
@@ -1232,7 +1253,8 @@ namespace atlas
                                        }>(state, action_it);
 
             case 32:
-                return vfTernaryHelper<XLEN, 32, opMode, [](auto src2, auto src1, auto dst)
+                return vfTernaryHelper<XLEN, 32, opMode,
+                                       [](auto src2, auto src1, auto dst)
                                        {
                                            if constexpr (opMode.dst == OperandMode::Mode::W)
                                            {
@@ -1251,7 +1273,8 @@ namespace atlas
             case 64:
                 if constexpr (opMode.dst != OperandMode::Mode::W)
                 {
-                    return vfTernaryHelper<XLEN, 64, opMode, [](auto src2, auto src1, auto dst)
+                    return vfTernaryHelper<XLEN, 64, opMode,
+                                           [](auto src2, auto src1, auto dst)
                                            {
                                                return funcWrapper.template operator()<f64_mulAdd>(
                                                    float64_t{src2}, float64_t{src1},
@@ -1265,4 +1288,4 @@ namespace atlas
 
         return ++action_it;
     }
-} // namespace atlas
+} // namespace pegasus

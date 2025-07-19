@@ -6,10 +6,10 @@
 #include "sparta/simulation/Unit.hpp"
 #include "include/ActionTags.hpp"
 
-namespace atlas
+namespace pegasus
 {
 
-    class AtlasState;
+    class PegasusState;
 
     /// This class handles exceptions that occur during the fetch-translate-decode-execute cycle,
     /// e.g. for handling illegal instructions.
@@ -48,7 +48,7 @@ namespace atlas
         void onBindTreeEarly_() override;
 
         template <typename XLEN>
-        Action::ItrType handleException_(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType handleException_(pegasus::PegasusState* state, Action::ItrType action_it);
 
         ActionGroup exception_action_group_{"Exception"};
 
@@ -58,8 +58,8 @@ namespace atlas
         sparta::utils::ValidValue<FaultCause> fault_cause_;
         sparta::utils::ValidValue<InterruptCause> interrupt_cause_;
 
-        uint64_t determineTrapValue_(const FaultCause & trap_cause, AtlasState* state);
-        uint64_t determineTrapValue_(const InterruptCause & trap_cause, AtlasState* state);
+        uint64_t determineTrapValue_(const FaultCause & trap_cause, PegasusState* state);
+        uint64_t determineTrapValue_(const InterruptCause & trap_cause, PegasusState* state);
     };
 
-} // namespace atlas
+} // namespace pegasus

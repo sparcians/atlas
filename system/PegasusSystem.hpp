@@ -2,7 +2,7 @@
 
 #include "elfio/elfio.hpp"
 
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 #include "system/SimpleUART.hpp"
 #include "system/MagicMemory.hpp"
 
@@ -20,18 +20,18 @@ namespace sparta::memory
     class SimpleMemoryMapNode;
 } // namespace sparta::memory
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasSystem : public sparta::Unit
+    class PegasusSystem : public sparta::Unit
     {
       public:
         //! brief Name of this resource. Required by sparta::UnitFactory
-        static constexpr char name[] = "AtlasSystem";
+        static constexpr char name[] = "PegasusSystem";
 
-        class AtlasSystemParameters : public sparta::ParameterSet
+        class PegasusSystemParameters : public sparta::ParameterSet
         {
           public:
-            AtlasSystemParameters(sparta::TreeNode* node) : sparta::ParameterSet(node) {}
+            PegasusSystemParameters(sparta::TreeNode* node) : sparta::ParameterSet(node) {}
 
             PARAMETER(bool, enable_uart, false, "Enable a Uart")
             HIDDEN_PARAMETER(std::vector<std::string>, workload_and_args, {},
@@ -39,7 +39,7 @@ namespace atlas
         };
 
         // Constructor
-        AtlasSystem(sparta::TreeNode* sys_node, const AtlasSystemParameters* p);
+        PegasusSystem(sparta::TreeNode* sys_node, const PegasusSystemParameters* p);
 
         // Get pointer to system memory
         sparta::memory::SimpleMemoryMapNode* getSystemMemory() { return memory_map_.get(); }
@@ -55,10 +55,10 @@ namespace atlas
 
         const std::unordered_map<Addr, std::string> & getSymbols() const { return symbols_; }
 
-        constexpr static sparta::memory::addr_t ATLAS_SYSTEM_BLOCK_SIZE = 0x1000; // 4K
-        constexpr static sparta::memory::addr_t ATLAS_SYSTEM_TOTAL_MEMORY =
+        constexpr static sparta::memory::addr_t PEGASUS_SYSTEM_BLOCK_SIZE = 0x1000; // 4K
+        constexpr static sparta::memory::addr_t PEGASUS_SYSTEM_TOTAL_MEMORY =
             0x8000000000000000; // 4G
-        constexpr static uint64_t ATLAS_MEMORY_FILL = 0x0;
+        constexpr static uint64_t PEGASUS_MEMORY_FILL = 0x0;
 
       private:
         // Device factories
@@ -114,4 +114,4 @@ namespace atlas
         sparta::utils::ValidValue<Addr> pass_addr_;
         sparta::utils::ValidValue<Addr> fail_addr_;
     };
-} // namespace atlas
+} // namespace pegasus

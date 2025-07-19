@@ -3,14 +3,14 @@
 
 #include "core/translate/Translate.hpp"
 #include "core/translate/PageTableEntry.hpp"
-#include "core/AtlasInst.hpp"
-#include "core/AtlasState.hpp"
+#include "core/PegasusInst.hpp"
+#include "core/PegasusState.hpp"
 
 #include "include/ActionTags.hpp"
 
 #include "sparta/utils/LogUtils.hpp"
 
-namespace atlas
+namespace pegasus
 {
 
     Translate::Translate(sparta::TreeNode* translate_node, const TranslateParameters* p) :
@@ -149,9 +149,9 @@ namespace atlas
     template void Translate::changeMMUMode<RV64>(const MMUMode, const MMUMode);
 
     template <typename XLEN, MMUMode MODE, Translate::AccessType TYPE>
-    Action::ItrType Translate::translate_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType Translate::translate_(PegasusState* state, Action::ItrType action_it)
     {
-        AtlasTranslationState* translation_state = nullptr;
+        PegasusTranslationState* translation_state = nullptr;
         if constexpr (TYPE == AccessType::INSTRUCTION)
         {
             // Translation reqest is from fetch
@@ -164,7 +164,8 @@ namespace atlas
         }
 
         // Get request from the request queue
-        const AtlasTranslationState::TranslationRequest & request = translation_state->getRequest();
+        const PegasusTranslationState::TranslationRequest & request =
+            translation_state->getRequest();
         const XLEN vaddr = request.isMisaligned()
                                ? (request.getVAddr() + request.getMisalignedBytes())
                                : request.getVAddr();
@@ -311,7 +312,7 @@ namespace atlas
             --level;
         }
 
-        // If we got here, then Atlas could not translate the address
+        // If we got here, then Pegasus could not translate the address
         // at any level.  We throw at this point.
         switch (TYPE)
         {
@@ -325,7 +326,7 @@ namespace atlas
     }
 
     template <typename XLEN, MMUMode MODE, Translate::AccessType TYPE>
-    Action::ItrType Translate::setResult_(AtlasTranslationState* translation_state,
+    Action::ItrType Translate::setResult_(PegasusTranslationState* translation_state,
                                           Action::ItrType action_it, const Addr paddr,
                                           const uint32_t level)
     {
@@ -333,7 +334,7 @@ namespace atlas
         const uint32_t width = std::is_same_v<XLEN, RV64> ? 16 : 8;
         ILOG("   Result: " << HEX(paddr, width));
 
-        AtlasTranslationState::TranslationRequest & request = translation_state->getRequest();
+        PegasusTranslationState::TranslationRequest & request = translation_state->getRequest();
         const XLEN vaddr = request.isMisaligned()
                                ? (request.getVAddr() + request.getMisalignedBytes())
                                : request.getVAddr();
@@ -390,67 +391,67 @@ namespace atlas
     // Being pedantic
     template Action::ItrType
     Translate::translate_<RV32, MMUMode::BAREMETAL, Translate::AccessType::INSTRUCTION>(
-        AtlasState*, Action::ItrType);
+        PegasusState*, Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV32, MMUMode::BAREMETAL, Translate::AccessType::LOAD>(AtlasState*,
+    Translate::translate_<RV32, MMUMode::BAREMETAL, Translate::AccessType::LOAD>(PegasusState*,
                                                                                  Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV32, MMUMode::BAREMETAL, Translate::AccessType::STORE>(AtlasState*,
+    Translate::translate_<RV32, MMUMode::BAREMETAL, Translate::AccessType::STORE>(PegasusState*,
                                                                                   Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV32, MMUMode::SV32, Translate::AccessType::INSTRUCTION>(AtlasState*,
+    Translate::translate_<RV32, MMUMode::SV32, Translate::AccessType::INSTRUCTION>(PegasusState*,
                                                                                    Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV32, MMUMode::SV32, Translate::AccessType::LOAD>(AtlasState*,
+    Translate::translate_<RV32, MMUMode::SV32, Translate::AccessType::LOAD>(PegasusState*,
                                                                             Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV32, MMUMode::SV32, Translate::AccessType::STORE>(AtlasState*,
+    Translate::translate_<RV32, MMUMode::SV32, Translate::AccessType::STORE>(PegasusState*,
                                                                              Action::ItrType);
 
     template Action::ItrType
     Translate::translate_<RV64, MMUMode::BAREMETAL, Translate::AccessType::INSTRUCTION>(
-        AtlasState*, Action::ItrType);
+        PegasusState*, Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::BAREMETAL, Translate::AccessType::LOAD>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::BAREMETAL, Translate::AccessType::LOAD>(PegasusState*,
                                                                                  Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::BAREMETAL, Translate::AccessType::STORE>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::BAREMETAL, Translate::AccessType::STORE>(PegasusState*,
                                                                                   Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV32, Translate::AccessType::INSTRUCTION>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV32, Translate::AccessType::INSTRUCTION>(PegasusState*,
                                                                                    Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV32, Translate::AccessType::LOAD>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV32, Translate::AccessType::LOAD>(PegasusState*,
                                                                             Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV32, Translate::AccessType::STORE>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV32, Translate::AccessType::STORE>(PegasusState*,
                                                                              Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV39, Translate::AccessType::INSTRUCTION>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV39, Translate::AccessType::INSTRUCTION>(PegasusState*,
                                                                                    Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV39, Translate::AccessType::LOAD>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV39, Translate::AccessType::LOAD>(PegasusState*,
                                                                             Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV39, Translate::AccessType::STORE>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV39, Translate::AccessType::STORE>(PegasusState*,
                                                                              Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV48, Translate::AccessType::INSTRUCTION>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV48, Translate::AccessType::INSTRUCTION>(PegasusState*,
                                                                                    Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV48, Translate::AccessType::LOAD>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV48, Translate::AccessType::LOAD>(PegasusState*,
                                                                             Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV48, Translate::AccessType::STORE>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV48, Translate::AccessType::STORE>(PegasusState*,
                                                                              Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV57, Translate::AccessType::INSTRUCTION>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV57, Translate::AccessType::INSTRUCTION>(PegasusState*,
                                                                                    Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV57, Translate::AccessType::LOAD>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV57, Translate::AccessType::LOAD>(PegasusState*,
                                                                             Action::ItrType);
     template Action::ItrType
-    Translate::translate_<RV64, MMUMode::SV57, Translate::AccessType::STORE>(AtlasState*,
+    Translate::translate_<RV64, MMUMode::SV57, Translate::AccessType::STORE>(PegasusState*,
                                                                              Action::ItrType);
 
-} // namespace atlas
+} // namespace pegasus

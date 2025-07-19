@@ -51,145 +51,145 @@ class BrokenPipeResponse(SimResponse):
     def __bool__(self):
         return False
 
-# Equiv C++:  AtlasState::getXlen()
-def atlas_xlen(endpoint):
+# Equiv C++:  PegasusState::getXlen()
+def pegasus_xlen(endpoint):
     return endpoint.request('state.xlen')
 
-# Equiv C++:  AtlasState::getPc()
-def atlas_pc(endpoint):
+# Equiv C++:  PegasusState::getPc()
+def pegasus_pc(endpoint):
     pc = endpoint.request('state.pc')
     if type(pc) in (int, str):
         pc = FormatHex(pc)
 
     return pc
 
-# Equiv C++:  AtlasState::getPrevPc()
-def atlas_prev_pc(endpoint):
+# Equiv C++:  PegasusState::getPrevPc()
+def pegasus_prev_pc(endpoint):
     pc = endpoint.request('state.prev_pc')
     if type(pc) in (int, str):
         pc = FormatHex(pc)
 
     return pc
 
-# Equiv C++:  AtlasState::getSimState()->current_uid
-def atlas_current_uid(endpoint):
+# Equiv C++:  PegasusState::getSimState()->current_uid
+def pegasus_current_uid(endpoint):
     return endpoint.request('state.current_uid')
 
-# Equiv C++:  AtlasState::getSimState()->workload_exit_code
-def atlas_exit_code(endpoint):
+# Equiv C++:  PegasusState::getSimState()->workload_exit_code
+def pegasus_exit_code(endpoint):
     return endpoint.request('state.exit_code')
 
-# Equiv C++:  AtlasState::getSimState()->test_passed
-def atlas_test_passed(endpoint):
+# Equiv C++:  PegasusState::getSimState()->test_passed
+def pegasus_test_passed(endpoint):
     return endpoint.request('state.test_passed')
 
-# Equiv C++:  AtlasState::getSimState()->sim_stopped
-def atlas_sim_stopped(endpoint):
+# Equiv C++:  PegasusState::getSimState()->sim_stopped
+def pegasus_sim_stopped(endpoint):
     return endpoint.request('state.sim_stopped')
 
-# Equiv C++:  AtlasState::getSimState()->inst_count
-def atlas_inst_count(endpoint):
+# Equiv C++:  PegasusState::getSimState()->inst_count
+def pegasus_inst_count(endpoint):
     return endpoint.request('state.inst_count')
 
-# Equiv C++:  AtlasState::getCurrentInst()->getUid()
-def atlas_inst_uid(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->getUid()
+def pegasus_inst_uid(endpoint):
     return endpoint.request('inst.uid')
 
-# Equiv C++:  AtlasState::getCurrentInst()->getMnemonic()
-def atlas_inst_mnemonic(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->getMnemonic()
+def pegasus_inst_mnemonic(endpoint):
     return endpoint.request('inst.mnemonic')
 
-# Equiv C++:  AtlasState::getCurrentInst()->dasmString()
-def atlas_inst_dasm_string(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->dasmString()
+def pegasus_inst_dasm_string(endpoint):
     return endpoint.request('inst.dasm_string')
 
-# Equiv C++:  AtlasState::getCurrentInst()->getOpcode()
-def atlas_inst_opcode(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->getOpcode()
+def pegasus_inst_opcode(endpoint):
     opcode = endpoint.request('inst.opcode')
     if type(opcode) in (int, str):
         opcode = FormatHex(opcode)
 
     return opcode
 
-# Equiv C++:  AtlasState::getCurrentInst()->getPrivMode()
-def atlas_inst_priv(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->getPrivMode()
+def pegasus_inst_priv(endpoint):
     return endpoint.request('inst.priv')
 
-# Equiv C++:  AtlasState::getCurrentInst()->hasImmediate()
-def atlas_inst_has_immediate(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->hasImmediate()
+def pegasus_inst_has_immediate(endpoint):
     return endpoint.request('inst.has_immediate')
 
-# Equiv C++:  AtlasState::getCurrentInst()->getImmediate()
-def atlas_inst_immediate(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->getImmediate()
+def pegasus_inst_immediate(endpoint):
     imm = endpoint.request('inst.immediate')
     if type(imm) in (int, str):
         imm = FormatHex(imm)
 
     return imm
 
-# Equiv C++:  AtlasState::getCurrentInst()->getRs1()->getName()
-def atlas_inst_rs1_name(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->getRs1()->getName()
+def pegasus_inst_rs1_name(endpoint):
     rs1_name = endpoint.request('inst.rs1.name')
     if isinstance(rs1_name, str) and rs1_name != '':
         return rs1_name
 
     return None
 
-# Equiv C++:  AtlasState::getCurrentInst()->getRs2()->getName()
-def atlas_inst_rs2_name(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->getRs2()->getName()
+def pegasus_inst_rs2_name(endpoint):
     rs2_name = endpoint.request('inst.rs2.name')
     if isinstance(rs2_name, str) and rs2_name != '':
         return rs2_name
 
     return None
 
-# Equiv C++:  AtlasState::getCurrentInst()->getRd()->getName()
-def atlas_inst_rd_name(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->getRd()->getName()
+def pegasus_inst_rd_name(endpoint):
     rd_name = endpoint.request('inst.rd.name')
     if isinstance(rd_name, str) and rd_name != '':
         return rd_name
 
     return None
 
-# Equiv C++:  AtlasState::getCurrentInst()->getExceptionUnit()->getUnhandledException()
-def atlas_inst_active_exception(endpoint):
+# Equiv C++:  PegasusState::getCurrentInst()->getExceptionUnit()->getUnhandledException()
+def pegasus_inst_active_exception(endpoint):
     return endpoint.request('inst.active_exception')
 
-# Equiv C++:  AtlasState::get[Int|Fp|Vec|Csr]RegisterSet()->getNumRegisters()
-def atlas_num_regs_in_group(endpoint, group_num):
+# Equiv C++:  PegasusState::get[Int|Fp|Vec|Csr]RegisterSet()->getNumRegisters()
+def pegasus_num_regs_in_group(endpoint, group_num):
     return endpoint.request('state.num_regs_in_group %d' % group_num)
 
-# Equiv C++:  AtlasState::getCsrRegisterSet()->getRegister(csr_num)->getName()
-def atlas_csr_name(endpoint, csr_num):
+# Equiv C++:  PegasusState::getCsrRegisterSet()->getRegister(csr_num)->getName()
+def pegasus_csr_name(endpoint, csr_num):
     return endpoint.request('csr.name %d' % csr_num)
 
-# Equiv C++:  AtlasState::findRegister(reg_name)->getGroupNum()
-def atlas_reg_group_num(endpoint, reg_name):
+# Equiv C++:  PegasusState::findRegister(reg_name)->getGroupNum()
+def pegasus_reg_group_num(endpoint, reg_name):
     return endpoint.request('reg.group_num %s' % reg_name)
 
-# Equiv C++:  AtlasState::findRegister(reg_name)->getID()
-def atlas_reg_id(endpoint, reg_name):
+# Equiv C++:  PegasusState::findRegister(reg_name)->getID()
+def pegasus_reg_id(endpoint, reg_name):
     return endpoint.request('reg.reg_id %s' % reg_name)
 
-# Equiv C++:  AtlasState::findRegister(reg_name)->read()
-def atlas_reg_value(endpoint, reg_name):
+# Equiv C++:  PegasusState::findRegister(reg_name)->read()
+def pegasus_reg_value(endpoint, reg_name):
     reg_value = endpoint.request('reg.value %s' % reg_name)
     if type(reg_value) in (int, str):
         reg_value = FormatHex(reg_value)
 
     return reg_value
 
-# Equiv C++:  AtlasState::findRegister(reg_name)->write(value)
-def atlas_reg_write(endpoint, reg_name, value):
+# Equiv C++:  PegasusState::findRegister(reg_name)->write(value)
+def pegasus_reg_write(endpoint, reg_name, value):
     value = c_dtypes.convert_to_hex(value)
     return endpoint.request('reg.write %s %s' % (reg_name, value))
 
-# Equiv C++:  AtlasState::findRegister(reg_name)->dmiWrite<uint64_t>(value)
-def atlas_reg_dmiwrite(endpoint, reg_name, value):
+# Equiv C++:  PegasusState::findRegister(reg_name)->dmiWrite<uint64_t>(value)
+def pegasus_reg_dmiwrite(endpoint, reg_name, value):
     value = c_dtypes.convert_to_hex(value)
     return endpoint.request('reg.dmiwrite %s %s' % (reg_name, value))
 
-# Equiv C++:  This goes through the AtlasState's SimController observer,
+# Equiv C++:  This goes through the PegasusState's SimController observer,
 #             whose Observer base class holds a vector of these structs:
 #
 #                 struct MemRead
@@ -204,7 +204,7 @@ def atlas_reg_dmiwrite(endpoint, reg_name, value):
 #
 # Returns a list of c_dtypes.MemRead objects.
 #
-def atlas_mem_reads(endpoint):
+def pegasus_mem_reads(endpoint):
     reads = []
     ans = endpoint.request('mem.reads')
     if not isinstance(ans, str):
@@ -221,7 +221,7 @@ def atlas_mem_reads(endpoint):
 
     return reads
 
-# Equiv C++:  This goes through the AtlasState's SimController observer,
+# Equiv C++:  This goes through the PegasusState's SimController observer,
 #             whose Observer base class holds a vector of these structs:
 #
 #                 struct MemWrite
@@ -237,7 +237,7 @@ def atlas_mem_reads(endpoint):
 #
 # Returns a list of c_dtypes.MemWrite objects.
 #
-def atlas_mem_writes(endpoint):
+def pegasus_mem_writes(endpoint):
     writes = []
     ans = endpoint.request('mem.writes')
     if not isinstance(ans, str):
@@ -255,20 +255,20 @@ def atlas_mem_writes(endpoint):
 
     return writes
 
-# Equiv C++:  AtlasState->getCurrentInst()
+# Equiv C++:  PegasusState->getCurrentInst()
 #                       ->getMavisOpcodeInfo()
 #                       ->getSpecialField(mavis::OpcodeInfo::SpecialField::CSR);
-def atlas_inst_csr(endpoint):
+def pegasus_inst_csr(endpoint):
     return endpoint.request('inst.csr.name')
 
-# Equiv C++:  AtlasState->getCurrentInst()
+# Equiv C++:  PegasusState->getCurrentInst()
 #                       ->getMavisOpcodeInfo()
 #                       ->getInstType();
-def atlas_inst_type(endpoint):
+def pegasus_inst_type(endpoint):
     return endpoint.request('inst.type')
 
 
-# Stop Atlas from executing C++ instruction handler code and jump right
+# Stop Pegasus from executing C++ instruction handler code and jump right
 # to the finish ActionGroup (increment PC, post_execute). This is useful
 # for when Python code is to be injected into the simulation in place of
 # the C++ code.
@@ -278,18 +278,18 @@ def atlas_inst_type(endpoint):
 #
 #     class PythonInstRewriter(Observer):
 #         def OnPreExecute(self, endpoint):
-#             insn = atlas_current_inst(endpoint)
+#             insn = pegasus_current_inst(endpoint)
 #             insn.getRd().write(insn.getRs1().read() * insn.getRs2().read())
 #
-#             # Tell Atlas to skip the C++ inst implementation.
-#             atlas_finish_execute(endpoint)
+#             # Tell Pegasus to skip the C++ inst implementation.
+#             pegasus_finish_execute(endpoint)
 #
-def atlas_finish_execute(endpoint):
+def pegasus_finish_execute(endpoint):
     return endpoint.request('sim.finish_execute', 'sim_dead')
 
 # Set a breakpoint at the given execute phase.
 # Must be one of pre_execute, pre_exception, or post_execute.
-def atlas_break_action(endpoint, action):
+def pegasus_break_action(endpoint, action):
     return endpoint.request('sim.break %s' % action)
 
 # Continue the running simulation until the next breakpoint is hit
@@ -298,12 +298,12 @@ def atlas_break_action(endpoint, action):
 # Returns the simulation/execution phase that the simulator is in
 # which is one of pre_execute, pre_exception, post_execute, or
 # sim_finished.
-def atlas_continue(endpoint):
+def pegasus_continue(endpoint):
     return endpoint.request('sim.continue', 'sim_dead')
 
 # Finish the simulation now. The simulation will complete and the
 # simulator will exit. This invalidates further use of the endpoint.
-def atlas_finish_sim(endpoint):
+def pegasus_finish_sim(endpoint):
     return endpoint.request('sim.finish', 'sim_dead')
 
 # Terminate a simulation early for any reason with the given exit code.
@@ -313,7 +313,7 @@ def atlas_finish_sim(endpoint):
 #   sim_state.workload_exit_code = exit_code
 #   sim_state.test_passed = false
 #   sim_state.sim_stopped = true
-def atlas_kill_sim(endpoint, exit_code):
+def pegasus_kill_sim(endpoint, exit_code):
     return endpoint.request('sim.kill %d' % exit_code)
 
 ### ====================================================================

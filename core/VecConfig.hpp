@@ -3,9 +3,9 @@
 #include <stdint.h>
 #include <iostream>
 
-#include "core/AtlasState.hpp"
+#include "core/PegasusState.hpp"
 
-namespace atlas
+namespace pegasus
 {
     constexpr size_t VLEN_MIN = 32;
 
@@ -79,7 +79,7 @@ namespace atlas
 
         size_t getVLMAX() const { return getVLEN() / 8 * getLMUL() / getSEW(); }
 
-        template <typename XLEN> XLEN vsetAVL(AtlasState* state, bool set_max, XLEN avl = 0)
+        template <typename XLEN> XLEN vsetAVL(PegasusState* state, bool set_max, XLEN avl = 0)
         {
             const size_t vl = set_max ? getVLMAX() : std::min<size_t>(getVLMAX(), avl);
             setVL(vl);
@@ -87,7 +87,7 @@ namespace atlas
             return vl;
         }
 
-        template <typename XLEN> void vsetVTYPE(AtlasState* state, XLEN vtype)
+        template <typename XLEN> void vsetVTYPE(PegasusState* state, XLEN vtype)
         {
             WRITE_CSR_REG<XLEN>(state, VTYPE, vtype);
             const size_t vlmul = READ_CSR_FIELD<XLEN>(state, VTYPE, "vlmul");
@@ -142,9 +142,10 @@ namespace atlas
             os << config.getLMUL() / 8 << " ";
         }
         os << "SEW: " << config.getSEW() << " ";
-        os << "VTA: " << std::boolalpha << config.getVTA() << " " << "VMA: " << config.getVMA()
-           << std::noboolalpha << " ";
-        os << "VL: " << config.getVL() << " " << "VSTART: " << config.getVSTART() << "; ";
+        os << "VTA: " << std::boolalpha << config.getVTA() << " "
+           << "VMA: " << config.getVMA() << std::noboolalpha << " ";
+        os << "VL: " << config.getVL() << " "
+           << "VSTART: " << config.getVSTART() << "; ";
         return os;
     }
-} // namespace atlas
+} // namespace pegasus

@@ -1,6 +1,6 @@
 #include "core/Execute.hpp"
-#include "core/AtlasInst.hpp"
-#include "core/AtlasState.hpp"
+#include "core/PegasusInst.hpp"
+#include "core/PegasusState.hpp"
 #include "core/translate/Translate.hpp"
 #include "include/ActionTags.hpp"
 
@@ -24,13 +24,13 @@
 #include "core/inst_handlers/v/RvvMaskInsts.hpp"
 #include "core/inst_handlers/v/RvvFloatInsts.hpp"
 
-namespace atlas
+namespace pegasus
 {
     Execute::Execute(sparta::TreeNode* execute_node, const ExecuteParameters* p) :
         sparta::Unit(execute_node),
         enable_syscall_emulation_(p->enable_syscall_emulation)
     {
-        Action execute_action = atlas::Action::createAction<&Execute::execute_>(this, "Execute");
+        Action execute_action = pegasus::Action::createAction<&Execute::execute_>(this, "Execute");
         execute_action.addTag(ActionTags::EXECUTE_TAG);
         execute_action_group_.addAction(execute_action);
 
@@ -98,7 +98,7 @@ namespace atlas
     template const Execute::InstHandlersMap*
     Execute::getInstComputeAddressHandlersMap<RV32>() const;
 
-    Action::ItrType Execute::execute_(AtlasState* state, Action::ItrType action_it)
+    Action::ItrType Execute::execute_(PegasusState* state, Action::ItrType action_it)
     {
         // Connect instruction to Fetch
         const auto inst = state->getCurrentInst();
@@ -141,4 +141,4 @@ namespace atlas
         execute_action_group_.setNextActionGroup(inst_action_group);
         return ++action_it;
     }
-} // namespace atlas
+} // namespace pegasus

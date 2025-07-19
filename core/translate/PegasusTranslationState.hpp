@@ -2,11 +2,11 @@
 
 #include <cassert>
 
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasTranslationState
+    class PegasusTranslationState
     {
       public:
         static const uint32_t MAX_TRANSLATION = 64;
@@ -127,4 +127,4 @@ namespace atlas
         std::array<TranslationResult, MAX_TRANSLATION> results_;
         uint32_t results_cnt_ = 0;
     };
-} // namespace atlas
+} // namespace pegasus

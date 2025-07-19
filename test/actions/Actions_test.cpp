@@ -1,15 +1,15 @@
 #include "TestComponents.hpp"
-#include "sim/AtlasSim.hpp"
+#include "sim/PegasusSim.hpp"
 
 #include "sparta/utils/SpartaTester.hpp"
 
-void runSim(atlas::AtlasState* state, atlas::ActionGroup* atlas_core,
+void runSim(pegasus::PegasusState* state, pegasus::ActionGroup* pegasus_core,
             const uint32_t expected_num_insts, const uint32_t expected_num_action_groups)
 {
     state->setPc(0x1000);
     state->getSimState()->inst_count = 0;
 
-    atlas::ActionGroup* action_group = atlas_core;
+    pegasus::ActionGroup* action_group = pegasus_core;
     uint32_t num_action_groups_executed = 0;
     while (action_group)
     {
@@ -29,7 +29,7 @@ class dummyClass
   public:
     using base_type = dummyClass;
 
-    atlas::Action::ItrType dummyAction(atlas::AtlasState*, atlas::Action::ItrType action_it)
+    pegasus::Action::ItrType dummyAction(pegasus::PegasusState*, pegasus::Action::ItrType action_it)
     {
         return ++action_it;
     }
@@ -40,31 +40,31 @@ int main()
     // Create the simulator
     sparta::Scheduler scheduler_;
     const uint64_t ilimit = 0;
-    atlas::AtlasSim atlas_sim{&scheduler_, {}, {}, ilimit};
+    pegasus::PegasusSim pegasus_sim{&scheduler_, {}, {}, ilimit};
 
-    atlas_sim.buildTree();
-    atlas_sim.configureTree();
-    atlas_sim.finalizeTree();
+    pegasus_sim.buildTree();
+    pegasus_sim.configureTree();
+    pegasus_sim.finalizeTree();
 
-    atlas::AtlasState* state = atlas_sim.getAtlasState();
+    pegasus::PegasusState* state = pegasus_sim.getPegasusState();
 
     // Create core units
     FetchUnit fetch_unit{};
-    atlas::ActionGroup* fetch = fetch_unit.getActionGroup();
+    pegasus::ActionGroup* fetch = fetch_unit.getActionGroup();
     DecodeUnit decode_unit{};
-    atlas::ActionGroup* decode = decode_unit.getActionGroup();
+    pegasus::ActionGroup* decode = decode_unit.getActionGroup();
     ExecuteUnit execute_unit{fetch};
-    atlas::ActionGroup* execute = execute_unit.getActionGroup();
+    pegasus::ActionGroup* execute = execute_unit.getActionGroup();
 
-    atlas::Action fetch_action = atlas::Action::createAction<&FetchUnit::fetch_inst>(
+    pegasus::Action fetch_action = pegasus::Action::createAction<&FetchUnit::fetch_inst>(
         &fetch_unit, fetch_unit.getName().c_str());
-    fetch_action.addTag(atlas::ActionTags::FETCH_TAG);
-    atlas::Action decode_action = atlas::Action::createAction<&DecodeUnit::decode_inst>(
+    fetch_action.addTag(pegasus::ActionTags::FETCH_TAG);
+    pegasus::Action decode_action = pegasus::Action::createAction<&DecodeUnit::decode_inst>(
         &decode_unit, decode_unit.getName().c_str());
-    decode_action.addTag(atlas::ActionTags::DECODE_TAG);
-    atlas::Action execute_action = atlas::Action::createAction<&ExecuteUnit::execute_inst>(
+    decode_action.addTag(pegasus::ActionTags::DECODE_TAG);
+    pegasus::Action execute_action = pegasus::Action::createAction<&ExecuteUnit::execute_inst>(
         &execute_unit, execute_unit.getName().c_str());
-    execute_action.addTag(atlas::ActionTags::EXECUTE_TAG);
+    execute_action.addTag(pegasus::ActionTags::EXECUTE_TAG);
 
     fetch->addAction(fetch_action);
     decode->addAction(decode_action);
@@ -78,9 +78,9 @@ int main()
     // Dummy Action
     const std::string dummy_action_name = "Dummy";
     dummyClass dummy_class;
-    atlas::Action dummy_action = atlas::Action::createAction<&dummyClass::dummyAction>(
+    pegasus::Action dummy_action = pegasus::Action::createAction<&dummyClass::dummyAction>(
         &dummy_class, dummy_action_name.c_str());
-    const atlas::ActionTagType DUMMY_TAG = atlas::ActionTagFactory::createTag("DUMMY_TAG");
+    const pegasus::ActionTagType DUMMY_TAG = pegasus::ActionTagFactory::createTag("DUMMY_TAG");
     dummy_action.addTag(DUMMY_TAG);
 
     //
@@ -97,7 +97,7 @@ int main()
     //
     // Add a dummy Action after Fetch
     //
-    fetch->insertActionAfter(dummy_action, atlas::ActionTags::FETCH_TAG);
+    fetch->insertActionAfter(dummy_action, pegasus::ActionTags::FETCH_TAG);
     std::cout << "TEST: Insert Action After\n";
     std::cout << fetch << std::endl;
     std::cout << std::endl;
@@ -106,7 +106,7 @@ int main()
     //
     // Add another dummy Action before Execute
     //
-    execute->insertActionBefore(dummy_action, atlas::ActionTags::EXECUTE_TAG);
+    execute->insertActionBefore(dummy_action, pegasus::ActionTags::EXECUTE_TAG);
     std::cout << "TEST: Insert Action After\n";
     std::cout << execute << std::endl;
     std::cout << std::endl;
@@ -145,10 +145,11 @@ int main()
     std::cout << "TEST: Add Translation ActionGroup\n";
     std::cout << std::endl;
     TranslateUnit translate_unit;
-    atlas::ActionGroup* translate = translate_unit.getActionGroup();
-    atlas::Action translate_action = atlas::Action::createAction<&TranslateUnit::translate_addr>(
-        &translate_unit, translate_unit.getName().c_str());
-    translate_action.addTag(atlas::ActionTags::INST_TRANSLATE_TAG);
+    pegasus::ActionGroup* translate = translate_unit.getActionGroup();
+    pegasus::Action translate_action =
+        pegasus::Action::createAction<&TranslateUnit::translate_addr>(
+            &translate_unit, translate_unit.getName().c_str());
+    translate_action.addTag(pegasus::ActionTags::INST_TRANSLATE_TAG);
     translate->addAction(translate_action);
     // fetch -> translate -> decode
     fetch->setNextActionGroup(translate);

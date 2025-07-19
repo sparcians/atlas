@@ -1,15 +1,15 @@
 #pragma once
 
-#include "include/AtlasTypes.hpp"
+#include "include/PegasusTypes.hpp"
 #include "core/Action.hpp"
 
 #include <map>
 #include <string>
 #include <bit>
 
-namespace atlas
+namespace pegasus
 {
-    class AtlasState;
+    class PegasusState;
 
     class RvzbbInsts
     {
@@ -127,12 +127,12 @@ namespace atlas
         };
 
         template <typename XLEN, typename OP>
-        Action::ItrType unaryOpHandler(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType unaryOpHandler(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN, typename OP>
-        Action::ItrType binaryOpHandler(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType binaryOpHandler(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN, typename OP>
-        Action::ItrType immOpHandler(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType immOpHandler(pegasus::PegasusState* state, Action::ItrType action_it);
         template <typename XLEN>
-        Action::ItrType orc_bHandler(atlas::AtlasState* state, Action::ItrType action_it);
+        Action::ItrType orc_bHandler(pegasus::PegasusState* state, Action::ItrType action_it);
     };
-} // namespace atlas
+} // namespace pegasus

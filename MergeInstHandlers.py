@@ -28,9 +28,9 @@ lines.append('')
 with open(rv_insts_cpp, 'r') as fin:
     transfer = False
     for line in fin.readlines():
-        if line.find('namespace atlas') == 0:
+        if line.find('namespace pegasus') == 0:
             transfer = True
-        elif line.find('// namespace atlas') != -1:
+        elif line.find('// namespace pegasus') != -1:
             break
 
         if transfer:
@@ -47,14 +47,14 @@ for filename in os.listdir(os.getcwd()):
             for line in fin.readlines():
                 if re.search(pattern, line):
                     transfer = True
-                elif line.find('// namespace atlas') != -1:
+                elif line.find('// namespace pegasus') != -1:
                     break
 
                 if transfer:
                     lines.append(line.rstrip('\n'))
 
 lines.append('')
-lines.append('} // namespace atlas')
+lines.append('} // namespace pegasus')
 
 with open(rv_insts_cpp, 'w') as fout:
     fout.write('\n'.join(lines))

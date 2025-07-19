@@ -1,16 +1,16 @@
-project(Atlas)
+project(Pegasus)
 
-add_library(atlassim
+add_library(pegasussim
     STATIC
-    AtlasSim.cpp
+    PegasusSim.cpp
 )
 
-add_dependencies(atlassim AutogenArchFiles)
+add_dependencies(pegasussim AutogenArchFiles)
 
-# Atlas simulator
-add_executable(atlas atlas.cpp)
+# Pegasus simulator
+add_executable(pegasus pegasus.cpp)
 
-target_link_libraries(atlas atlassim atlascore atlasinsts softfloat atlassys ${ATLAS_LIBS} ${STF_LINK_LIBS})
+target_link_libraries(pegasus pegasuscore pegasusinsts softfloat pegasussys pegasussim ${PEGASUS_LIBS})
 
 file (CREATE_LINK ${PROJECT_SOURCE_DIR}/../arch                    ${CMAKE_CURRENT_BINARY_DIR}/arch SYMBOLIC)
 file (CREATE_LINK ${PROJECT_SOURCE_DIR}/../mavis/json              ${CMAKE_CURRENT_BINARY_DIR}/mavis_json SYMBOLIC)
